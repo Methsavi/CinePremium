@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Aether Horizon - CinePremium</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container": "#191f31",
+                      "primary-fixed-dim": "#c0c1ff",
+                      "on-surface-variant": "#c7c4d7",
+                      "inverse-on-surface": "#2a3043",
+                      "tertiary-fixed": "#e0e3e5",
+                      "surface-container-highest": "#2e3447",
+                      "secondary-container": "#571bc1",
+                      "on-primary-fixed": "#07006c",
+                      "outline-variant": "#464554",
+                      "primary-container": "#8083ff",
+                      "on-secondary-fixed-variant": "#5516be",
+                      "surface-dim": "#0c1324",
+                      "inverse-surface": "#dce1fb",
+                      "on-primary": "#1000a9",
+                      "outline": "#908fa0",
+                      "on-error": "#690005",
+                      "surface-container-lowest": "#070d1f",
+                      "primary-fixed": "#e1e0ff",
+                      "surface-container-low": "#151b2d",
+                      "secondary-fixed": "#e9ddff",
+                      "background": "#0c1324",
+                      "secondary": "#d0bcff",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "on-secondary": "#3c0091",
+                      "on-primary-fixed-variant": "#2f2ebe",
+                      "on-background": "#dce1fb",
+                      "tertiary": "#c4c7c9",
+                      "on-tertiary": "#2d3133",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "on-primary-container": "#0d0096",
+                      "surface-tint": "#c0c1ff",
+                      "error-container": "#93000a",
+                      "tertiary-container": "#8e9193",
+                      "on-surface": "#dce1fb",
+                      "primary": "#c0c1ff",
+                      "surface-variant": "#2e3447",
+                      "surface-bright": "#33394c",
+                      "secondary-fixed-dim": "#d0bcff",
+                      "error": "#ffb4ab",
+                      "on-tertiary-fixed": "#191c1e",
+                      "inverse-primary": "#494bd6",
+                      "surface-container-high": "#23293c",
+                      "on-secondary-fixed": "#23005c",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary-container": "#272a2c",
+                      "surface": "#0c1324",
+                      "on-secondary-container": "#c4abff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-sm": "8px",
+                      "margin-mobile": "16px",
+                      "container-max": "1280px",
+                      "gutter": "24px",
+                      "stack-lg": "32px",
+                      "unit": "4px",
+                      "margin-desktop": "48px",
+                      "stack-md": "16px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "title-lg": [
+                              "Geist"
+                      ],
+                      "display": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "label-sm": [
+                              "Geist"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "body-sm": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased pt-20">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop h-20 max-w-container-max mx-auto bg-surface-dim dark:bg-surface-dim border-b border-outline-variant flat no shadows">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">
+            CinePremium
+        </div>
+<!-- Web Nav -->
+<nav class="hidden md:flex gap-gutter">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md hover:text-primary transition-colors duration-200 Active: opacity-80 transition-all" href="#">Movies</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200 Active: opacity-80 transition-all" href="#">Cinemas</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200 Active: opacity-80 transition-all" href="#">Offers</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200 Active: opacity-80 transition-all" href="#">Profile</a>
+</nav>
+<div class="flex items-center gap-gutter">
+<button class="hidden md:block bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md hover:bg-primary-container transition-colors duration-200">
+                Book Now
+            </button>
+<span class="material-symbols-outlined text-primary cursor-pointer hover:text-primary-container md:hidden" data-icon="menu">menu</span>
+</div>
+</header>
+<main class="w-full">
+<!-- Hero Section -->
+<section class="relative w-full h-[70vh] min-h-[600px] flex items-end pb-margin-desktop pt-20">
+<div class="absolute inset-0 z-0 bg-surface-container" data-alt="A sweeping cinematic view of a futuristic space station orbiting a glowing nebula, deep indigo and dark blue space background, high contrast, dramatic lighting, immersive scifi aesthetic, epic scale, 8k resolution." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDS--0DHwjgA0nbE_vpCjIzFM1892207YRTROTsVdu08Zc7gNeSuP8pqsucJ4U1uYS_gIcU6i3yYWFmS1uW8gudOUC-MZyd4g9gppRFYcJtuHMLKmY_1DEVjhkSNmwurI3IhUVlLMA0loCnpzWbgbsynACvQbHdkBCG_xESI3r__jgWBUvCpi6cuTCohxbWpFT9fuN2wmMBhbcapjfdJ-p9Uz5cXUXI0qpPMup_ERA127qhtztHKht-')">
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/50 to-transparent"></div>
+</div>
+<div class="relative z-10 w-full max-w-container-max mx-auto px-margin-desktop md:px-margin-desktop">
+<div class="flex flex-col md:flex-row gap-gutter items-end">
+<!-- Poster (Desktop) -->
+<div class="hidden md:block w-64 flex-shrink-0 rounded-xl overflow-hidden border border-outline-variant shadow-2xl">
+<img class="w-full h-auto object-cover aspect-[2/3]" data-alt="A vertical cinematic movie poster for a scifi adventure, featuring a lone astronaut silhouetted against a massive swirling galaxy, dark slate background, striking indigo highlights, sleek modern typography layout, premium streaming platform style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoKycjUG7Xuph0joNyJ9nknimZpy5EE-ZQdSq2u0iMWf0csv6SVkvF0F8SBV2omfGuhnYg_5P1Lo-X84QNtGHpCZGEIuJ4yxw1-U_FB-eJg-uiYDcQMNKsZ0t64tHmaScHzgTy01_v5T0kpVbXXZukQ8JSn605jWz-p6dDQHxI4BXgAJ2_cDLM5LDdpodXjifj2_NXhCOWFHVFGi2qxgG0Kiw21f3gMjER3Lm5ft3cqb-x0eRRoR_k"/>
+</div>
+<div class="flex-col flex gap-stack-md flex-grow pb-4">
+<div class="flex flex-wrap gap-stack-sm items-center">
+<span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-sm">Sci-Fi</span>
+<span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-sm">Adventure</span>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md font-bold">9.2</span>
+</div>
+<span class="text-on-surface-variant font-label-md border-l border-outline-variant pl-stack-sm">2h 15m</span>
+</div>
+<h1 class="font-display text-display text-on-surface">The Aether Horizon</h1>
+<div class="flex flex-wrap gap-stack-sm mt-stack-sm">
+<button class="bg-primary text-on-primary px-8 py-3 rounded-lg font-label-md font-bold hover:bg-primary-container transition-colors duration-200 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
+                                Book Tickets
+                            </button>
+<button class="border border-outline-variant text-on-surface bg-surface-dim/50 backdrop-blur-sm px-8 py-3 rounded-lg font-label-md hover:border-primary hover:text-primary transition-colors duration-200 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+                                Play Trailer
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Content Grid -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Column: Synopsis & Cast -->
+<div class="md:col-span-8 flex flex-col gap-stack-lg">
+<!-- Synopsis -->
+<div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-sm">Synopsis</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                        In the year 2145, humanity's survival depends on a desperate mission to the edge of the known universe. A team of elite explorers aboard the starship "Vanguard" must navigate the treacherous Aether Horizon—a spatial anomaly where time and reality fracture. As they face unimaginable cosmic threats, they discover secrets that could alter the fate of civilization forever.
+                    </p>
+</div>
+<!-- Cast -->
+<div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="group">group</span>
+                        Cast &amp; Crew
+                    </h2>
+<div class="flex overflow-x-auto gap-stack-md pb-4 snap-x">
+<!-- Cast Member 1 -->
+<div class="flex flex-col items-center gap-2 min-w-[100px] snap-start">
+<div class="w-20 h-20 rounded-full overflow-hidden border-2 border-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A highly detailed cinematic portrait of a rugged male astronaut actor in a sleek dark gray spacesuit with indigo trim. Moody dramatic studio lighting, dark slate background. The aesthetic is modern, gritty, and premium scifi film still style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApJygMX6CcHd_rME1vUa2lekGbVkC47aHVT-lHHp_-kNyqvmbBiuC3buS1TOSSRMnK1T3d_Q9R0BHlkt8QJqJKnrEFAB_hi0g18JDyvwfaWMQ7hGon2zDJFYBxNo_NIV62mKGGFkS9cagS_hL1DvUZd-35fdP7W9KsdY-zw22hwYTQB0tgMqLyBDqs2gF2tyzbe4A9r17l9De6pFLB1I7qnawRMaBKiVBRNNzYFGnycFrB_AC2slsT"/>
+</div>
+<span class="font-label-md text-on-surface text-center">Elias Vance</span>
+<span class="font-label-sm text-on-surface-variant text-center">Cmdr. Steele</span>
+</div>
+<!-- Cast Member 2 -->
+<div class="flex flex-col items-center gap-2 min-w-[100px] snap-start">
+<div class="w-20 h-20 rounded-full overflow-hidden border-2 border-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A highly detailed cinematic portrait of a determined female scientist actor in a dark technical uniform. Soft rim lighting with subtle blue hues, deep black background. The aesthetic is modern, intense, and premium scifi film still style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-IAtFc5PZAN6ebkPs_73E-mpjwO_ZRj5BGeLO_y6Fy4yEhu_tV3UspSpoofCGxgYX5JY8Fl0APpo51BIdOjY_NBq_ajZBfoCaNE_jJr2gqvF43wGzSYVB0Ppmmd3_DUV-l-8oIHeC9RK_ke7KQZ-qEDy0C7EJc39QAcyGCCsBlorEM8KDFYfP72ml7rOpwtIrC3DdR2jeJ6OhWiObtVk8s9NLgerr9yCmQqwf-vqkWFORJfjWKthP"/>
+</div>
+<span class="font-label-md text-on-surface text-center">Lyra Chen</span>
+<span class="font-label-sm text-on-surface-variant text-center">Dr. Aris</span>
+</div>
+<!-- Cast Member 3 -->
+<div class="flex flex-col items-center gap-2 min-w-[100px] snap-start">
+<div class="w-20 h-20 rounded-full overflow-hidden border-2 border-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A highly detailed cinematic portrait of a stoic male pilot actor in a dark textured flight suit. Harsh, high-contrast side lighting, dark slate background. The aesthetic is modern, atmospheric, and premium scifi film still style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL6q9KopBX7s2HvU7hjDs7zZhwwH8XfLnpPKZWUnH0e3UEg4CtqrZ6RraGC6iLwFn2hC4zHOFsMUuBbVvThFTSagf-ikuSU-MqHbJ-VWlx8PYDnqfchgPVs4v3TxlZ9rVRx4OYGtu3gewM70Uo5eyeWHy4wbIQpPZNH1ZHQ5kdRVQp8_H8zUmWHH84d7yhQUELPzM943bxJ9_LBU6itW8gn4KJpFrinuCaxB4oq8F5WtFcUZ50nn5T"/>
+</div>
+<span class="font-label-md text-on-surface text-center">Jaxon Rey</span>
+<span class="font-label-sm text-on-surface-variant text-center">Pilot Kael</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Showtimes & Reviews -->
+<div class="md:col-span-4 flex flex-col gap-stack-lg">
+<!-- Showtimes -->
+<div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant flex flex-col gap-stack-md">
+<h2 class="font-title-lg text-title-lg text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="schedule">schedule</span>
+                        Showtimes
+                    </h2>
+<!-- Date Selector -->
+<div class="flex gap-2 overflow-x-auto pb-2 border-b border-outline-variant">
+<button class="flex flex-col items-center p-2 rounded-lg bg-surface-variant border border-primary text-primary min-w-[60px]">
+<span class="font-label-sm uppercase">Today</span>
+<span class="font-headline-md">14</span>
+</button>
+<button class="flex flex-col items-center p-2 rounded-lg bg-surface hover:bg-surface-variant text-on-surface-variant transition-colors min-w-[60px] border border-transparent">
+<span class="font-label-sm uppercase">Fri</span>
+<span class="font-headline-md">15</span>
+</button>
+<button class="flex flex-col items-center p-2 rounded-lg bg-surface hover:bg-surface-variant text-on-surface-variant transition-colors min-w-[60px] border border-transparent">
+<span class="font-label-sm uppercase">Sat</span>
+<span class="font-headline-md">16</span>
+</button>
+</div>
+<!-- Cinema Locations -->
+<div class="flex flex-col gap-stack-md mt-2">
+<!-- Location 1 -->
+<div>
+<h3 class="font-label-md text-on-surface mb-2">Grand Galaxy Cinema</h3>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1.5 rounded bg-surface border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors font-label-md flex flex-col items-center">
+<span>18:30</span>
+<span class="text-[10px] opacity-70">IMAX</span>
+</button>
+<button class="px-3 py-1.5 rounded bg-surface border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors font-label-md flex flex-col items-center">
+<span>21:00</span>
+<span class="text-[10px] opacity-70">IMAX</span>
+</button>
+</div>
+</div>
+<!-- Location 2 -->
+<div>
+<h3 class="font-label-md text-on-surface mb-2">Starlight Multiplex</h3>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1.5 rounded bg-surface border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors font-label-md flex flex-col items-center">
+<span>19:15</span>
+<span class="text-[10px] opacity-70">3D</span>
+</button>
+<button class="px-3 py-1.5 rounded bg-surface border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors font-label-md flex flex-col items-center">
+<span>22:30</span>
+<span class="text-[10px] opacity-70">2D</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Reviews Snippet -->
+<div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="forum">forum</span>
+                        Audience Reviews
+                    </h2>
+<div class="flex flex-col gap-4">
+<div class="border-b border-outline-variant pb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant italic">"A visual masterpiece. The final act left me breathless. Truly the best sci-fi of the decade."</p>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm text-on-surface-variant" data-icon="star_half" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant italic">"Incredible world-building, though the pacing dips slightly in the middle. Still highly recommended."</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-stack-lg px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant flat no shadows mt-20">
+<div class="font-title-lg text-title-lg font-bold text-on-surface mb-4 md:mb-0">
+            CinePremium
+        </div>
+<nav class="flex flex-wrap justify-center gap-gutter mb-4 md:mb-0">
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-primary-fixed-dim transition-colors duration-200 cursor-pointer" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-primary-fixed-dim transition-colors duration-200 cursor-pointer" href="#">Terms of Service</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-primary-fixed-dim transition-colors duration-200 cursor-pointer" href="#">Contact Us</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-primary-fixed-dim transition-colors duration-200 cursor-pointer" href="#">Help Center</a>
+</nav>
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+            © 2024 CinePremium. All cinematic rights reserved.
+        </div>
+</footer>
+</body></html>

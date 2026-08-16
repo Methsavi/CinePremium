@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CinePremium - Desktop</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#e1e0ff",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-container": "#272a2c",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "primary-container": "#8083ff",
+                        "on-surface": "#dce1fb",
+                        "surface-container-lowest": "#070d1f",
+                        "surface-container-low": "#151b2d",
+                        "background": "#0c1324",
+                        "on-secondary-container": "#c4abff",
+                        "surface-dim": "#0c1324",
+                        "inverse-primary": "#494bd6",
+                        "surface-variant": "#2e3447",
+                        "on-primary-fixed": "#07006c",
+                        "surface-tint": "#c0c1ff",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "on-secondary": "#3c0091",
+                        "surface-container-highest": "#2e3447",
+                        "secondary-fixed": "#e9ddff",
+                        "on-primary": "#1000a9",
+                        "outline": "#908fa0",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "on-tertiary": "#2d3133",
+                        "error": "#ffb4ab",
+                        "inverse-surface": "#dce1fb",
+                        "tertiary-fixed": "#e0e3e5",
+                        "on-background": "#dce1fb",
+                        "primary": "#c0c1ff",
+                        "on-error": "#690005",
+                        "surface-container": "#191f31",
+                        "tertiary": "#c4c7c9",
+                        "tertiary-container": "#8e9193",
+                        "surface-container-high": "#23293c",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "on-secondary-fixed": "#23005c",
+                        "inverse-on-surface": "#2a3043",
+                        "outline-variant": "#464554",
+                        "on-tertiary-fixed": "#191c1e",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-primary-container": "#0d0096",
+                        "surface-bright": "#33394c",
+                        "secondary-container": "#571bc1",
+                        "surface": "#0c1324",
+                        "on-surface-variant": "#c7c4d7",
+                        "secondary": "#d0bcff",
+                        "on-primary-fixed-variant": "#2f2ebe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "margin-desktop": "48px",
+                        "container-max": "1280px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Geist", "sans-serif"],
+                        "body-md": ["Geist", "sans-serif"],
+                        "headline-lg-mobile": ["Geist", "sans-serif"],
+                        "display": ["Geist", "sans-serif"],
+                        "label-md": ["Geist", "sans-serif"],
+                        "headline-lg": ["Geist", "sans-serif"],
+                        "label-sm": ["Geist", "sans-serif"],
+                        "body-sm": ["Geist", "sans-serif"],
+                        "headline-md": ["Geist", "sans-serif"],
+                        "body-lg": ["Geist", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Geist', sans-serif; background-color: #0c1324; color: #dce1fb; }
+        .hero-gradient { background: linear-gradient(to top, #0c1324 0%, transparent 100%); }
+        .movie-card:hover .poster-overlay { opacity: 1; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 w-full z-50 flex items-center justify-between px-margin-desktop h-20 max-w-container-max mx-auto bg-background border-b border-outline-variant">
+<div class="flex items-center gap-gutter">
+<h1 class="font-display text-display font-bold text-primary tracking-tighter">CinePremium</h1>
+<nav class="hidden md:flex items-center gap-stack-lg ml-gutter">
+<a class="text-primary font-medium border-b-2 border-primary pb-1 transition-all duration-200" href="#">Movies</a>
+<a class="text-on-surface-variant font-medium hover:text-on-surface hover:text-primary transition-colors transition-all duration-200" href="#">Cinemas</a>
+<a class="text-on-surface-variant font-medium hover:text-on-surface hover:text-primary transition-colors transition-all duration-200" href="#">Offers</a>
+<a class="text-on-surface-variant font-medium hover:text-on-surface hover:text-primary transition-colors transition-all duration-200" href="#">Profile</a>
+</nav>
+</div>
+<div class="flex items-center gap-stack-lg">
+<div class="flex items-center gap-stack-md">
+<button class="text-on-surface-variant hover:text-primary transition-all duration-200 p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-all duration-200 p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+<button class="bg-primary text-on-primary font-label-md px-6 py-2.5 rounded-full hover:bg-inverse-primary transition-colors">Book Now</button>
+<img alt="User profile" class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="A cinematic portrait of a user profile avatar. Moody lighting with subtle indigo rim light, dark background. High quality, professional photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWruq2LCNi8Lgv54qbWnQRNfVKmcrrwTD3yy_C6BUrbTyig9gIO3duRyS8fYd5TEP34iYCgZMnB5WFPXxFvtNg53tqUNs338nIE4PblrmzAbknduAUvh4KpJHHOfe0IXDXfLJc-K57JpF9a3ZvqWSinK1nSn8XaIPpHe3pKD8fu8ofYRjqiAwB92tVub4xB49vjLqORVkB3ELzoDZB1ds08z3yFfNQxVLUIEM_0kaxfGxEkscXljpS"/>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 pt-20">
+<!-- Hero Section -->
+<section class="relative w-full h-[716px] min-h-[600px] flex items-end justify-center mb-stack-lg">
+<div class="absolute inset-0 w-full h-full">
+<div class="absolute inset-0 bg-cover bg-center w-full h-full" data-alt="A sweeping, epic cinematic shot of a futuristic metropolis floating in the clouds at sunset. Deep blues and vibrant oranges. Highly detailed sci-fi landscape, 8k resolution, photorealistic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBQcB7EfyWD0yEfUxGzlFCim2wv3tmg95dT43_4Pbp6I2Cxln5D9YJ9BHBovIDkmgIky_ii5nN2v6HyFj6b1YLoZ0-PwYKJmkGlauVnfntnzMPQrBHb30HyNtJTf8RkHetUweX3aXt2tRa9QtwPncrNhXQsci3Tor7R8RtqFEvSq7M8tAoLajZuNgyQBD_zuD-FWU0sH5BBWIVD6gb28-d5GB7YiPO1qQ_aDBfusdCCWkaieI8TQIWH')"></div>
+<div class="absolute inset-0 hero-gradient"></div>
+</div>
+<div class="relative z-10 w-full max-w-container-max px-margin-desktop pb-margin-desktop flex flex-col items-start gap-stack-md">
+<span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-sm uppercase tracking-widest border border-outline-variant">Featured Premiere</span>
+<h2 class="font-display text-display text-on-surface max-w-3xl leading-tight">The Aether Horizon</h2>
+<p class="font-body-lg text-on-surface-variant max-w-2xl mb-stack-sm">A breathtaking journey beyond the known universe. When an anomaly threatens to unravel the fabric of space-time, an elite team must cross the aether to save humanity.</p>
+<div class="flex items-center gap-stack-md">
+<button class="bg-primary text-on-primary font-label-md px-8 py-3 rounded-full hover:bg-inverse-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">confirmation_number</span>
+                        Book Now
+                    </button>
+<button class="bg-surface/50 backdrop-blur-sm border border-outline-variant text-on-surface font-label-md px-8 py-3 rounded-full hover:bg-surface-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">play_arrow</span>
+                        Watch Trailer
+                    </button>
+</div>
+</div>
+</section>
+<div class="max-w-container-max mx-auto px-margin-desktop space-y-margin-desktop pb-margin-desktop">
+<!-- Search & Filters -->
+<section class="flex flex-col md:flex-row justify-between items-center gap-stack-lg bg-surface p-stack-md rounded-xl border border-outline-variant shadow-lg shadow-black/20">
+<div class="relative w-full md:w-96">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-background border border-outline-variant rounded-full py-3 pl-12 pr-4 text-body-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all" placeholder="Search movies, cinemas..." type="text"/>
+</div>
+<div class="flex items-center gap-stack-sm overflow-x-auto hide-scrollbar w-full md:w-auto pb-2 md:pb-0">
+<button class="whitespace-nowrap px-4 py-2 bg-primary text-on-primary rounded-full font-label-sm transition-colors">All</button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-variant text-on-surface-variant hover:text-on-surface border border-outline-variant rounded-full font-label-sm hover:border-outline transition-all">Action</button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-variant text-on-surface-variant hover:text-on-surface border border-outline-variant rounded-full font-label-sm hover:border-outline transition-all">Sci-Fi</button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-variant text-on-surface-variant hover:text-on-surface border border-outline-variant rounded-full font-label-sm hover:border-outline transition-all">Drama</button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-variant text-on-surface-variant hover:text-on-surface border border-outline-variant rounded-full font-label-sm hover:border-outline transition-all">Thriller</button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-variant text-on-surface-variant hover:text-on-surface border border-outline-variant rounded-full font-label-sm hover:border-outline transition-all">Comedy</button>
+</div>
+</section>
+<!-- Now Playing -->
+<section>
+<div class="flex justify-between items-end mb-stack-lg border-b border-outline-variant pb-4">
+<h3 class="font-headline-lg text-on-surface">Now Playing</h3>
+<a class="text-primary hover:text-inverse-primary font-label-md flex items-center gap-1 transition-colors" href="#">View All <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-gutter">
+<!-- Movie Card 1 -->
+<div class="movie-card group cursor-pointer flex flex-col gap-stack-sm">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden border border-outline-variant group-hover:border-primary transition-colors">
+<img alt="Neon Rain" class="w-full h-full object-cover" data-alt="A dark and gritty movie poster featuring a silhouette of a lone detective in the rain against a neon-lit cyberpunk city alley. Deep blues and purples. High contrast, cinematic lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvytP5P3QMEvD_l48Ho0EaUIpo-Z5hT-7MgdfiiT5MRRbrakUf_ZqaeBq3VAJTrbzOnHf4onSQJKr517sNSx6DWsyPd53jVYWIn2zliiTFNDABF4VYIUkpFY8eCB4aMz_vKrdt-XMkU0etgbhpmwnqZ2S2uXjjWidhzLc6FXqrK1YALzlKTmFPiXMFelceENBB6qItoAPrtCDgdTC1FKzyaAPxSI5CmqZPe6-J5fcKLijCvEY48dXE"/>
+<div class="poster-overlay absolute inset-0 bg-background/80 flex flex-col items-center justify-center gap-stack-sm opacity-0 transition-opacity duration-300">
+<button class="bg-primary text-on-primary font-label-sm px-4 py-2 rounded-full hover:bg-inverse-primary transition-colors">Get Tickets</button>
+</div>
+<div class="absolute top-2 right-2 bg-surface/80 backdrop-blur-sm border border-outline-variant px-2 py-1 rounded font-label-sm text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-yellow-500" style="font-variation-settings: 'FILL' 1;">star</span> 8.4
+                            </div>
+</div>
+<div>
+<h4 class="font-title-lg text-on-surface truncate">Neon Rain</h4>
+<p class="font-body-sm text-on-surface-variant truncate">Sci-Fi • Thriller • 1h 55m</p>
+</div>
+</div>
+<!-- Movie Card 2 -->
+<div class="movie-card group cursor-pointer flex flex-col gap-stack-sm">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden border border-outline-variant group-hover:border-primary transition-colors">
+<img alt="The Silent Echo" class="w-full h-full object-cover" data-alt="An elegant, minimalist movie poster showing a single red rose on a stark white and grey marble floor. Dramatic spotlight, high fashion aesthetic, cinematic drama. Deep shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNv2ywNqTzedchsZyCaHTjWU5tS7h71zHg0v8lIl_kvUiGnETibG_zSR2Ari5ScomARxmkARfgOWvmMgt4kvZdfndQba2A977FYyDKm6z3wekndJEL3h8lrsgBRJnps_xUkhqwtDxQyvfCOX5mTV0l6C-N47_5h6TGJPJiOvS8blXQlpHrUYDkg7i2ou4pr0kti7IDaijgm8B6PSODxZl6y9vEwIp5AmnqN1uSsk02xJcpS1glEqIr"/>
+<div class="poster-overlay absolute inset-0 bg-background/80 flex flex-col items-center justify-center gap-stack-sm opacity-0 transition-opacity duration-300">
+<button class="bg-primary text-on-primary font-label-sm px-4 py-2 rounded-full hover:bg-inverse-primary transition-colors">Get Tickets</button>
+</div>
+<div class="absolute top-2 right-2 bg-surface/80 backdrop-blur-sm border border-outline-variant px-2 py-1 rounded font-label-sm text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-yellow-500" style="font-variation-settings: 'FILL' 1;">star</span> 7.9
+                            </div>
+</div>
+<div>
+<h4 class="font-title-lg text-on-surface truncate">The Silent Echo</h4>
+<p class="font-body-sm text-on-surface-variant truncate">Drama • Mystery • 2h 10m</p>
+</div>
+</div>
+<!-- Movie Card 3 -->
+<div class="movie-card group cursor-pointer flex flex-col gap-stack-sm">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden border border-outline-variant group-hover:border-primary transition-colors">
+<img alt="Velocity Drive" class="w-full h-full object-cover" data-alt="Action-packed movie poster with a sleek black sports car drifting through a desert canyon at high speed, kicking up dust. Warm orange and golden hour lighting, intense cinematic action shot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb9BJ1_qgykKI0DK7DFqjRfne_7-F7mWxfwMKY6RNXlpU8fJ4YJ-XD_8LJP_ncqB8oSqKzqoyCV-wagdOgKU43ADurcmypmol-yYtZt6QqwYSlbSgWFrvslYBmqUSfHuKBtAgwWndBNJHBKeWfnSlDG3gWmvSeyAbOM0v_-KuCEgftskemAfjoeJ0JoO94TzKsNrKOOydmI5ymE-8ppbqJLDBby4-03o-PTcrnln0lnU7qSjkKGd08"/>
+<div class="poster-overlay absolute inset-0 bg-background/80 flex flex-col items-center justify-center gap-stack-sm opacity-0 transition-opacity duration-300">
+<button class="bg-primary text-on-primary font-label-sm px-4 py-2 rounded-full hover:bg-inverse-primary transition-colors">Get Tickets</button>
+</div>
+<div class="absolute top-2 right-2 bg-surface/80 backdrop-blur-sm border border-outline-variant px-2 py-1 rounded font-label-sm text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-yellow-500" style="font-variation-settings: 'FILL' 1;">star</span> 9.1
+                            </div>
+</div>
+<div>
+<h4 class="font-title-lg text-on-surface truncate">Velocity Drive</h4>
+<p class="font-body-sm text-on-surface-variant truncate">Action • Adrenaline • 2h 5m</p>
+</div>
+</div>
+<!-- Movie Card 4 -->
+<div class="movie-card group cursor-pointer flex flex-col gap-stack-sm hidden md:flex">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden border border-outline-variant group-hover:border-primary transition-colors">
+<img alt="Whispering Woods" class="w-full h-full object-cover" data-alt="A terrifying horror movie poster showing a dark, twisted ancient forest with glowing red eyes peering from the shadows. Cold, eerie blue and green mist, highly detailed cinematic horror aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtILcvj-JlmkekqLGeqCKqVlV-T6GqfBch8rTcw5ZoeJjujTT-jL-GANfnWeJwH9JGY7aHzCPkUOWNBcYd9-Fql1aIYb0h40t6TD-5MefBCUJR4FbEOfaz7JZK-RVDX0kzOtekBc_K3RJZhK_bCrWyK-keZ5hYirHmn3vJPYUBLBwOHJ7ofMHBLNw0hSOxsmQxyGaL7XWdPDjNIa0lAa9ALksV0woviaHIrBkhtPUiMUnQVZhsglfm"/>
+<div class="poster-overlay absolute inset-0 bg-background/80 flex flex-col items-center justify-center gap-stack-sm opacity-0 transition-opacity duration-300">
+<button class="bg-primary text-on-primary font-label-sm px-4 py-2 rounded-full hover:bg-inverse-primary transition-colors">Get Tickets</button>
+</div>
+<div class="absolute top-2 right-2 bg-surface/80 backdrop-blur-sm border border-outline-variant px-2 py-1 rounded font-label-sm text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-yellow-500" style="font-variation-settings: 'FILL' 1;">star</span> 6.8
+                            </div>
+</div>
+<div>
+<h4 class="font-title-lg text-on-surface truncate">Whispering Woods</h4>
+<p class="font-body-sm text-on-surface-variant truncate">Horror • Thriller • 1h 45m</p>
+</div>
+</div>
+<!-- Movie Card 5 -->
+<div class="movie-card group cursor-pointer flex flex-col gap-stack-sm hidden lg:flex">
+<div class="relative aspect-[2/3] rounded-xl overflow-hidden border border-outline-variant group-hover:border-primary transition-colors">
+<img alt="Skyward Bound" class="w-full h-full object-cover" data-alt="A colorful, vibrant animated movie poster featuring a whimsical flying ship sailing over a sea of fluffy pink clouds. Bright, cheerful lighting, highly detailed 3D animation style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuzeTfD3c5g7f4svVTiLeUhRSBBoXWak5h8977qd6cFFwAtStu0KBgotWn4YSaBeeOSmcjWw9n53RafWBUHd6LBucoViT1BTZM-ag5xctxMo1TMpy2U2A1SO3JY-C8IrbAjErRONy5IvZ7MKDXUGEbQkd6OTbvXFdKCBIO3zwGxve8YQ5vH_fP7P2GEnaTgMBLPBSALI2mUiUZImcC4qf9ul40GAM9z4FVG04jghatc9-PRDP-XMQ4"/>
+<div class="poster-overlay absolute inset-0 bg-background/80 flex flex-col items-center justify-center gap-stack-sm opacity-0 transition-opacity duration-300">
+<button class="bg-primary text-on-primary font-label-sm px-4 py-2 rounded-full hover:bg-inverse-primary transition-colors">Get Tickets</button>
+</div>
+<div class="absolute top-2 right-2 bg-surface/80 backdrop-blur-sm border border-outline-variant px-2 py-1 rounded font-label-sm text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-yellow-500" style="font-variation-settings: 'FILL' 1;">star</span> 8.9
+                            </div>
+</div>
+<div>
+<h4 class="font-title-lg text-on-surface truncate">Skyward Bound</h4>
+<p class="font-body-sm text-on-surface-variant truncate">Animation • Family • 1h 30m</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Coming Soon (Bento Grid Style Layout) -->
+<section class="mt-stack-lg">
+<div class="flex justify-between items-end mb-stack-lg border-b border-outline-variant pb-4">
+<h3 class="font-headline-lg text-on-surface">Coming Soon</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter h-auto md:h-[400px]">
+<!-- Large Feature Card -->
+<div class="md:col-span-2 relative rounded-xl border border-outline-variant overflow-hidden group cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center w-full h-full opacity-60 group-hover:opacity-80 transition-opacity duration-500 group-hover:scale-105 transform" data-alt="Epic wide shot of a medieval battle with dragons soaring in the sky. Fiery orange and dark slate tones, highly detailed fantasy cinematic artwork." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAk6C0bGtj6tLaE8nVFJlDjr2XPmtOINLepv_oL1fCwFuNALimWyrgqcynl6SWTA_WXmW-PnzAkpx5bRrdvdrQXI_3pduhtmm7evD3u-8GVp92hUgh8zdTDWEjMkIMv91hVvwPMk9gp3v9bLQXxMo6W1j6XQL70CaRZweHGJUH_YL4cUgKg4xm0MWoDRKyKCn-k_D8i-Y1OBJjL1GDRP83lV20yLOjZ0OZrA51NtcNbr45XpsrLzyl_')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-stack-lg w-full flex flex-col md:flex-row justify-between items-end gap-4">
+<div>
+<span class="px-2 py-1 bg-surface-variant/80 backdrop-blur text-on-surface-variant rounded text-[10px] uppercase font-bold tracking-wider mb-2 inline-block">Releasing Nov 15</span>
+<h4 class="font-headline-lg text-on-surface leading-tight">Dragon's Fall</h4>
+<p class="font-body-md text-on-surface-variant max-w-md hidden md:block">The highly anticipated sequel to the fantasy epic that redefined the genre.</p>
+</div>
+<button class="bg-surface/50 backdrop-blur-sm border border-outline-variant text-on-surface font-label-md px-6 py-2 rounded-full hover:bg-surface-variant transition-colors flex items-center gap-2 whitespace-nowrap">
+<span class="material-symbols-outlined">notifications</span> Remind Me
+                            </button>
+</div>
+</div>
+<!-- Smaller Cards Stack -->
+<div class="flex flex-col gap-gutter h-full">
+<div class="flex-1 relative rounded-xl border border-outline-variant overflow-hidden group cursor-pointer bg-surface">
+<div class="absolute inset-0 p-stack-md flex flex-col justify-end z-10">
+<span class="text-primary font-label-sm mb-1">Dec 12</span>
+<h4 class="font-title-lg text-on-surface">The Last Martian</h4>
+<p class="font-body-sm text-on-surface-variant">Sci-Fi Drama</p>
+</div>
+<div class="absolute inset-0 bg-cover bg-center w-full h-full opacity-40 group-hover:scale-105 transition-transform duration-500" data-alt="Minimalist poster design featuring a lone astronaut walking on red martian soil. High contrast, cinematic wide shot." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKBd51WFLwv_JOsT38mHMEbgitlFUsqO-IABUvRaqXNibDCbEKQsnkq0g6bf7gEIKD1qxHa7XCNrFqfqTT94prUSUgig0kSTlhJfdCQtu0nReeCuYaU5z9EQSuwox8rQsVvrEsu-4s3pqMVidqQ6m-cd3rXAFdgNVH6Loul1OjJ7ZYtLX9vPkaRgZgDMaTC4SGFzYheFqP3klXELMZB3OBIgoyzUQyeWIjERV8mh_R7HJJW6G9C2rn')"></div>
+</div>
+<div class="flex-1 relative rounded-xl border border-outline-variant overflow-hidden group cursor-pointer bg-surface">
+<div class="absolute inset-0 p-stack-md flex flex-col justify-end z-10">
+<span class="text-primary font-label-sm mb-1">Jan 05</span>
+<h4 class="font-title-lg text-on-surface">Midnight Jazz</h4>
+<p class="font-body-sm text-on-surface-variant">Musical</p>
+</div>
+<div class="absolute inset-0 bg-cover bg-center w-full h-full opacity-40 group-hover:scale-105 transition-transform duration-500" data-alt="A moody, smoky jazz club setting with a saxophone player in silhouette against a warm spotlight. Noir cinematic style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVN8XT6JzNPer5HDqbX9uN44D3xJ5FX5S50GdOrXx5xi754pfq27vvGdQnb4rezbvzofsz1yc4pgTYNyMj4R1x6nEw5BptG5q86y8TAeFs5rf6t4zxmLqorWB2E2bousSVHir8uMFIKhAY2YT0qhSaJTtHKhm2-x-lCvbUK-NFR5P8_6fs30g8PekzC28j_dhr97trklnUOrJsr4DmB5Q1qlMwChX7ctPGgLgR8SrsQ2l5wf00vp9Q')"></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant w-full mt-auto">
+<div class="w-full py-stack-lg px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto gap-stack-md">
+<h2 class="font-display text-headline-md font-bold text-on-surface">CinePremium</h2>
+<div class="flex flex-wrap items-center justify-center gap-stack-md">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Contact Us</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Help Center</a>
+</div>
+<p class="font-body-sm text-body-sm text-primary">© 2024 CinePremium. All rights reserved.</p>
+</div>
+</footer>
+</body></html>
