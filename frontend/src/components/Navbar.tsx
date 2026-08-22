@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Search, LogIn, UserPlus, LogOut, Ticket, Shield, 
   User as UserIcon, ChevronDown, Film, MapPin, Sparkles, 
-  Menu, X, Clapperboard
+  Menu, X
 } from 'lucide-react';
 import { USER_AVATAR } from '../data/movies';
+import logo from '../assets/logo.png';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -135,7 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="flex items-center gap-2.5 group cursor-pointer select-none"
           >
             <div className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary/25 to-inverse-primary/30 border border-primary/40 shadow-[0_0_15px_rgba(192,193,255,0.25)]  transition-all duration-200">
-              <Clapperboard className="w-5 h-5 text-primary group-hover:text-white transition-colors" />
+              <img src={logo} alt="CinePremium" className="w-full h-full rounded-xl object-contain" />
               <div className="absolute inset-0 rounded-xl bg-primary/10 blur-sm pointer-events-none" />
             </div>
             <div className="flex flex-col">
