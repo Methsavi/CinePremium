@@ -7,7 +7,6 @@ import { HeroSection } from './components/HeroSection';
 import { SearchFilterSection } from './components/SearchFilterSection';
 import { NowPlayingSection } from './components/NowPlayingSection';
 import { ComingSoonSection } from './components/ComingSoonSection';
-import { ExperienceSection } from './components/ExperienceSection';
 import { QuickBookingModal } from '@/components/QuickBookingModal';
 import { TrailerModal } from '@/components/TrailerModal';
 import { MyTicketsModal, BookingRecord } from '@/components/MyTicketsModal';
@@ -111,9 +110,6 @@ export function HomePage() {
             movies={filteredNowPlaying}
             onBookMovie={handleBookClick}
           />
-
-          {/* Cinematic Experiences (IMAX, Dolby, 4DX) */}
-          <ExperienceSection />
 
           {/* Coming Soon Section (Bento Grid) */}
           <ComingSoonSection onRemindMe={handleRemindMe} />
