@@ -58,7 +58,7 @@ export const QuickFilterBar: React.FC<QuickFilterBarProps> = ({
                 : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
             }`}
           >
-            <Sparkles className="w-4 h-4 text-purple-400" />
+            <Sparkles className="w-4 h-4 text-primary" />
             <span>All Movies</span>
           </button>
         </div>
