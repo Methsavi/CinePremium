@@ -115,7 +115,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <div className="absolute fixed top-3 sm:top-5 inset-x-0 z-50 px-3 sm:px-6 pointer-events-none transition-all duration-300">
+    <div className="fixed top-3 sm:top-5 inset-x-0 z-50 px-2 sm:px-6 pointer-events-none transition-all duration-300">
       <header
         className={`pointer-events-auto max-w-7xl mx-auto w-full relative transition-all duration-300 ease-out ${
           isScrolled
@@ -124,24 +124,24 @@ export const Navbar: React.FC<NavbarProps> = ({
         }`}
       >
         {/* Specular Ambient Glow Overlay */}
-        <div className="absolute -inset-[1px] rounded-2xl md:rounded-full bg-gradient-to-r from-primary/20 via-indigo-500/10 to-primary/20 blur-lg -z-10 opacity-70 pointer-events-none" />
+        <div className="absolute -inset-[1px] rounded-2xl md:rounded-full bg-gradient-to-r from-primary/20 via-red-500/10 to-primary/20 blur-lg -z-10 opacity-70 pointer-events-none" />
 
-        <div className="flex items-center justify-between gap-2 sm:gap-4">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-4">
           {/* Brand Logo with Liquid Gem Badge */}
           <div
             onClick={() => {
               navigate('/');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="flex items-center gap-2.5 group cursor-pointer select-none"
+            className="flex min-w-0 items-center gap-1.5 sm:gap-2.5 group cursor-pointer select-none"
           >
-            <div className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary/25 to-inverse-primary/30 border border-primary/40 shadow-[0_0_15px_rgba(192,193,255,0.25)]  transition-all duration-200">
+            <div className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary/25 to-inverse-primary/30 border border-primary/40 shadow-[0_0_15px_rgba(229,9,20,0.25)]  transition-all duration-200">
               <img src={logo} alt="CinePremium" className="w-full h-full rounded-xl object-contain" />
               <div className="absolute inset-0 rounded-xl bg-primary/10 blur-sm pointer-events-none" />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="font-display text-xl sm:text-2xl font-black tracking-tight text-white group-hover:text-primary transition-colors">
+                <span className="font-display text-lg sm:text-2xl font-black tracking-tight text-white group-hover:text-primary transition-colors truncate">
                   Cine<span className="text-primary">Premium</span>
                 </span>
                 <span className="hidden lg:inline-block px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-widest bg-primary/15 border border-primary/30 text-primary">
@@ -191,9 +191,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             {/* Quick Action Icons */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <button
                 onClick={onSearchClick}
                 title="Search Movies & Theaters"
@@ -205,7 +205,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={onOpenMyTickets}
                 title="My Booked Tickets"
-                className="liquid-glass-btn p-2 sm:p-2.5 rounded-full text-on-surface-variant hover:text-white cursor-pointer relative group"
+                className="hidden min-[375px]:block liquid-glass-btn p-2 sm:p-2.5 rounded-full text-on-surface-variant hover:text-white cursor-pointer relative group"
               >
                 <Ticket className="w-4 h-4 transition-transform group-hover:scale-110" />
                 <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(192,193,255,0.8)]" />
@@ -214,11 +214,14 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Glowing Liquid CTA Button */}
             <button
-              onClick={onBookNowClick}
-              className="liquid-glow-btn text-surface-container-lowest font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-full flex items-center gap-1.5 cursor-pointer shadow-md tracking-tight"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                onBookNowClick();
+              }}
+                className="liquid-glow-btn text-surface-container-lowest font-bold text-xs sm:text-sm px-2 sm:px-5 py-2 sm:py-2.5 rounded-full flex items-center gap-1.5 cursor-pointer shadow-md tracking-tight"
             >
-              <Sparkles className="w-3.5 h-3.5 fill-current hidden sm:inline-block" />
-              <span>Book Now</span>
+              <Sparkles className="w-3.5 h-3.5 fill-current" />
+              <span className="hidden sm:inline">Book Now</span>
             </button>
 
             {/* User Profile / Auth Area */}
@@ -382,6 +385,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>Offers</span>
               </button>
             </div>
+
+            <button
+              onClick={onBookNowClick}
+              className="liquid-glow-btn w-full text-surface-container-lowest font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
+            >
+              <Sparkles className="w-3.5 h-3.5 fill-current" />
+              <span>Book Now</span>
+            </button>
 
             {/* Mobile Auth Links when logged out */}
             {!isAuthenticated && (
