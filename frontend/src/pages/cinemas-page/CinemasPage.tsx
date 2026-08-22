@@ -275,13 +275,13 @@ export function CinemasPage() {
                                   alt={movie.title} 
                                   className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" 
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324] via-transparent to-transparent opacity-85" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-85" />
                                 
                                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between z-10">
                                   <span className="text-[9px] font-extrabold bg-primary text-on-primary px-2.5 py-0.5 rounded-md uppercase tracking-wider">
                                     {movie.genres?.[0] || 'Drama'}
                                   </span>
-                                  <div className="flex items-center gap-1 text-amber-400 text-xs font-bold bg-[#0c1324]/85 px-2 py-0.5 rounded-md border border-white/5 backdrop-blur-sm">
+                                  <div className="flex items-center gap-1 text-amber-400 text-xs font-bold bg-background/85 px-2 py-0.5 rounded-md border border-white/5 backdrop-blur-sm">
                                     <Star className="w-3.5 h-3.5 fill-amber-400" />
                                     {movie.rating}
                                   </div>
@@ -315,7 +315,7 @@ export function CinemasPage() {
                                     <span className="text-xs font-black text-white group-hover/btn:text-primary">
                                       {st.time}
                                     </span>
-                                    <span className="text-[8px] text-[#908fa0] font-bold mt-0.5">
+                                    <span className="text-[8px] text-on-surface-variant font-bold mt-0.5">
                                       {st.format} • ${st.price.toFixed(2)}
                                     </span>
                                   </button>
