@@ -2,16 +2,18 @@ import { Movie, Cinema } from '../types/movie';
 
 export const HERO_MOVIE: Movie = {
   id: 'm-hero',
-  title: 'The Aether Horizon',
-  tagline: 'A breathtaking journey beyond the known universe.',
-  synopsis: 'In the year 2145, humanity\'s survival depends on a desperate mission to the edge of the known universe. A team of elite explorers aboard the starship "Vanguard" must navigate the treacherous Aether Horizon—a spatial anomaly where time and reality fracture. As they face unimaginable cosmic threats, they discover secrets that could alter the fate of civilization forever.',
-  posterUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBoKycjUG7Xuph0joNyJ9nknimZpy5EE-ZQdSq2u0iMWf0csv6SVkvF0F8SBV2omfGuhnYg_5P1Lo-X84QNtGHpCZGEIuJ4yxw1-U_FB-eJg-uiYDcQMNKsZ0t64tHmaScHzgTy01_v5T0kpVbXXZukQ8JSn605jWz-p6dDQHxI4BXgAJ2_cDLM5LDdpodXjifj2_NXhCOWFHVFGi2qxgG0Kiw21f3gMjER3Lm5ft3cqb-x0eRRoR_k',
-  backdropUrl: '/cinema_hero_backdrop.jpg',
-  rating: 9.2,
-  duration: '2h 15m',
-  genres: ['Sci-Fi', 'Adventure'],
-  status: 'now_showing',
-  trailerUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+  title: 'Spider-Man: Brand New Day',
+  tagline: 'A new day. A new city. A brand-new Spider-Man.',
+  synopsis: 'Peter Parker begins a new chapter as Spider-Man, facing a fresh threat while protecting New York and finding his place in a world that has changed around him.',
+  posterUrl: 'https://cdn.marvel.com/content/1x/spidermanbrandnewday_lob_crd_02.webp',
+  backdropUrl: 'https://cdn.marvel.com/content/2x/spidermanbrandnewday_lob_mas_mob_02_0.webp',
+  rating: 0,
+  duration: 'TBA',
+  genres: ['Action', 'Adventure', 'Superhero'],
+  releaseDate: 'July 31, 2026',
+  ageRating: 'PG-13',
+  director: 'Destin Daniel Cretton',
+  status: 'coming_soon',
   castMembers: [
     {
       id: 'c1',
