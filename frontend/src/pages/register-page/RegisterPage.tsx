@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, Film, ArrowRight, AlertCircle, CheckCircle2, Check } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import logo2 from '@/assets/logo2.png';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -104,7 +105,21 @@ export function RegisterPage() {
 
       {/* Main Form Container */}
       <main className="flex-1 flex items-center justify-center px-4 py-8 z-10">
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(420px,520px)] items-center gap-8 lg:gap-16">
+          {/* Brand panel */}
+          <section className="flex flex-col items-center justify-center text-center lg:text-left lg:items-start">
+            <img
+              src={logo2}
+              alt="CinePremium - Premium Movies, Premium Experience"
+              className="w-full max-w-md lg:max-w-lg object-contain drop-shadow-[0_0_40px_rgba(229,9,20,0.2)]"
+            />
+            <p className="max-w-md text-sm sm:text-base text-on-surface-variant leading-relaxed lg:pl-4">
+              Your front-row seat to unforgettable stories, premium screens, and effortless movie nights.
+            </p>
+          </section>
+
+          {/* Registration form */}
+          <div className="w-full max-w-lg justify-self-center lg:justify-self-end">
           <div className="bg-surface-container/80 backdrop-blur-xl border border-outline-variant/60 rounded-3xl p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-300">
             {/* Title Header */}
             <div className="text-center space-y-2">
@@ -297,6 +312,7 @@ export function RegisterPage() {
                 Sign In
               </Link>
             </div>
+          </div>
           </div>
         </div>
       </main>
