@@ -32,9 +32,24 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {HERO_MOVIE.title}
         </h2>
 
+        {HERO_MOVIE.tagline && (
+          <p className="text-lg sm:text-xl text-primary font-semibold max-w-2xl -mt-2">
+            {HERO_MOVIE.tagline}
+          </p>
+        )}
+
         <p className="text-base sm:text-lg text-on-surface-variant max-w-2xl mb-2 leading-relaxed">
           {HERO_MOVIE.synopsis}
         </p>
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-on-surface-variant">
+          {HERO_MOVIE.releaseDate && <span>{HERO_MOVIE.releaseDate}</span>}
+          <span>{HERO_MOVIE.duration}</span>
+          {HERO_MOVIE.ageRating && <span>{HERO_MOVIE.ageRating}</span>}
+          {HERO_MOVIE.rating > 0 && <span>Rating {HERO_MOVIE.rating}/10</span>}
+          <span>{HERO_MOVIE.genres.join(' / ')}</span>
+          {HERO_MOVIE.director && <span>Directed by {HERO_MOVIE.director}</span>}
+        </div>
 
         <div className="flex flex-wrap items-center gap-4">
           <button
