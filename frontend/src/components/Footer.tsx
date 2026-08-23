@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import { 
-  Film, Tv, HelpCircle, ArrowUpRight
+  Film, HelpCircle
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
@@ -15,7 +15,7 @@ export const Footer: React.FC = () => {
       <div className="max-w-[1280px] mx-auto px-6 md:px-12 pt-14 pb-8 space-y-12 relative z-10">
         
         {/* Top Multi-column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           
           {/* Brand Column (Spans 2 on lg) */}
           <div className="lg:col-span-2 space-y-4">
@@ -63,47 +63,7 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Column 2: Experiences */}
-          <div className="space-y-3.5">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white font-display flex items-center gap-2">
-              <Tv className="w-3.5 h-3.5 text-red-500" />
-              <span>Experiences</span>
-            </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm">
-              <li>
-                <Link to="/imax" className="text-zinc-400 hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1">
-                  <span>IMAX 3D Laser</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-50" />
-                </Link>
-              </li>
-              <li>
-                <Link to="/dolby-cinema" className="text-zinc-400 hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1">
-                  <span>Dolby Cinema</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-50" />
-                </Link>
-              </li>
-              <li>
-                <Link to="/4dx" className="text-zinc-400 hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1">
-                  <span>4DX Motion</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-50" />
-                </Link>
-              </li>
-              <li>
-                <Link to="/screenx" className="text-zinc-400 hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1">
-                  <span>ScreenX 270°</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-50" />
-                </Link>
-              </li>
-              <li>
-                <Link to="/vip-recliners" className="text-zinc-400 hover:text-white hover:translate-x-1 transition-all inline-flex items-center gap-1">
-                  <span>VIP Luxury Recliners</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-50" />
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3: Support & Legal */}
+          {/* Column 2: Support & Legal */}
           <div className="space-y-3.5">
             <h4 className="text-xs font-bold uppercase tracking-wider text-white font-display flex items-center gap-2">
               <HelpCircle className="w-3.5 h-3.5 text-red-500" />
