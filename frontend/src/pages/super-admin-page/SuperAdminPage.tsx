@@ -8,7 +8,9 @@ import { getHalls } from "../../services/hallApi";
 import { getShowtimes } from "../../services/showtimeApi";
 import { getRegisteredUsers, deleteUser, updateUser } from "../../services/userApi";
 import { useAuth } from "../../context/AuthContext";
+import { useNotification } from "../../context/NotificationContext";
 import { User } from "../../types/auth";
+import logo from "../../assets/logo.png";
 import { 
   Users, Film, Tv, Calendar, ArrowLeft, LayoutDashboard, 
   LogOut, ShieldAlert, RefreshCw, Search, Trash2, 
@@ -20,6 +22,7 @@ type ActiveTab = "overview" | "users" | "movies" | "halls" | "showtimes";
 export default function SuperAdminPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated, token, isLoading: authLoading, logout } = useAuth();
+  const { addNotification } = useNotification();
   const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
   
   // Stats states
@@ -111,8 +114,21 @@ export default function SuperAdminPage() {
       
       setActionSuccess(`User "${targetName}" deleted successfully.`);
       setTimeout(() => setActionSuccess(null), 4000);
+
+      addNotification({
+        type: 'delete',
+        title: 'User Account Deleted 🗑️',
+        message: `Account for "${targetName}" was permanently removed.`,
+        actionUrl: '/super-admin',
+        actionLabel: 'View Users'
+      });
     } catch (err: any) {
       alert(err.message || "Failed to delete user");
+      addNotification({
+        type: 'error',
+        title: 'User Deletion Failed',
+        message: err.message || "Failed to delete user."
+      });
     } finally {
       setDeletingId(null);
     }
@@ -133,8 +149,21 @@ export default function SuperAdminPage() {
 
       setActionSuccess(`Successfully updated "${targetName}" role to ${newRole}.`);
       setTimeout(() => setActionSuccess(null), 4000);
+
+      addNotification({
+        type: 'info',
+        title: 'User Role Promoted / Updated 🛡️',
+        message: `User "${targetName}" has been assigned the "${newRole}" role.`,
+        actionUrl: '/super-admin',
+        actionLabel: 'View Users'
+      });
     } catch (err: any) {
       alert(err.message || "Failed to change user role");
+      addNotification({
+        type: 'error',
+        title: 'Role Update Failed',
+        message: err.message || "Failed to change user role."
+      });
     } finally {
       setUpdatingId(null);
     }
@@ -205,13 +234,22 @@ export default function SuperAdminPage() {
       <aside className="w-64 bg-[#0c1324] border-r border-[#2e3447] flex flex-col justify-between shrink-0 h-screen sticky top-0 z-30">
         <div>
           {/* Logo Header */}
-          <div className="h-20 px-6 border-b border-[#2e3447] flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-[#494bd6] flex items-center justify-center text-white font-black text-lg shadow-lg">
-              S
-            </div>
-            <div>
-              <h1 className="text-sm font-bold tracking-tight text-white">CinePremium</h1>
-              <p className="text-[10px] text-purple-400 font-semibold uppercase tracking-wider">Super Admin Panel</p>
+          <div className="h-20 px-5 border-b border-[#2e3447] flex items-center gap-3 bg-[#0c1324]">
+            <img 
+              src={logo} 
+              alt="CinePremium Logo" 
+              className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]" 
+            />
+            <div className="min-w-0">
+              <h1 className="text-sm font-black tracking-tight text-white font-display truncate">
+                CinePremium
+              </h1>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-purple-400 font-black uppercase tracking-wider">
+                  Admin Panel
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+              </div>
             </div>
           </div>
 
