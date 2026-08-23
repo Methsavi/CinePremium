@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { Movie } from '@/types/movie';
-import { Bell, ChevronLeft, ChevronRight, Sparkles, Calendar, Star } from 'lucide-react';
+import { Bell, ChevronLeft, ChevronRight, Calendar, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface ComingSoonSectionProps {
@@ -81,12 +81,8 @@ export const ComingSoonSection: React.FC<ComingSoonSectionProps> = ({ movies, on
       {/* ── Section Header & Navigation ── */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-outline-variant pb-4">
         <div>
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Upcoming Blockbusters</span>
-          </div>
           <h3 className="text-2xl sm:text-3xl font-black text-on-surface font-display tracking-tight">
-            Coming Soon to Theaters
+            Coming Soon
           </h3>
         </div>
 

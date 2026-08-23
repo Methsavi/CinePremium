@@ -3,9 +3,9 @@ import { Movie } from '../types/movie';
 // Hero section showcase movie (Preserved for Hero session)
 export const HERO_MOVIE: Movie = {
   id: 'm-hero',
-  title: 'Spider-Man: Brand New Day',
-  tagline: 'A new day. A new city. A brand-new Spider-Man.',
-  synopsis: 'Peter Parker begins a new chapter as Spider-Man, facing a fresh threat while protecting New York and finding his place in a world that has changed around him.',
+  title: 'Spider Man: Brand New Day',
+  tagline: 'A new day. A new city. A brand-new Spider Man.',
+  synopsis: 'Peter Parker begins a new chapter as Spider Man, facing a fresh threat while protecting New York and finding his place in a world that has changed around him.',
   posterUrl: 'https://cdn.marvel.com/content/1x/spidermanbrandnewday_lob_crd_02.webp',
   backdropUrl: 'https://cdn.marvel.com/content/2x/spidermanbrandnewday_lob_mas_mob_02_0.webp',
   trailerUrl: 'https://www.youtube.com/watch?v=JfVOs4VSpmA',

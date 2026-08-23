@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { Movie } from '@/types/movie';
-import { Star, ArrowRight, Film, ChevronLeft, ChevronRight, Ticket, Sparkles } from 'lucide-react';
+import { Star, ArrowRight, Film, ChevronLeft, ChevronRight, Ticket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface NowPlayingSectionProps {
@@ -84,12 +84,8 @@ export const NowPlayingSection: React.FC<NowPlayingSectionProps> = ({
       {/* ── Section Header & Slider Controls ── */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-outline-variant pb-4">
         <div>
-          <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-wider mb-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Theatrical Screenings</span>
-          </div>
           <h3 className="text-2xl sm:text-3xl font-black text-on-surface font-display tracking-tight">
-            Now Playing in Cinemas
+            Now Playing
           </h3>
         </div>
 

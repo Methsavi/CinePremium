@@ -257,19 +257,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* ── 3. RIGHT SECTION: Search, Notification, Profile/Login ── */}
+          {/* ── 3. RIGHT SECTION: Search, Notification, Profile/Login ── */}
           <div className="flex shrink-0 items-center gap-1 sm:gap-2.5">
             
-            {/* Search Icon */}
+            {/* Search Icon (Desktop only) */}
             <button
               onClick={handleSearchAction}
               title="Search Movies & Showtimes"
-              className="liquid-glass-btn p-2 sm:p-2.5 rounded-full text-on-surface-variant hover:text-white cursor-pointer relative group transition-all"
+              className="hidden lg:flex liquid-glass-btn p-2 sm:p-2.5 rounded-full text-on-surface-variant hover:text-white cursor-pointer relative group transition-all"
             >
               <Search className="w-4 h-4 transition-transform group-hover:scale-110" />
             </button>
 
-            {/* Notification Icon */}
-            <div className="relative" ref={notificationRef}>
+            {/* Notification Icon (Desktop only) */}
+            <div className="hidden lg:block relative" ref={notificationRef}>
               <button
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                 title="Notifications"
@@ -378,118 +379,120 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
 
-            {/* Profile / Login Area */}
-            {isAuthenticated && user ? (
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="liquid-glass-btn flex items-center gap-2 p-1 sm:pr-2.5 rounded-full cursor-pointer transition-all border border-white/15 hover:border-primary/40"
-                >
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary text-white font-black flex items-center justify-center text-xs shadow-md border border-primary/50">
-                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                  <span className="hidden sm:inline font-medium text-xs text-white max-w-[80px] truncate">
-                    {user.name.split(' ')[0]}
-                  </span>
-                  <ChevronDown className={`w-3 h-3 text-on-surface-variant transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
+            {/* Profile / Login Area (Desktop only) */}
+            <div className="hidden lg:flex items-center">
+              {isAuthenticated && user ? (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="liquid-glass-btn flex items-center gap-2 p-1 sm:pr-2.5 rounded-full cursor-pointer transition-all border border-white/15 hover:border-primary/40"
+                  >
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary text-white font-black flex items-center justify-center text-xs shadow-md border border-primary/50">
+                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <span className="hidden sm:inline font-medium text-xs text-white max-w-[80px] truncate">
+                      {user.name.split(' ')[0]}
+                    </span>
+                    <ChevronDown className={`w-3 h-3 text-on-surface-variant transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
 
-                {/* Profile Dropdown Menu */}
-                {isDropdownOpen && (
-                  <div className="liquid-glass-dropdown absolute right-0 mt-3 w-64 rounded-2xl p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150 border border-white/20 bg-[#0d0d10]/95 backdrop-blur-2xl shadow-2xl">
-                    {/* User Info Card */}
-                    <div className="px-3 py-2.5 border-b border-white/10 mb-1.5 rounded-xl bg-white/[0.03]">
-                      <div className="font-bold text-sm text-white truncate">{user.name}</div>
-                      <div className="text-[11px] text-zinc-400 truncate">{user.email}</div>
-                      <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-600/15 border border-red-500/30 text-[10px] font-bold uppercase text-red-400 tracking-wider">
-                        {user.role === 'admin' ? (
-                          <Shield className="w-3 h-3 text-red-500" />
-                        ) : user.role === 'cinema_manager' ? (
-                          <Shield className="w-3 h-3 text-red-400" />
-                        ) : (
-                          <UserIcon className="w-3 h-3" />
+                  {/* Profile Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div className="liquid-glass-dropdown absolute right-0 mt-3 w-64 rounded-2xl p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150 border border-white/20 bg-[#0d0d10]/95 backdrop-blur-2xl shadow-2xl">
+                      {/* User Info Card */}
+                      <div className="px-3 py-2.5 border-b border-white/10 mb-1.5 rounded-xl bg-white/[0.03]">
+                        <div className="font-bold text-sm text-white truncate">{user.name}</div>
+                        <div className="text-[11px] text-zinc-400 truncate">{user.email}</div>
+                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-600/15 border border-red-500/30 text-[10px] font-bold uppercase text-red-400 tracking-wider">
+                          {user.role === 'admin' ? (
+                            <Shield className="w-3 h-3 text-red-500" />
+                          ) : user.role === 'cinema_manager' ? (
+                            <Shield className="w-3 h-3 text-red-400" />
+                          ) : (
+                            <UserIcon className="w-3 h-3" />
+                          )}
+                          {user.role === 'admin' ? 'Site Admin' : user.role === 'cinema_manager' ? 'Cinema Manager' : 'Member'}
+                        </div>
+                      </div>
+
+                      {/* Menu Actions */}
+                      <div className="space-y-1">
+                        <button
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            handleMyBookingsClick();
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
+                        >
+                          <Ticket className="w-4 h-4 text-red-500" />
+                          <span>My Tickets & Bookings</span>
+                        </button>
+
+                        {user.role === 'cinema_manager' && (
+                          <button
+                            onClick={() => {
+                              setIsDropdownOpen(false);
+                              navigate('/admin');
+                            }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
+                          >
+                            <Shield className="w-4 h-4 text-red-400" />
+                            <span>Cinema Manager Panel</span>
+                          </button>
                         )}
-                        {user.role === 'admin' ? 'Site Admin' : user.role === 'cinema_manager' ? 'Cinema Manager' : 'Member'}
+
+                        {user.role === 'admin' && (
+                          <button
+                            onClick={() => {
+                              setIsDropdownOpen(false);
+                              navigate('/super-admin');
+                            }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
+                          >
+                            <Shield className="w-4 h-4 text-red-500" />
+                            <span>Super Admin Panel</span>
+                          </button>
+                        )}
+
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/15 hover:text-red-300 rounded-xl transition-colors text-left cursor-pointer mt-1 border-t border-white/5 pt-2"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Sign Out</span>
+                        </button>
                       </div>
                     </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <Link
+                    to="/login"
+                    className="liquid-glass-btn text-xs font-semibold px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full text-on-surface-variant hover:text-white transition-all flex items-center gap-1.5"
+                  >
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>Sign In</span>
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="bg-primary/15 text-primary border border-primary/30 hover:bg-primary hover:text-white text-xs font-semibold px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full transition-all hidden sm:flex items-center gap-1.5 shadow-[0_0_12px_rgba(229,9,20,0.15)]"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>Register</span>
+                  </Link>
+                </div>
+              )}
+            </div>
 
-                    {/* Menu Actions */}
-                    <div className="space-y-1">
-                      <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          handleMyBookingsClick();
-                        }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
-                      >
-                        <Ticket className="w-4 h-4 text-red-500" />
-                        <span>My Tickets & Bookings</span>
-                      </button>
-
-                      {user.role === 'cinema_manager' && (
-                        <button
-                          onClick={() => {
-                            setIsDropdownOpen(false);
-                            navigate('/admin');
-                          }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
-                        >
-                          <Shield className="w-4 h-4 text-red-400" />
-                          <span>Cinema Manager Panel</span>
-                        </button>
-                      )}
-
-                      {user.role === 'admin' && (
-                        <button
-                          onClick={() => {
-                            setIsDropdownOpen(false);
-                            navigate('/super-admin');
-                          }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
-                        >
-                          <Shield className="w-4 h-4 text-red-500" />
-                          <span>Super Admin Panel</span>
-                        </button>
-                      )}
-
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/15 hover:text-red-300 rounded-xl transition-colors text-left cursor-pointer mt-1 border-t border-white/5 pt-2"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Sign Out</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <Link
-                  to="/login"
-                  className="liquid-glass-btn text-xs font-semibold px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full text-on-surface-variant hover:text-white transition-all flex items-center gap-1.5"
-                >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span>Sign In</span>
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-primary/15 text-primary border border-primary/30 hover:bg-primary hover:text-white text-xs font-semibold px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full transition-all hidden sm:flex items-center gap-1.5 shadow-[0_0_12px_rgba(229,9,20,0.15)]"
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>Register</span>
-                </Link>
-              </div>
-            )}
-
-            {/* Mobile Menu Toggle Button */}
+            {/* Mobile Menu Toggle Button (Visible only on mobile) */}
             <button
               id="mobile-menu-toggle"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden liquid-glass-btn p-2 rounded-xl text-on-surface hover:text-white cursor-pointer"
+              className="lg:hidden liquid-glass-btn p-2 rounded-xl text-white hover:text-primary cursor-pointer transition-colors"
               aria-label="Toggle Navigation Menu"
             >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMobileMenuOpen ? <X className="w-5 h-5 text-primary" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -500,6 +503,93 @@ export const Navbar: React.FC<NavbarProps> = ({
             ref={mobileMenuRef}
             className="lg:hidden mt-3 pt-3 border-t border-white/10 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200"
           >
+            {/* User Profile Card if logged in */}
+            {isAuthenticated && user && (
+              <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-primary text-white font-black flex items-center justify-center text-xs shadow-md border border-primary/50">
+                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div>
+                      <div className="font-bold text-xs text-white truncate">{user.name}</div>
+                      <div className="text-[10px] text-zinc-400 truncate">{user.email}</div>
+                    </div>
+                  </div>
+                  <div className="px-2 py-0.5 rounded-full bg-red-600/15 border border-red-500/30 text-[9px] font-bold uppercase text-red-400 tracking-wider">
+                    {user.role === 'admin' ? 'Site Admin' : user.role === 'cinema_manager' ? 'Cinema Manager' : 'Member'}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1 border-t border-white/5">
+                  {user.role === 'admin' && (
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        navigate('/super-admin');
+                      }}
+                      className="flex-1 py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] font-medium text-zinc-200 flex items-center justify-center gap-1.5"
+                    >
+                      <Shield className="w-3.5 h-3.5 text-red-500" />
+                      <span>Admin Panel</span>
+                    </button>
+                  )}
+                  {user.role === 'cinema_manager' && (
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        navigate('/admin');
+                      }}
+                      className="flex-1 py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] font-medium text-zinc-200 flex items-center justify-center gap-1.5"
+                    >
+                      <Shield className="w-3.5 h-3.5 text-red-400" />
+                      <span>Manager Panel</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="py-1.5 px-3 rounded-xl bg-red-600/15 hover:bg-red-600/25 text-red-400 text-[11px] font-medium flex items-center justify-center gap-1"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Quick Search & Notifications Row */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  handleSearchAction();
+                }}
+                className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-medium text-zinc-300 hover:text-white transition-all cursor-pointer"
+              >
+                <Search className="w-3.5 h-3.5 text-primary" />
+                <span>Search Movies</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsNotificationOpen(true);
+                }}
+                className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-medium text-zinc-300 hover:text-white transition-all cursor-pointer relative"
+              >
+                <Bell className="w-3.5 h-3.5 text-primary" />
+                <span>Notifications</span>
+                {unreadCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-primary text-[9px] font-bold text-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+            </div>
+
             {/* 4 Main Nav Buttons */}
             <div className="grid grid-cols-2 gap-2">
               <button

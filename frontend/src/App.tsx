@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
 import HomePage from "./pages/home-page/HomePage";
 import SingleMovieListingPage from "./pages/single-movie-listingpage/SingleMovieListingPage";
 import LoginPage from "./pages/login-page/LoginPage";
@@ -15,7 +16,9 @@ import { NotFoundPage } from "./pages/not-found-page/NotFoundPage.tsx";
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/movies" element={<MoviesPage />} />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
@@ -36,5 +39,6 @@ export default function App() {
       {/* 404 Page Not Found (Catches all undefined routes including /my-payments) */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
+  </>
   );
 }
