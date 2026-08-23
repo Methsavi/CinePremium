@@ -37,7 +37,7 @@ export default function MovieDetails({
 
         {/* Right Column: Showtimes & Reviews */}
         <div className="md:col-span-4 flex flex-col gap-6">
-          <MovieShowtimes onSelectShowtime={onSelectShowtime} />
+          <MovieShowtimes movie={movie} onSelectShowtime={onSelectShowtime} />
           <MovieReviews reviews={movie.reviews} />
         </div>
       </section>
