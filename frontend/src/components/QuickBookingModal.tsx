@@ -318,7 +318,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
                             }`}
                           >
                             <div className="text-sm font-bold">{st.time}</div>
-                            <div className="text-[10px] opacity-80">{st.format} • ${st.price}</div>
+                            <div className="text-[10px] opacity-80">{st.format} • Rs. {st.price}</div>
                           </button>
                         );
                       })}
@@ -366,11 +366,11 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
               <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-300 border-t border-white/10 pt-4">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded bg-slate-800 border border-white/10" />
-                  <span>Standard ($16)</span>
+                  <span>Standard (Rs. 16)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded bg-amber-500/20 border border-amber-500/40" />
-                  <span>VIP Lounge ($22)</span>
+                  <span>VIP Lounge (Rs. 22)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded bg-red-600" />
@@ -427,7 +427,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
                   </div>
                   <div className="text-right">
                     <span className="text-xs text-slate-400 block">Total Paid</span>
-                    <span className="text-lg font-black text-emerald-400">${totalAmount.toFixed(2)}</span>
+                    <span className="text-lg font-black text-emerald-400">Rs. {totalAmount.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -457,7 +457,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
           {step === 'seats' && (
             <>
               <div className="text-sm text-slate-300">
-                Seats ({selectedSeats.length}): <span className="font-bold text-emerald-400">${totalAmount.toFixed(2)}</span>
+                Seats ({selectedSeats.length}): <span className="font-bold text-emerald-400">Rs. {totalAmount.toFixed(2)}</span>
               </div>
               <button
                 disabled={selectedSeats.length === 0 || isBooking}
@@ -469,7 +469,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
                 ) : (
                   <Armchair className="w-4 h-4" />
                 )}
-                <span>{isBooking ? 'Confirming...' : `Confirm & Pay $${totalAmount.toFixed(2)}`}</span>
+                <span>{isBooking ? 'Confirming...' : `Confirm & Pay Rs. ${totalAmount.toFixed(2)}`}</span>
               </button>
             </>
           )}
