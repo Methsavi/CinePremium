@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { createHall } from "../../../services/hallApi";
+import { updateHall } from "../../../services/hallApi";
+import { CinemaHall } from "../../../types/hall";
 import { useNotification } from "../../../context/NotificationContext";
-import { Tv, Plus, Trash2, X, CheckCircle2, AlertCircle, Armchair } from "lucide-react";
+import { Tv, Plus, Trash2, X, CheckCircle2, AlertCircle, Armchair, Edit3 } from "lucide-react";
 
-interface HallAddFormProps {
+interface HallEditFormProps {
+  hall: CinemaHall;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -13,14 +15,18 @@ interface TierInput {
   seatCount: number | "";
 }
 
-function HallAddForm({ onSuccess, onCancel }: HallAddFormProps) {
+function HallEditForm({ hall, onSuccess, onCancel }: HallEditFormProps) {
   const { addNotification } = useNotification();
-  const [name, setName] = useState("");
-  const [screenType, setScreenType] = useState("IMAX 3D");
-  const [seatTiers, setSeatTiers] = useState<TierInput[]>([
-    { tierName: "VIP / Recliner", seatCount: 20 },
-    { tierName: "Standard", seatCount: 60 },
-  ]);
+  const [name, setName] = useState(hall.name || "");
+  const [screenType, setScreenType] = useState(hall.screenType || "Standard 2D");
+  const [seatTiers, setSeatTiers] = useState<TierInput[]>(
+    hall.seatTiers && hall.seatTiers.length > 0
+      ? hall.seatTiers.map((t) => ({ tierName: t.tierName, seatCount: t.seatCount }))
+      : [
+          { tierName: "VIP / Recliner", seatCount: 20 },
+          { tierName: "Standard", seatCount: 60 },
+        ]
+  );
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,31 +93,31 @@ function HallAddForm({ onSuccess, onCancel }: HallAddFormProps) {
 
     try {
       setSubmitting(true);
-      await createHall({
-        name,
+      await updateHall(hall.id, {
+        name: name.trim(),
         screenType,
         seatTiers: seatTiers.map((t) => ({
-          tierName: t.tierName,
+          tierName: t.tierName.trim(),
           seatCount: Number(t.seatCount),
           price: 0,
         })),
       });
 
       addNotification({
-        type: 'add',
-        title: 'Cinema Hall Created! 🏛️',
-        message: `Hall "${name}" (${screenType}, ${totalCapacity} seats) configured successfully.`,
+        type: 'info',
+        title: 'Cinema Hall Updated 🏛️',
+        message: `Hall "${name}" configuration and seat tiers were updated.`,
         actionUrl: '/admin',
         actionLabel: 'View in Admin'
       });
 
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create cinema hall");
+      setError(err instanceof Error ? err.message : "Failed to update cinema hall");
       addNotification({
         type: 'error',
-        title: 'Hall Creation Failed',
-        message: err instanceof Error ? err.message : "Failed to create cinema hall."
+        title: 'Hall Update Failed',
+        message: err instanceof Error ? err.message : "Failed to update cinema hall."
       });
     } finally {
       setSubmitting(false);
@@ -130,12 +136,12 @@ function HallAddForm({ onSuccess, onCancel }: HallAddFormProps) {
         {/* Sticky Header */}
         <div className="flex items-center justify-between px-6 py-4.5 bg-[#0c1324] border-b border-[#2e3447] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-primary/15 text-primary border border-primary/30 flex items-center justify-center">
-              <Tv className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+              <Edit3 className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white font-display">Add Cinema Hall</h3>
-              <p className="text-[11px] text-[#908fa0]">Configure screen projection and tier capacities</p>
+              <h3 className="text-base font-bold text-white font-display">Edit Cinema Hall — {hall.name}</h3>
+              <p className="text-[11px] text-[#908fa0]">Modify hall layout and seat capacities</p>
             </div>
           </div>
           <button
@@ -194,10 +200,10 @@ function HallAddForm({ onSuccess, onCancel }: HallAddFormProps) {
             <div className="space-y-3 pt-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#908fa0] uppercase">
-                  <Armchair className="w-4 h-4 text-primary" />
+                  <Armchair className="w-4 h-4 text-amber-400" />
                   Seat Tiers & Capacities
                 </div>
-                <span className="text-xs font-bold text-primary bg-[#0c1324] px-3 py-1 rounded-full border border-[#2e3447]">
+                <span className="text-xs font-bold text-amber-400 bg-[#0c1324] px-3 py-1 rounded-full border border-[#2e3447]">
                   Total: {totalCapacity} Seats
                 </span>
               </div>
@@ -275,12 +281,12 @@ function HallAddForm({ onSuccess, onCancel }: HallAddFormProps) {
               {submitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-surface-container-lowest border-t-transparent rounded-full animate-spin" />
-                  <span>Creating Hall...</span>
+                  <span>Updating Hall...</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Create Hall Structure</span>
+                  <span>Save Changes</span>
                 </>
               )}
             </button>
@@ -291,4 +297,4 @@ function HallAddForm({ onSuccess, onCancel }: HallAddFormProps) {
   );
 }
 
-export default HallAddForm;
+export default HallEditForm;
