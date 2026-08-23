@@ -22,6 +22,8 @@ export interface AppNotification {
   type: NotificationType;
   timestamp: number;
   read: boolean;
+  actionUrl?: string;
+  actionLabel?: string;
 }
 
 interface ToastItem {
@@ -138,6 +140,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       type: notifType,
       timestamp: Date.now(),
       read: false,
+      actionUrl: typeof params === 'string' ? undefined : params.actionUrl,
+      actionLabel: typeof params === 'string' ? undefined : params.actionLabel,
     };
 
     setNotifications((prev) => [newNotif, ...prev].slice(0, 30));

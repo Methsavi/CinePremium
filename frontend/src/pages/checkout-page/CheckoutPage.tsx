@@ -11,7 +11,6 @@ import {
   CreditCard,
   Lock,
   ShieldCheck,
-  ChevronLeft,
   Calendar,
   Clock,
   Tv,
@@ -224,90 +223,34 @@ export function CheckoutPage() {
 
       <main className="flex-1 pt-24 pb-20 px-4 sm:px-6 md:px-12 max-w-[1300px] mx-auto w-full space-y-8">
         
-        {/* ── Progress Step Bar ── */}
-        <div className="flex items-center justify-between gap-4 bg-[#0d0d10] border border-white/10 p-4 sm:p-5 rounded-2xl shadow-xl">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-white rounded-xl transition-all cursor-pointer"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                <span>Secure Checkout & Payment</span>
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
-              </h1>
-              <p className="text-xs text-zinc-400">
-                Step 3 of 3 • Review order, enter payment, and receive instant digital tickets
-              </p>
-            </div>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3.5 py-1.5 rounded-full border border-emerald-500/30">
-            <Lock className="w-3.5 h-3.5" />
-            <span>256-Bit SSL Encrypted</span>
-          </div>
-        </div>
-
         {/* ── Payment Success Screen (Modal / View) ── */}
         {paymentSuccess ? (
-          <div className="bg-[#0d0d10] border border-emerald-500/40 rounded-2xl p-8 sm:p-12 text-center max-w-2xl mx-auto shadow-2xl space-y-6 animate-in zoom-in-95 duration-300">
-            <div className="w-20 h-20 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(16,185,129,0.3)]">
-              <CheckCircle2 className="w-10 h-10" />
+          <div className="bg-[#0d0d10] border border-emerald-500/40 rounded-2xl p-8 sm:p-12 text-center max-w-xl mx-auto shadow-2xl space-y-6 animate-in zoom-in-95 duration-300 my-8">
+            <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto shadow-[0_0_25px_rgba(16,185,129,0.3)]">
+              <CheckCircle2 className="w-8 h-8" />
             </div>
 
-            <div className="space-y-2">
-              <span className="text-xs font-black uppercase tracking-widest text-emerald-400">
-                Payment Authorized & Confirmed
-              </span>
+            <div className="space-y-3">
               <h2 className="text-2xl sm:text-3xl font-black text-white">
-                Your Tickets Are Booked!
+                Payment Successful. Your Tickets are booked
               </h2>
-              <p className="text-sm text-zinc-400 max-w-md mx-auto">
-                Booking Reference: <strong className="text-white font-mono">{confirmedBookingId}</strong>
-                <br />
-                We've sent a digital copy with QR code to <strong className="text-red-400">{contactEmail}</strong>.
+              <p className="text-sm text-zinc-400">
+                Booking Reference ID: <strong className="text-white font-mono font-bold text-base">{confirmedBookingId}</strong>
               </p>
             </div>
 
-            {/* Ticket Summary Card */}
-            <div className="p-4 sm:p-6 bg-zinc-950 rounded-xl border border-white/10 text-left flex items-center gap-4">
-              <img
-                src={movie.posterUrl || movie.backdropUrl}
-                alt={movie.title}
-                className="w-16 sm:w-20 h-24 sm:h-28 object-cover rounded-xl border border-white/10 shrink-0"
-              />
-              <div className="space-y-1 min-w-0 flex-1">
-                <h4 className="font-bold text-base text-white truncate">{movie.title}</h4>
-                <p className="text-xs text-zinc-400">{hall.name} • {format}</p>
-                <p className="text-xs text-zinc-300 font-semibold">{showDate} at {showTime}</p>
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {selectedSeats.map((s) => (
-                    <span
-                      key={s.id}
-                      className="px-2 py-0.5 rounded bg-red-600/20 text-red-400 border border-red-500/40 text-[10px] font-bold"
-                    >
-                      Seat {s.id}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
               <button
                 onClick={() => navigate('/my-bookings')}
-                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-red-600/20 cursor-pointer transition-all"
+                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-6 py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-red-600/20 cursor-pointer transition-all"
               >
                 <Ticket className="w-4 h-4" />
-                <span>View My Tickets & QR Passes</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>View My Tickets</span>
               </button>
 
               <Link
                 to="/movies"
-                className="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-white text-sm font-semibold px-6 py-3.5 rounded-xl text-center transition-all"
+                className="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-white text-sm font-semibold px-6 py-3.5 rounded-xl text-center transition-all cursor-pointer"
               >
                 Browse More Movies
               </Link>

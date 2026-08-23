@@ -208,3 +208,31 @@ body {
   box-shadow: 0 0 16px rgba(229, 9, 20, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transform: translateY(-1px);
 }
+
+/* ════ Print Styles for Cinema Tickets ════ */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .printable-ticket-section,
+  .printable-ticket-section * {
+    visibility: visible !important;
+  }
+  .printable-ticket-section {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+}

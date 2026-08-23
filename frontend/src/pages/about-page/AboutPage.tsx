@@ -93,9 +93,7 @@ export function AboutPage() {
         <div className="max-w-[1280px] mx-auto px-6 md:px-12 space-y-24">
           {/* Hero Section */}
           <section className="relative pt-6 sm:pt-10 text-center space-y-6 max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs sm:text-sm font-bold tracking-wide shadow-[0_0_20px_rgba(229,9,20,0.15)] animate-in fade-in zoom-in-95 duration-300">
-              <span>The Next Chapter in Cinematic Entertainment</span>
-            </div>
+           
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white font-display leading-[1.1]">
               Redefining How You <br />
@@ -110,19 +108,10 @@ export function AboutPage() {
 
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
               <Link
-                to="/"
-                className="liquid-glow-btn text-surface-container-lowest font-extrabold text-sm px-7 py-3 rounded-full flex items-center gap-2 cursor-pointer shadow-lg tracking-tight hover:scale-105 transition-all"
+                to="/movies"
+                className="liquid-glow-btn text-surface-container-lowest font-extrabold text-sm px-8 py-3.5 rounded-full flex items-center gap-2 cursor-pointer shadow-lg tracking-tight hover:scale-105 transition-all"
               >
-                <Film className="w-4 h-4 fill-current" />
-                <span>Explore Now Playing</span>
-              </Link>
-
-              <Link
-                to="/cinemas"
-                className="liquid-glass-btn text-sm font-semibold px-6 py-3 rounded-full text-white hover:text-primary transition-all flex items-center gap-2"
-              >
-                <MapPin className="w-4 h-4 text-primary" />
-                <span>Find a Theater</span>
+                <span>Explore Movies</span>
               </Link>
             </div>
           </section>
@@ -153,7 +142,7 @@ export function AboutPage() {
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-6 space-y-6">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
-                <Film className="w-3.5 h-3.5" />
+               
                 Our Story & Vision
               </div>
 
@@ -256,10 +245,9 @@ export function AboutPage() {
 
               <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
                 <button
-                  onClick={() => handleBookClick(HERO_MOVIE)}
+                  onClick={handleBookClick}
                   className="liquid-glow-btn text-surface-container-lowest font-extrabold text-sm px-8 py-3.5 rounded-full flex items-center gap-2 cursor-pointer shadow-xl tracking-tight hover:scale-105 transition-all"
                 >
-                  <Sparkles className="w-4 h-4 fill-current" />
                   <span>Book Tickets Now</span>
                 </button>
 

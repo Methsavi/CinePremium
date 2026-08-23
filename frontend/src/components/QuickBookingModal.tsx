@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Movie, Cinema, Showtime, Seat } from '../types/movie';
-import { X, Calendar, MapPin, Ticket, CheckCircle, Armchair, ChevronRight, ArrowLeft, QrCode, Loader2 } from 'lucide-react';
+import { X, Calendar, MapPin, Ticket, CheckCircle, Armchair, ChevronRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { bookingApi } from '../services/bookingApi';
 import { getShowtimes } from '../services/showtimeApi';
@@ -55,6 +56,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
   onClose,
   onBookingSuccess
 }) => {
+  const navigate = useNavigate();
   const { token } = useAuth();
   const [currentTime, setCurrentTime] = useState<Date>(() => new Date());
 
@@ -519,49 +521,41 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
 
           {/* STEP 3: CONFIRMATION SUCCESS */}
           {step === 'confirmation' && (
-            <div className="text-center py-6 space-y-6">
+            <div className="text-center py-10 space-y-6 max-w-md mx-auto">
               <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/20">
-                <CheckCircle className="w-10 h-10" />
+                <CheckCircle className="w-8 h-8" />
               </div>
 
-              <div className="space-y-1">
-                <h3 className="text-2xl font-black text-white">Tickets Confirmed!</h3>
-                <p className="text-zinc-400 text-sm">Booking ID: <span className="font-mono font-bold text-red-400">{confirmedBookingId}</span></p>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black text-white">
+                  Payment Successful. Your Tickets are booked
+                </h3>
+                <p className="text-sm text-zinc-400">
+                  Booking Reference ID: <strong className="text-white font-mono font-bold text-base">{confirmedBookingId}</strong>
+                </p>
               </div>
 
-              {/* Digital Ticket Card */}
-              <div className="max-w-md mx-auto bg-zinc-950 border border-white/15 rounded-xl p-6 text-left space-y-4 shadow-2xl relative overflow-hidden">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                  <div>
-                    <h4 className="font-bold text-white text-base">{movie.title}</h4>
-                    <p className="text-xs text-zinc-400">{selectedCinema.name}</p>
-                  </div>
-                  <span className="px-2.5 py-1 rounded text-xs font-bold bg-red-600 text-white">
-                    {selectedShowtime?.format}
-                  </span>
-                </div>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+                <button
+                  onClick={() => {
+                    onClose();
+                    navigate('/my-bookings');
+                  }}
+                  className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-6 py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-red-600/20 cursor-pointer transition-all"
+                >
+                  <Ticket className="w-4 h-4" />
+                  <span>View My Tickets</span>
+                </button>
 
-                <div className="grid grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <span className="text-zinc-500 block uppercase font-bold text-[10px]">Date & Time</span>
-                    <span className="text-zinc-200 font-semibold">{selectedDate} • {selectedShowtime?.time}</span>
-                  </div>
-                  <div>
-                    <span className="text-zinc-500 block uppercase font-bold text-[10px]">Seats</span>
-                    <span className="text-zinc-200 font-semibold">{selectedSeats.map(s => s.id).join(', ')}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-3 border-t border-dashed border-white/15">
-                  <div className="flex items-center gap-2">
-                    <QrCode className="w-12 h-12 text-slate-950 bg-white p-1 rounded" />
-                    <span className="text-[10px] text-zinc-400">Scan at cinema entry gate</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs text-zinc-400 block">Total Paid</span>
-                    <span className="text-lg font-black text-emerald-400">Rs. {totalAmount.toFixed(2)}</span>
-                  </div>
-                </div>
+                <button
+                  onClick={() => {
+                    onClose();
+                    navigate('/movies');
+                  }}
+                  className="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-white text-sm font-semibold px-6 py-3.5 rounded-xl text-center transition-all cursor-pointer"
+                >
+                  Browse More Movies
+                </button>
               </div>
             </div>
           )}
@@ -569,52 +563,45 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-5 border-t border-white/10 bg-zinc-950/80 flex items-center justify-between">
-          {step === 'showtime' && (
-            <>
-              <div className="text-sm text-zinc-300">
-                Showtime: <span className="font-bold text-white">{selectedShowtime?.time} ({selectedShowtime?.format})</span>
-              </div>
-              <button
-                disabled={!selectedShowtime}
-                onClick={() => setStep('seats')}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-600/30 transition-all cursor-pointer"
-              >
-                <span>Select Seats</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </>
-          )}
+        {step !== 'confirmation' && (
+          <div className="p-5 border-t border-white/10 bg-zinc-950/80 flex items-center justify-between">
+            {step === 'showtime' && (
+              <>
+                <div className="text-sm text-zinc-300">
+                  Showtime: <span className="font-bold text-white">{selectedShowtime?.time} ({selectedShowtime?.format})</span>
+                </div>
+                <button
+                  disabled={!selectedShowtime}
+                  onClick={() => setStep('seats')}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-600/30 transition-all cursor-pointer"
+                >
+                  <span>Select Seats</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </>
+            )}
 
-          {step === 'seats' && (
-            <>
-              <div className="text-sm text-zinc-300">
-                Seats ({selectedSeats.length}): <span className="font-bold text-emerald-400">Rs. {totalAmount.toFixed(2)}</span>
-              </div>
-              <button
-                disabled={selectedSeats.length === 0 || isBooking}
-                onClick={handleConfirmPayment}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-600/30 disabled:opacity-50 transition-all cursor-pointer"
-              >
-                {isBooking ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Armchair className="w-4 h-4" />
-                )}
-                <span>{isBooking ? 'Confirming...' : `Confirm & Pay Rs. ${totalAmount.toFixed(2)}`}</span>
-              </button>
-            </>
-          )}
-
-          {step === 'confirmation' && (
-            <button
-              onClick={onClose}
-              className="w-full py-3 rounded-xl bg-red-600 text-white font-bold text-sm hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
-            >
-              Done & Return to Homepage
-            </button>
-          )}
-        </div>
+            {step === 'seats' && (
+              <>
+                <div className="text-sm text-zinc-300">
+                  Seats ({selectedSeats.length}): <span className="font-bold text-emerald-400">Rs. {totalAmount.toFixed(2)}</span>
+                </div>
+                <button
+                  disabled={selectedSeats.length === 0 || isBooking}
+                  onClick={handleConfirmPayment}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-600/30 disabled:opacity-50 transition-all cursor-pointer"
+                >
+                  {isBooking ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Armchair className="w-4 h-4" />
+                  )}
+                  <span>{isBooking ? 'Confirming...' : `Confirm & Pay Rs. ${totalAmount.toFixed(2)}`}</span>
+                </button>
+              </>
+            )}
+          </div>
+        )}
 
       </div>
     </div>
