@@ -2,6 +2,7 @@ import { Hall } from '../models/hall.model.js';
 import { ApiError } from '../utils/apiError.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { broadcastCatalogEvent } from '../socket/seatSocket.js';
 
 // @desc    Get all cinema halls
 // @route   GET /api/v1/halls
@@ -43,6 +44,8 @@ export const createHall = asyncHandler(async (req, res) => {
     totalCapacity,
   });
 
+  broadcastCatalogEvent(req.app.get('io'), 'hall-created', hall);
+
   res.status(201).json(new ApiResponse(201, hall, 'Cinema hall created successfully'));
 });
 
@@ -75,6 +78,8 @@ export const updateHall = asyncHandler(async (req, res) => {
     runValidators: true,
   });
 
+  broadcastCatalogEvent(req.app.get('io'), 'hall-updated', updatedHall);
+
   res.status(200).json(new ApiResponse(200, updatedHall, 'Cinema hall updated successfully'));
 });
 
@@ -87,6 +92,8 @@ export const deleteHall = asyncHandler(async (req, res) => {
   if (!hall) {
     throw new ApiError(404, 'Cinema hall not found');
   }
+
+  broadcastCatalogEvent(req.app.get('io'), 'hall-deleted', hall);
 
   res.status(200).json(new ApiResponse(200, hall, 'Cinema hall deleted successfully'));
 });

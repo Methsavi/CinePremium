@@ -1,6 +1,6 @@
 import { BookingModel } from '../models/booking.model.js';
 import { SeatLockModel } from '../models/seatLock.model.js';
-import { broadcastSeatUpdate } from '../socket/seatSocket.js';
+import { broadcastSeatUpdate, broadcastBookingEvent } from '../socket/seatSocket.js';
 
 export const createBooking = async (req, res) => {
   try {
@@ -49,6 +49,7 @@ export const createBooking = async (req, res) => {
     const io = req.app.get('io');
     if (io) {
       broadcastSeatUpdate(io, showtimeId, date);
+      broadcastBookingEvent(io, 'booking-created', newBooking);
     }
 
     res.status(201).json({
@@ -87,6 +88,7 @@ export const cancelBooking = async (req, res) => {
     const io = req.app.get('io');
     if (io) {
       broadcastSeatUpdate(io, booking.showtimeId, booking.date);
+      broadcastBookingEvent(io, 'booking-cancelled', booking);
     }
 
     res.status(200).json({ message: 'Booking cancelled successfully', booking });

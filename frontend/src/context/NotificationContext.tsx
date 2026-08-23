@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { io } from 'socket.io-client';
+import { useAuth } from './AuthContext';
 import { 
   CheckCircle2, AlertCircle, Trash2, Ticket, PlusCircle, 
   XCircle, Bell, X, Check
@@ -49,6 +51,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 const STORAGE_KEY = 'cinepremium_notifications_v1';
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { token } = useAuth();
   const [notifications, setNotifications] = useState<AppNotification[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -62,6 +65,35 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   });
 
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const baseUrl = import.meta.env.VITE_API_URL || import.meta.env.BACKEND_URL?.replace(/\/$/, '') || 'http://localhost:5000';
+    const socket = io(baseUrl, { auth: { token } });
+
+    socket.on('booking-created', ({ booking }: { booking: { movieTitle?: string; bookingId?: string } }) => {
+      addNotification({
+        type: 'booking',
+        message: `Booking confirmed for ${booking.movieTitle || 'your movie'}${booking.bookingId ? ` (${booking.bookingId})` : ''}.`
+      });
+    });
+
+    socket.on('booking-cancelled', ({ booking }: { booking: { movieTitle?: string; bookingId?: string } }) => {
+      addNotification({
+        type: 'cancel',
+        message: `Booking cancelled for ${booking.movieTitle || 'your movie'}${booking.bookingId ? ` (${booking.bookingId})` : ''}.`
+      });
+    });
+
+    socket.on('connect_error', (error) => {
+      console.warn('[Realtime] Socket connection failed:', error.message);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [token]);
 
   // Save persistent history
   useEffect(() => {

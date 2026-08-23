@@ -11,6 +11,7 @@ import { getShowtimes } from "../../services/showtimeApi";
 import { getRegisteredUsers, deleteUser, updateUser } from "../../services/userApi";
 import { useAuth } from "../../context/AuthContext";
 import { useNotification } from "../../context/NotificationContext";
+import { io } from "socket.io-client";
 import { User } from "../../types/auth";
 import { Movie } from "../../types/movie";
 import { CinemaHall } from "../../types/hall";
@@ -98,6 +99,28 @@ export default function SuperAdminPage() {
     if (!isAuthenticated || user?.role !== "admin") return;
     loadStats();
   }, [activeTab, isAuthenticated, user]);
+
+  useEffect(() => {
+    if (!token || user?.role !== "admin") return;
+
+    const baseUrl = import.meta.env.VITE_API_URL || import.meta.env.BACKEND_URL?.replace(/\/$/, '') || 'http://localhost:5000';
+    const socket = io(baseUrl, { auth: { token } });
+    const refresh = () => loadStats();
+
+    socket.on('booking-created', refresh);
+    socket.on('booking-cancelled', refresh);
+    socket.on('movie-created', refresh);
+    socket.on('movie-updated', refresh);
+    socket.on('movie-deleted', refresh);
+    socket.on('hall-created', refresh);
+    socket.on('hall-updated', refresh);
+    socket.on('hall-deleted', refresh);
+    socket.on('showtime-created', refresh);
+    socket.on('showtime-updated', refresh);
+    socket.on('showtime-deleted', refresh);
+
+    return () => socket.disconnect();
+  }, [token, user?.role]);
 
   useEffect(() => {
     if (activeTab === "users" && isAuthenticated && user?.role === "admin") {

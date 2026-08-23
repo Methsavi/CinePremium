@@ -1,5 +1,7 @@
 import { BookingModel } from '../models/booking.model.js';
 import { SeatLockModel } from '../models/seatLock.model.js';
+import jwt from 'jsonwebtoken';
+import { config } from '../config/env.js';
 
 /**
  * Fetch all occupied seats (both confirmed bookings and active temporary locks) from MongoDB
@@ -55,12 +57,57 @@ export async function broadcastSeatUpdate(io, showtimeId, date) {
   }
 }
 
+export function broadcastBookingEvent(io, eventName, booking) {
+  if (!io || !booking) return;
+
+  const payload = {
+    booking: booking.toJSON ? booking.toJSON() : booking,
+    timestamp: new Date().toISOString()
+  };
+
+  io.to('admins').emit(eventName, payload);
+  if (booking.user) {
+    io.to(`user:${booking.user.toString()}`).emit(eventName, payload);
+  }
+}
+
+export function broadcastCatalogEvent(io, eventName, record) {
+  if (!io || !record) return;
+  const payload = {
+    record: record.toJSON ? record.toJSON() : record,
+    timestamp: new Date().toISOString()
+  };
+  io.to('admins').emit(eventName, payload);
+  io.emit(eventName, payload);
+  io.emit('catalog-updated', { eventName, payload });
+}
+
 /**
  * Setup Socket.IO connection and event handlers
  */
 export function setupSeatSocket(io) {
+  io.use((socket, next) => {
+    const token = socket.handshake.auth?.token;
+    if (!token) return next();
+
+    try {
+      socket.user = jwt.verify(token, config.jwtSecret);
+      next();
+    } catch (error) {
+      next(new Error('Unauthorized socket connection'));
+    }
+  });
+
   io.on('connection', (socket) => {
     console.log('[SeatSocket] Client connected:', socket.id);
+
+    if (socket.user?.id) {
+      socket.join(`user:${socket.user.id}`);
+      if (socket.user.role === 'admin' || socket.user.role === 'cinema_manager') {
+        socket.join('admins');
+      }
+      socket.emit('socket-ready', { userId: socket.user.id, role: socket.user.role });
+    }
 
     // Join showtime room
     socket.on('join_showtime', async (data) => {
@@ -128,6 +175,7 @@ export function setupSeatSocket(io) {
 
     // Handle real-time seat selection & MongoDB locking
     socket.on('seat_select', async ({ showtimeId, date, seatId, status }) => {
+      if (!showtimeId || !date || !seatId || !['locked', 'available'].includes(status)) return;
       const roomId = `show:${showtimeId}:${date}`;
 
       try {
@@ -149,6 +197,13 @@ export function setupSeatSocket(io) {
           }
 
           // Persist temporary lock in MongoDB (unique index prevents duplicates)
+          await SeatLockModel.deleteMany({
+            showtimeId,
+            date,
+            seatId,
+            createdAt: { $lt: new Date(Date.now() - 10 * 60 * 1000) }
+          });
+
           await SeatLockModel.create({
             showtimeId,
             date,
@@ -157,7 +212,7 @@ export function setupSeatSocket(io) {
           });
 
           // Broadcast to other clients in the room
-          socket.to(roomId).emit('seat_update', { seatId, status: 'locked' });
+          io.to(roomId).emit('seat_update', { seatId, status: 'locked', socketId: socket.id });
         } else {
           // User deselected seat: delete temporary lock from MongoDB
           await SeatLockModel.deleteOne({
@@ -168,7 +223,7 @@ export function setupSeatSocket(io) {
           });
 
           // Broadcast availability to other clients in the room
-          socket.to(roomId).emit('seat_update', { seatId, status: 'available' });
+          io.to(roomId).emit('seat_update', { seatId, status: 'available', socketId: socket.id });
         }
       } catch (err) {
         if (err.code === 11000) {

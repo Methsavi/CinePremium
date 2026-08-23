@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Movie, Cinema, Showtime, Seat } from '../types/movie';
 import { X, Calendar, MapPin, Ticket, CheckCircle, Armchair, ChevronRight, ArrowLeft, QrCode, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { bookingApi } from '../services/bookingApi';
+import { getShowtimes } from '../services/showtimeApi';
+import { getHalls } from '../services/hallApi';
 import { io, Socket } from 'socket.io-client';
+import { getUpcomingCalendarDays, isShowtimePast } from '../lib/utils';
 
 const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.BACKEND_URL?.replace(/\/$/, '') || 'http://localhost:5000';
-
-const DEFAULT_CINEMA: Cinema = {
-  id: 'c1',
-  name: 'CinePremium Grand Hall',
-  location: 'Colombo, Sri Lanka',
-  distance: '1.5 km',
-  showtimes: [
-    { id: 'st1', time: '11:30 AM', format: 'IMAX 3D', price: 22, hall: 'Hall 1' },
-    { id: 'st2', time: '02:45 PM', format: 'Dolby Cinema', price: 18, hall: 'Hall 2' },
-  ]
-};
 
 interface QuickBookingModalProps {
   movie: Movie | null;
@@ -33,14 +25,6 @@ interface QuickBookingModalProps {
     totalAmount: number;
   }) => void;
 }
-
-const DATES = [
-  { day: 'Today', date: 'Aug 4', fullDate: '2026-08-04' },
-  { day: 'Wed', date: 'Aug 5', fullDate: '2026-08-05' },
-  { day: 'Thu', date: 'Aug 6', fullDate: '2026-08-06' },
-  { day: 'Fri', date: 'Aug 7', fullDate: '2026-08-07' },
-  { day: 'Sat', date: 'Aug 8', fullDate: '2026-08-08' },
-];
 
 const generateSeats = (occupiedIds: string[] = []): Seat[] => {
   return Array.from({ length: 48 }, (_, index) => {
@@ -72,23 +56,129 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
   onBookingSuccess
 }) => {
   const { token } = useAuth();
+  const [currentTime, setCurrentTime] = useState<Date>(() => new Date());
+
+  // Clock ticker for real-time past showtime invalidation
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 15000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const calendarDays = useMemo(() => getUpcomingCalendarDays(5), []);
   const [step, setStep] = useState<'showtime' | 'seats' | 'confirmation'>('showtime');
-  const [selectedDate, setSelectedDate] = useState(DATES[0].fullDate);
-  const [selectedCinema, setSelectedCinema] = useState<Cinema>(() => initialCinema || DEFAULT_CINEMA);
-  const [selectedShowtime, setSelectedShowtime] = useState<Showtime | null>(() => initialShowtime || (initialCinema ? initialCinema.showtimes[0] : DEFAULT_CINEMA.showtimes[0]));
+  const [selectedDate, setSelectedDate] = useState(calendarDays[0].dateStr);
+  const [dbShowtimes, setDbShowtimes] = useState<any[]>([]);
+  const [dbHalls, setDbHalls] = useState<any[]>([]);
+  const [loadingShowtimes, setLoadingShowtimes] = useState<boolean>(true);
+
+  const [selectedCinema, setSelectedCinema] = useState<Cinema | null>(null);
+  const [selectedShowtime, setSelectedShowtime] = useState<Showtime | null>(null);
   const [seats, setSeats] = useState<Seat[]>(generateSeats([]));
   const [confirmedBookingId, setConfirmedBookingId] = useState<string>('');
   const [isBooking, setIsBooking] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  // Fetch real database showtimes and halls
+  const loadDbData = useCallback(async () => {
+    if (!movie) return;
+    try {
+      setLoadingShowtimes(true);
+      const [halls, allShowtimes] = await Promise.all([
+        getHalls().catch(() => []),
+        getShowtimes().catch(() => [])
+      ]);
+      setDbHalls(halls || []);
+
+      const movieShowtimes = (allShowtimes || []).filter((st: any) => {
+        if (st.isActive === false) return false;
+        const mId = typeof st.movie === 'object' ? st.movie?.id || st.movie?._id : st.movie;
+        const movieUid = movie.id || (movie as any)._id;
+        return mId === movieUid || st.movie?.title?.toLowerCase() === movie.title?.toLowerCase();
+      });
+      setDbShowtimes(movieShowtimes);
+    } catch (err) {
+      console.error('Failed to load database showtimes for modal', err);
+    } finally {
+      setLoadingShowtimes(false);
+    }
+  }, [movie]);
+
+  useEffect(() => {
+    loadDbData();
+  }, [loadDbData]);
+
   // Initialize socket connection
   useEffect(() => {
     const newSocket = io(BASE_URL);
     setSocket(newSocket);
+
+    newSocket.on('showtime-created', loadDbData);
+    newSocket.on('showtime-updated', loadDbData);
+    newSocket.on('showtime-deleted', loadDbData);
+    newSocket.on('catalog-updated', loadDbData);
+
     return () => {
+      newSocket.off('showtime-created', loadDbData);
+      newSocket.off('showtime-updated', loadDbData);
+      newSocket.off('showtime-deleted', loadDbData);
+      newSocket.off('catalog-updated', loadDbData);
       newSocket.close();
     };
-  }, []);
+  }, [loadDbData]);
+
+  // Computed halls with active database showtimes for selectedDate
+  const availableCinemas = useMemo(() => {
+    if (!movie) return [];
+
+    const dateShowtimes = dbShowtimes.filter((st) => st.showDate === selectedDate);
+    
+    // Group by Hall
+    const cinemaMap = new Map<string, Cinema>();
+
+    dateShowtimes.forEach((st) => {
+      const hallObj = typeof st.hall === 'object' ? st.hall : dbHalls.find(h => h.id === st.hall);
+      const hallId = hallObj?.id || hallObj?._id || 'hall-default';
+      const hallName = hallObj?.name ? `CinePremium Multiplex – ${hallObj.name}` : 'CinePremium Multiplex';
+
+      if (!cinemaMap.has(hallId)) {
+        cinemaMap.set(hallId, {
+          id: hallId,
+          name: hallName,
+          location: 'CinePremium Multiplex Main Floor',
+          distance: hallObj?.screenType || 'Digital 3D',
+          showtimes: []
+        });
+      }
+
+      const cinema = cinemaMap.get(hallId)!;
+      const isPast = isShowtimePast(selectedDate, st.showTime, currentTime);
+
+      cinema.showtimes.push({
+        id: st.id || st._id,
+        time: st.showTime,
+        format: st.format || hallObj?.screenType || '3D',
+        price: st.tierPrices?.[0]?.price || 15,
+        hall: hallObj?.name || 'Screen 1',
+        isPast
+      } as any);
+    });
+
+    return Array.from(cinemaMap.values());
+  }, [movie, dbShowtimes, dbHalls, selectedDate, currentTime]);
+
+  // Auto-select first cinema & first available showtime
+  useEffect(() => {
+    if (availableCinemas.length > 0) {
+      setSelectedCinema(availableCinemas[0]);
+      const firstFutureShow = availableCinemas[0].showtimes.find((st: any) => !st.isPast);
+      setSelectedShowtime(firstFutureShow || availableCinemas[0].showtimes[0] || null);
+    } else {
+      setSelectedCinema(null);
+      setSelectedShowtime(null);
+    }
+  }, [availableCinemas]);
 
   // Fetch occupied seats on showtime change
   useEffect(() => {
@@ -124,7 +214,8 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
       });
     });
 
-    socket.on('seat_update', ({ seatId, status }: { seatId: string, status: string }) => {
+    socket.on('seat_update', ({ seatId, status, socketId }: { seatId: string, status: string, socketId?: string }) => {
+      if (socketId === socket.id) return;
       setSeats(prev => prev.map(seat => {
         if (seat.id === seatId) {
           return { ...seat, status: status === 'locked' ? 'occupied' : 'available' };
@@ -270,19 +361,20 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-red-500" /> Select Date
                 </label>
-                <div className="flex items-center gap-3 overflow-x-auto pb-2">
-                  {DATES.map((d) => (
+                <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+                  {calendarDays.map((d) => (
                     <button
-                      key={d.fullDate}
-                      onClick={() => setSelectedDate(d.fullDate)}
-                      className={`flex flex-col items-center justify-center p-3 min-w-[80px] rounded-xl border transition-all ${
-                        selectedDate === d.fullDate
+                      key={d.dateStr}
+                      onClick={() => setSelectedDate(d.dateStr)}
+                      className={`flex flex-col items-center justify-center p-3 min-w-[76px] rounded-xl border transition-all cursor-pointer select-none ${
+                        selectedDate === d.dateStr
                           ? 'bg-red-600 border-red-500 text-white shadow-lg shadow-red-600/30'
                           : 'bg-zinc-950 border-white/10 text-zinc-300 hover:bg-zinc-900'
                       }`}
                     >
-                      <span className="text-xs font-medium">{d.day}</span>
-                      <span className="text-base font-bold">{d.date}</span>
+                      <span className="text-[10px] font-bold uppercase">{d.dayLabel}</span>
+                      <span className="text-base font-black my-0.5">{d.dayNum}</span>
+                      <span className="text-[10px] font-semibold text-zinc-400">{d.month}</span>
                     </button>
                   ))}
                 </div>
@@ -291,50 +383,80 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
               {/* Cinema & Showtime Cards */}
               <div className="space-y-4">
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-red-500" /> Cinemas & Showtimes in Your City
+                  <MapPin className="w-4 h-4 text-red-500" /> Live Multiplex Screenings & Showtimes
                 </label>
 
-                {[selectedCinema].map((cinema) => (
-                  <div
-                    key={cinema.id}
-                    className={`p-4 rounded-xl border transition-all ${
-                      selectedCinema.id === cinema.id
-                        ? 'bg-zinc-950 border-red-500/50'
-                        : 'bg-zinc-950/50 border-white/10'
-                    }`}
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                      <div>
-                        <h4 className="font-bold text-white text-base">{cinema.name}</h4>
-                        <p className="text-xs text-zinc-400">{cinema.location} • {cinema.distance}</p>
+                {loadingShowtimes ? (
+                  <div className="p-8 text-center bg-zinc-950 border border-white/10 rounded-xl space-y-2">
+                    <Loader2 className="w-6 h-6 animate-spin text-red-500 mx-auto" />
+                    <p className="text-xs text-zinc-400 font-semibold">Loading real-time showtimes from database...</p>
+                  </div>
+                ) : availableCinemas.length === 0 ? (
+                  <div className="p-8 text-center bg-zinc-950 border border-white/10 rounded-xl">
+                    <p className="text-sm font-bold text-zinc-300">No Showtimes available for this date</p>
+                  </div>
+                ) : (
+                  availableCinemas.map((cinema) => (
+                    <div
+                      key={cinema.id}
+                      className={`p-4 rounded-xl border transition-all ${
+                        selectedCinema?.id === cinema.id
+                          ? 'bg-zinc-950 border-red-500/50'
+                          : 'bg-zinc-950/50 border-white/10'
+                      }`}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div>
+                          <h4 className="font-bold text-white text-base">{cinema.name}</h4>
+                          <p className="text-xs text-zinc-400">{cinema.distance}</p>
+                        </div>
+                      </div>
+
+                      {/* Showtimes Grid */}
+                      <div className="flex flex-wrap gap-2.5">
+                        {cinema.showtimes.map((st: any) => {
+                          const isSelected = selectedCinema?.id === cinema.id && selectedShowtime?.id === st.id;
+                          const isPast = st.isPast || false;
+
+                          if (isPast) {
+                            return (
+                              <div
+                                key={st.id}
+                                className="px-4 py-2.5 rounded-xl border border-white/5 bg-zinc-950/60 text-left opacity-40 cursor-not-allowed select-none"
+                                title="Screening time has already passed according to real time"
+                              >
+                                <div className="text-sm font-extrabold text-zinc-500 line-through decoration-zinc-600">
+                                  {st.time}
+                                </div>
+                                <div className="text-[9px] font-bold text-red-400/80 uppercase">
+                                  PASSED
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <button
+                              key={st.id}
+                              onClick={() => {
+                                setSelectedCinema(cinema);
+                                setSelectedShowtime(st);
+                              }}
+                              className={`px-4 py-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-red-600 border-red-500 text-white font-bold shadow-lg shadow-red-600/30'
+                                  : 'bg-zinc-900 border-white/10 text-zinc-200 hover:bg-zinc-800'
+                              }`}
+                            >
+                              <div className="text-sm font-bold">{st.time}</div>
+                              <div className="text-[10px] opacity-80">{st.format} • Rs. {st.price}</div>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
-
-                    {/* Showtimes Grid */}
-                    <div className="flex flex-wrap gap-2.5">
-                      {cinema.showtimes.map((st) => {
-                        const isSelected = selectedCinema.id === cinema.id && selectedShowtime?.id === st.id;
-                        return (
-                          <button
-                            key={st.id}
-                            onClick={() => {
-                              setSelectedCinema(cinema);
-                              setSelectedShowtime(st);
-                            }}
-                            className={`px-4 py-2.5 rounded-xl border text-left transition-all ${
-                              isSelected
-                                ? 'bg-red-600 border-red-500 text-white font-bold shadow-lg shadow-red-600/30'
-                                : 'bg-zinc-900 border-white/10 text-zinc-200 hover:bg-zinc-800'
-                            }`}
-                          >
-                            <div className="text-sm font-bold">{st.time}</div>
-                            <div className="text-[10px] opacity-80">{st.format} • Rs. {st.price}</div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -491,6 +613,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
             >
               Done & Return to Homepage
             </button>
+          )}
         </div>
 
       </div>

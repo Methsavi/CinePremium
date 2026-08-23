@@ -4,6 +4,7 @@ import { Hall } from '../models/hall.model.js';
 import { ApiError } from '../utils/apiError.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { broadcastCatalogEvent } from '../socket/seatSocket.js';
 
 // @desc    Get all showtimes / forecastings
 // @route   GET /api/v1/showtimes
@@ -47,6 +48,8 @@ export const createShowtime = asyncHandler(async (req, res) => {
   const populatedShowtime = await Showtime.findById(showtime._id)
     .populate('movie')
     .populate('hall');
+
+  broadcastCatalogEvent(req.app.get('io'), 'showtime-created', populatedShowtime);
 
   res.status(201).json(new ApiResponse(201, populatedShowtime, 'Showtime scheduled successfully'));
 });
@@ -103,6 +106,8 @@ export const updateShowtime = asyncHandler(async (req, res) => {
     .populate('movie')
     .populate('hall');
 
+  broadcastCatalogEvent(req.app.get('io'), 'showtime-updated', updatedShowtime);
+
   res.status(200).json(new ApiResponse(200, updatedShowtime, 'Showtime updated successfully'));
 });
 
@@ -115,6 +120,8 @@ export const deleteShowtime = asyncHandler(async (req, res) => {
   if (!showtime) {
     throw new ApiError(404, 'Showtime not found');
   }
+
+  broadcastCatalogEvent(req.app.get('io'), 'showtime-deleted', showtime);
 
   res.status(200).json(new ApiResponse(200, showtime, 'Showtime deleted successfully'));
 });

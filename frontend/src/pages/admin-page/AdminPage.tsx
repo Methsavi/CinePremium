@@ -13,6 +13,7 @@ import { CinemaHall } from "../../types/hall";
 import { Showtime } from "../../types/showtime";
 import { useAuth } from "../../context/AuthContext";
 import logo from "../../assets/logo.png";
+import { io } from "socket.io-client";
 import { 
   Film, Tv, Calendar, ArrowLeft, LayoutDashboard, 
   LogOut, ShieldAlert, ChevronRight,
@@ -31,7 +32,7 @@ const SCREEN_FORMAT_COLORS: Record<string, { fill: string }> = {
 
 export function AdminPage() {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const { user, token, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   
   const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
   const [moviesList, setMoviesList] = useState<Movie[]>([]);
@@ -62,6 +63,30 @@ export function AdminPage() {
     if (!isAuthenticated || user?.role !== "cinema_manager") return;
     loadDatabaseData();
   }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    if (!token || user?.role !== "cinema_manager") return;
+
+    const baseUrl = import.meta.env.VITE_API_URL || import.meta.env.BACKEND_URL?.replace(/\/$/, '') || 'http://localhost:5000';
+    const socket = io(baseUrl, { auth: { token } });
+    const refresh = () => loadDatabaseData();
+
+    socket.on('booking-created', refresh);
+    socket.on('booking-cancelled', refresh);
+    socket.on('movie-created', refresh);
+    socket.on('movie-updated', refresh);
+    socket.on('movie-deleted', refresh);
+    socket.on('hall-created', refresh);
+    socket.on('hall-updated', refresh);
+    socket.on('hall-deleted', refresh);
+    socket.on('showtime-created', refresh);
+    socket.on('showtime-updated', refresh);
+    socket.on('showtime-deleted', refresh);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [token, user?.role]);
 
   const handleLogout = async () => {
     await logout();

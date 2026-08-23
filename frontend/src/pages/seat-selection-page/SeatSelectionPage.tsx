@@ -9,6 +9,7 @@ import { getHalls } from '../../services/hallApi';
 import { Movie } from '../../types/movie';
 import { CinemaHall } from '../../types/hall';
 import { io, Socket } from 'socket.io-client';
+import { isShowtimePast } from '../../lib/utils';
 import {
   Armchair,
   ChevronLeft,
@@ -132,34 +133,60 @@ export function SeatSelectionPage() {
 
     loadOccupiedSeats();
 
-    // Listen for real-time seat locks/bookings from other users
-    newSocket.on('seatUpdated', (data: { showtimeId: string; date: string; occupiedSeats: string[] }) => {
-      if (data.showtimeId === showtimeId && data.date === showDate) {
-        const occupiedIds = data.occupiedSeats || [];
-        setSeats((prev) =>
-          prev.map((s) => ({
-            ...s,
-            status: occupiedIds.includes(s.id)
-              ? 'occupied'
-              : selectedSeatIds.includes(s.id)
-              ? 'selected'
-              : 'available',
-          }))
-        );
+    newSocket.emit('join_showtime', { showtimeId, date: showDate });
+
+    const updateSeats = ({ occupiedSeats }: { occupiedSeats: string[] }) => {
+      const occupiedIds = occupiedSeats || [];
+      setSeats((prev) =>
+        prev.map((seat) => ({
+          ...seat,
+          status: occupiedIds.includes(seat.id)
+            ? 'occupied'
+            : selectedSeatIds.includes(seat.id)
+            ? 'selected'
+            : 'available',
+        }))
+      );
+    };
+
+    const updateSeat = ({ seatId, status, socketId }: { seatId: string; status: string; socketId?: string }) => {
+      if (socketId === newSocket.id) return;
+      setSeats((prev) => prev.map((seat) => (
+        seat.id === seatId ? { ...seat, status: status === 'locked' ? 'occupied' : 'available' } : seat
+      )));
+      if (status === 'locked') {
+        setSelectedSeatIds((prev) => prev.filter((id) => id !== seatId));
       }
-    });
+    };
+
+    const handleLockFailed = ({ seatId, reason }: { seatId: string; reason?: string }) => {
+      setSelectedSeatIds((prev) => prev.filter((id) => id !== seatId));
+      setSeats((prev) => prev.map((seat) => (
+        seat.id === seatId ? { ...seat, status: 'occupied' } : seat
+      )));
+      setErrorMsg(reason || `Seat ${seatId} was just taken by another user.`);
+    };
+
+    newSocket.on('seats-update', updateSeats);
+    newSocket.on('seat_update', updateSeat);
+    newSocket.on('seat_lock_failed', handleLockFailed);
 
     return () => {
+      newSocket.emit('leave_showtime', { showtimeId, date: showDate });
+      newSocket.off('seats-update', updateSeats);
+      newSocket.off('seat_update', updateSeat);
+      newSocket.off('seat_lock_failed', handleLockFailed);
       newSocket.close();
     };
   }, [showtimeId, showDate]);
 
   // Toggle seat selection
   const handleSeatClick = (seat: SeatData) => {
-    if (seat.status === 'occupied') return;
+    if (isShowtimeExpired || seat.status === 'occupied') return;
 
     if (selectedSeatIds.includes(seat.id)) {
       // Deselect
+      socket?.emit('seat_select', { showtimeId, date: showDate, seatId: seat.id, status: 'available' });
       setSelectedSeatIds((prev) => prev.filter((id) => id !== seat.id));
       setSeats((prev) =>
         prev.map((s) => (s.id === seat.id ? { ...s, status: 'available' } : s))
@@ -171,6 +198,7 @@ export function SeatSelectionPage() {
         setTimeout(() => setErrorMsg(null), 3500);
         return;
       }
+      socket?.emit('seat_select', { showtimeId, date: showDate, seatId: seat.id, status: 'locked' });
       setSelectedSeatIds((prev) => [...prev, seat.id]);
       setSeats((prev) =>
         prev.map((s) => (s.id === seat.id ? { ...s, status: 'selected' } : s))
@@ -187,8 +215,15 @@ export function SeatSelectionPage() {
   const bookingFee = selectedSeatsList.length > 0 ? 1.50 : 0;
   const grandTotal = ticketsSubtotal + bookingFee;
 
+  const isShowtimeExpired = isShowtimePast(showDate, showTime);
+
   // Navigate to Checkout Page
   const handleProceedToCheckout = () => {
+    if (isShowtimeExpired) {
+      setErrorMsg('This screening showtime has already passed. Please choose an upcoming showtime.');
+      return;
+    }
+
     if (!isAuthenticated || !token) {
       navigate('/login', { state: { returnTo: location.pathname } });
       return;
@@ -286,6 +321,23 @@ export function SeatSelectionPage() {
             </span>
           </div>
         </div>
+
+        {isShowtimeExpired && (
+          <div className="p-4 bg-red-950/60 border border-red-500 text-red-300 text-sm rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
+            <div className="flex items-center gap-2.5">
+              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+              <span>
+                <strong>Screening Passed:</strong> This showtime ({showDate} at {showTime}) has already passed in real-time. Reservations are closed.
+              </span>
+            </div>
+            <button
+              onClick={() => navigate(`/movie/${movie.id}`)}
+              className="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold shrink-0 cursor-pointer shadow-md"
+            >
+              Browse Active Showtimes
+            </button>
+          </div>
+        )}
 
         {errorMsg && (
           <div className="p-4 bg-red-950/40 border border-red-500/30 text-red-400 text-sm rounded-xl flex items-center gap-2 animate-in fade-in">

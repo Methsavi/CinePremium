@@ -3,6 +3,7 @@ import { ApiError } from '../utils/apiError.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { uploadFileToR2 } from '../services/r2Storage.service.js';
+import { broadcastCatalogEvent } from '../socket/seatSocket.js';
 
 // @desc    Get all movies
 // @route   GET /api/v1/movies
@@ -57,6 +58,7 @@ export const addMovie = asyncHandler(async (req, res) => {
   };
 
   const movie = await Movie.create(movieData);
+  broadcastCatalogEvent(req.app.get('io'), 'movie-created', movie);
   res.status(201).json(new ApiResponse(201, movie, 'Movie added successfully'));
 });
 
@@ -114,6 +116,8 @@ export const updateMovie = asyncHandler(async (req, res) => {
     runValidators: true,
   });
 
+  broadcastCatalogEvent(req.app.get('io'), 'movie-updated', updatedMovie);
+
   res.status(200).json(new ApiResponse(200, updatedMovie, 'Movie updated successfully'));
 });
 
@@ -126,6 +130,8 @@ export const removeMovie = asyncHandler(async (req, res) => {
   if (!movie) {
     throw new ApiError(404, 'Movie not found');
   }
+
+  broadcastCatalogEvent(req.app.get('io'), 'movie-deleted', movie);
   
   res.status(200).json(new ApiResponse(200, movie, 'Movie removed successfully'));
 });
