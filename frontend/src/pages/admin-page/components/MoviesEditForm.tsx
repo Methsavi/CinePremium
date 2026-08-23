@@ -1,30 +1,36 @@
 import React, { useState } from "react";
-import { addMovie } from "../../../services/movieApi";
+import { updateMovie } from "../../../services/movieApi";
+import { Movie } from "../../../types/movie";
 import { useNotification } from "../../../context/NotificationContext";
-import { Film, Upload, X, CheckCircle2, AlertCircle } from "lucide-react";
+import { Film, Upload, X, CheckCircle2, AlertCircle, Edit3 } from "lucide-react";
 
-interface MoviesAddFormProps {
+interface MoviesEditFormProps {
+  movie: Movie;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-function MoviesAddForm({ onSuccess, onCancel }: MoviesAddFormProps) {
+function MoviesEditForm({ movie, onSuccess, onCancel }: MoviesEditFormProps) {
   const { addNotification } = useNotification();
-  const [title, setTitle] = useState("");
-  const [tagline, setTagline] = useState("");
-  const [synopsis, setSynopsis] = useState("");
-  const [rating, setRating] = useState("8.5");
-  const [duration, setDuration] = useState("2h 15m");
-  const [genres, setGenres] = useState("Sci-Fi, Action");
-  const [status, setStatus] = useState<"now_showing" | "coming_soon">("now_showing");
-  const [releaseDate, setReleaseDate] = useState("");
-  const [trailerUrl, setTrailerUrl] = useState("");
+  const [title, setTitle] = useState(movie.title || "");
+  const [tagline, setTagline] = useState(movie.tagline || "");
+  const [synopsis, setSynopsis] = useState(movie.synopsis || "");
+  const [rating, setRating] = useState(movie.rating ? String(movie.rating) : "8.5");
+  const [duration, setDuration] = useState(movie.duration || "2h 15m");
+  const [genres, setGenres] = useState(
+    movie.genres && Array.isArray(movie.genres) ? movie.genres.join(", ") : ""
+  );
+  const [status, setStatus] = useState<"now_showing" | "coming_soon">(
+    movie.status || "now_showing"
+  );
+  const [releaseDate, setReleaseDate] = useState(movie.releaseDate || "");
+  const [trailerUrl, setTrailerUrl] = useState(movie.trailerUrl || "");
 
   // Files & Previews
   const [posterFile, setPosterFile] = useState<File | null>(null);
-  const [posterPreview, setPosterPreview] = useState<string | null>(null);
+  const [posterPreview, setPosterPreview] = useState<string | null>(movie.posterUrl || null);
   const [backdropFile, setBackdropFile] = useState<File | null>(null);
-  const [backdropPreview, setBackdropPreview] = useState<string | null>(null);
+  const [backdropPreview, setBackdropPreview] = useState<string | null>(movie.backdropUrl || null);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,44 +67,53 @@ function MoviesAddForm({ onSuccess, onCancel }: MoviesAddFormProps) {
     try {
       setSubmitting(true);
       const formData = new FormData();
-      formData.append("title", title);
-      formData.append("tagline", tagline);
-      formData.append("synopsis", synopsis);
+      formData.append("title", title.trim());
+      formData.append("tagline", tagline.trim());
+      formData.append("synopsis", synopsis.trim());
       formData.append("rating", rating);
-      formData.append("duration", duration);
+      formData.append("duration", duration.trim());
 
       // Convert comma-separated string to genres array
       const genreArray = genres
         .split(",")
         .map((g) => g.trim())
         .filter(Boolean);
-      
+
       genreArray.forEach((g) => formData.append("genres[]", g));
 
       formData.append("status", status);
-      if (releaseDate) formData.append("releaseDate", releaseDate);
-      if (trailerUrl) formData.append("trailerUrl", trailerUrl);
+      formData.append("releaseDate", releaseDate.trim());
+      formData.append("trailerUrl", trailerUrl.trim());
 
-      if (posterFile) formData.append("poster", posterFile);
-      if (backdropFile) formData.append("backdrop", backdropFile);
+      if (posterFile) {
+        formData.append("poster", posterFile);
+      } else if (posterPreview) {
+        formData.append("posterUrl", posterPreview);
+      }
 
-      await addMovie(formData);
+      if (backdropFile) {
+        formData.append("backdrop", backdropFile);
+      } else if (backdropPreview) {
+        formData.append("backdropUrl", backdropPreview);
+      }
+
+      await updateMovie(movie.id, formData);
 
       addNotification({
-        type: 'add',
-        title: 'New Movie Published! 🎬',
-        message: `Movie "${title}" has been successfully created in the catalog.`,
+        type: 'info',
+        title: 'Movie Updated 🎬',
+        message: `Movie "${title}" details were successfully updated.`,
         actionUrl: '/movies',
         actionLabel: 'View in Catalog'
       });
 
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create movie");
+      setError(err instanceof Error ? err.message : "Failed to update movie");
       addNotification({
         type: 'error',
-        title: 'Movie Creation Failed',
-        message: err instanceof Error ? err.message : "Failed to create movie."
+        title: 'Update Failed',
+        message: err instanceof Error ? err.message : "Failed to update movie."
       });
     } finally {
       setSubmitting(false);
@@ -117,12 +132,12 @@ function MoviesAddForm({ onSuccess, onCancel }: MoviesAddFormProps) {
         {/* Sticky Header */}
         <div className="flex items-center justify-between px-6 py-4.5 bg-[#0c1324] border-b border-[#2e3447] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-primary/15 text-primary border border-primary/30 flex items-center justify-center">
-              <Film className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+              <Edit3 className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white font-display">Add New Movie</h3>
-              <p className="text-[11px] text-[#908fa0]">Provide title, media and screening details</p>
+              <h3 className="text-base font-bold text-white font-display">Edit Movie — {movie.title}</h3>
+              <p className="text-[11px] text-[#908fa0]">Update movie information and assets</p>
             </div>
           </div>
           <button
@@ -304,13 +319,13 @@ function MoviesAddForm({ onSuccess, onCancel }: MoviesAddFormProps) {
                   accept="image/*"
                   onChange={handlePosterChange}
                   className="hidden"
-                  id="poster-upload"
+                  id="edit-poster-upload"
                 />
                 <label
-                  htmlFor="poster-upload"
+                  htmlFor="edit-poster-upload"
                   className="inline-block mt-1 text-xs font-medium text-primary hover:underline cursor-pointer"
                 >
-                  {posterFile ? posterFile.name : "Browse Poster File"}
+                  {posterFile ? posterFile.name : "Replace Poster File"}
                 </label>
               </div>
 
@@ -344,13 +359,13 @@ function MoviesAddForm({ onSuccess, onCancel }: MoviesAddFormProps) {
                   accept="image/*"
                   onChange={handleBackdropChange}
                   className="hidden"
-                  id="backdrop-upload"
+                  id="edit-backdrop-upload"
                 />
                 <label
-                  htmlFor="backdrop-upload"
+                  htmlFor="edit-backdrop-upload"
                   className="inline-block mt-1 text-xs font-medium text-primary hover:underline cursor-pointer"
                 >
-                  {backdropFile ? backdropFile.name : "Browse Backdrop File"}
+                  {backdropFile ? backdropFile.name : "Replace Backdrop File"}
                 </label>
               </div>
             </div>
@@ -373,12 +388,12 @@ function MoviesAddForm({ onSuccess, onCancel }: MoviesAddFormProps) {
               {submitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-surface-container-lowest border-t-transparent rounded-full animate-spin" />
-                  <span>Uploading & Publishing...</span>
+                  <span>Updating Movie...</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Publish Movie</span>
+                  <span>Save Changes</span>
                 </>
               )}
             </button>
@@ -389,4 +404,4 @@ function MoviesAddForm({ onSuccess, onCancel }: MoviesAddFormProps) {
   );
 }
 
-export default MoviesAddForm;
+export default MoviesEditForm;
