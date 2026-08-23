@@ -10,11 +10,7 @@ import {
   Edit2,
   Trash2,
   Check,
-  X,
-  User,
-  AlertCircle,
   Clock,
-  Sparkles,
   LogIn
 } from 'lucide-react';
 import { Link } from 'react-router-dom';

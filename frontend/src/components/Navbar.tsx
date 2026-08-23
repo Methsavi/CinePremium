@@ -2,13 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Search, LogIn, UserPlus, LogOut, Ticket, Shield, 
   User as UserIcon, ChevronDown, Film, Info,
-  Menu, X, Home, CreditCard, Bell,
+  Menu, X, Home, Bell,
   Sparkles, Clock
 } from 'lucide-react';
 import logo from '../assets/logo.png';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useNotification, NotificationType } from '../context/NotificationContext';
+import { useNotification } from '../context/NotificationContext';
 
 interface NavbarProps {
   onBookNowClick?: () => void;
@@ -31,8 +31,7 @@ function formatNotificationTime(timestamp: number): string {
 
 export const Navbar: React.FC<NavbarProps> = ({
   onBookNowClick,
-  onSearchClick,
-  onOpenMyTickets
+  onSearchClick
 }) => {
   const [activeTab, setActiveTab] = useState<'Home' | 'Movies' | 'About Us' | 'My bookings'>('Home');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -161,10 +160,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         el?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     }
-  };
-
-  const handleMarkAllNotificationsRead = () => {
-    markAllAsRead();
   };
 
   return (

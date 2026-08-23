@@ -135,8 +135,6 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
   }, [existingShowtimes, selectedHallId, showDate]);
 
   const isCurrentSlotConflict = conflictingSlots.has(selectedTime);
-  const selectedMovie = movies.find((m) => m.id === selectedMovieId);
-  const selectedHall  = halls.find((h) => h.id === selectedHallId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

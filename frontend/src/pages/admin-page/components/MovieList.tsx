@@ -4,7 +4,7 @@ import { Movie } from "../../../types/movie";
 import { useNotification } from "../../../context/NotificationContext";
 import { 
   Film, Trash2, Search, AlertCircle, 
-  RefreshCw, Edit2, LayoutGrid, List, Eye, X, Calendar, Play
+  RefreshCw, Edit2, LayoutGrid, List, Eye, X, Play
 } from "lucide-react";
 import MoviesEditForm from "./MoviesEditForm";
 

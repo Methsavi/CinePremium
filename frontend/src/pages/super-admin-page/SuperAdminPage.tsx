@@ -33,8 +33,6 @@ export default function SuperAdminPage() {
   
   // Stats states
   const [userCount, setUserCount] = useState<number | null>(null);
-  const [managerCount, setManagerCount] = useState<number | null>(null);
-  const [adminCount, setAdminCount] = useState<number | null>(null);
   const [movieCount, setMovieCount] = useState<number | null>(null);
   const [hallCount, setHallCount] = useState<number | null>(null);
   const [showtimeCount, setShowtimeCount] = useState<number | null>(null);
@@ -65,8 +63,6 @@ export default function SuperAdminPage() {
       ]);
       
       setUserCount(users.length);
-      setAdminCount(users.filter(u => u.role === "admin").length);
-      setManagerCount(users.filter(u => u.role === "cinema_manager").length);
       
       setMovieCount(movies.length);
       setHallCount(halls.length);
@@ -119,7 +115,9 @@ export default function SuperAdminPage() {
     socket.on('showtime-updated', refresh);
     socket.on('showtime-deleted', refresh);
 
-    return () => socket.disconnect();
+    return () => {
+      socket.disconnect();
+    };
   }, [token, user?.role]);
 
   useEffect(() => {
@@ -161,7 +159,7 @@ export default function SuperAdminPage() {
     }
   };
 
-  const handleRoleChange = async (targetId: string, targetName: string, newRole: string) => {
+  const handleRoleChange = async (targetId: string, _targetName: string, newRole: string) => {
     if (targetId === user?.id) {
       addNotification({ message: 'Cannot modify own admin role', type: 'error' });
       return;

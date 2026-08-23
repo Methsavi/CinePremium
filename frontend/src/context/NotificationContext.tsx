@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import { 
-  CheckCircle2, AlertCircle, Trash2, Ticket, PlusCircle, 
-  XCircle, Bell, X, Check
+  CheckCircle2, AlertCircle, Trash2, Ticket, 
+  XCircle, X
 } from 'lucide-react';
 
 export type NotificationType = 

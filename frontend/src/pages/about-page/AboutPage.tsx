@@ -1,23 +1,12 @@
 import { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Navbar } from '../../components/Navbar';
 import { Footer } from '../../components/Footer';
 import { MyTicketsModal, BookingRecord } from '../../components/MyTicketsModal';
-import { Movie } from '../../types/movie';
-import { useAuth } from '../../context/AuthContext';
 import {
-  Film,
-  Sparkles,
   Award,
-  Tv,
-  Headphones,
-  Armchair,
-  Coffee,
-  Smartphone,
-  ShieldCheck,
   CheckCircle2,
   ArrowRight,
-  MapPin,
   Flame,
   Globe2,
   Heart,
@@ -25,17 +14,10 @@ import {
 
 export function AboutPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { isAuthenticated } = useAuth();
 
   // Modals state
-  const [bookingMovie, setBookingMovie] = useState<Movie | null>(null);
   const [isMyTicketsOpen, setIsMyTicketsOpen] = useState<boolean>(false);
   const [userBookings, setUserBookings] = useState<BookingRecord[]>([]);
-
-  const handleBookingSuccess = (newBooking: BookingRecord) => {
-    setUserBookings((prev) => [newBooking, ...prev]);
-  };
 
   const handleCancelBooking = (bookingId: string) => {
     setUserBookings((prev) => prev.filter((b) => b.id !== bookingId));

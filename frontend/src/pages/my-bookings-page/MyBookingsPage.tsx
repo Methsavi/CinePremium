@@ -12,16 +12,12 @@ import { BarcodeSVG } from './components/BarcodeSVG';
 import {
   Ticket,
   QrCode,
-  Calendar,
-  MapPin,
   Trash2,
-  CheckCircle2,
   Sparkles,
   LogIn,
   RefreshCw,
   Printer,
   Film,
-  Clock,
   Armchair
 } from 'lucide-react';
 

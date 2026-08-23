@@ -10,20 +10,14 @@ import { Navbar } from '../../components/Navbar';
 import { Footer } from '../../components/Footer';
 import { MyTicketsModal } from '../../components/MyTicketsModal';
 import {
-  MapPin,
   Clock,
   Sparkles,
   Search,
-  Star,
-  CheckCircle2,
-  Navigation,
   Compass,
   Tv,
-  Film,
   Armchair,
   RefreshCw,
-  ChevronRight,
-  Banknote
+  ChevronRight
 } from 'lucide-react';
 
 import { useNotification } from '../../context/NotificationContext';

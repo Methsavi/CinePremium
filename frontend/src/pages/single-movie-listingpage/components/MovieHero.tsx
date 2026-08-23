@@ -4,13 +4,12 @@ import { Star, Play, Clock } from 'lucide-react';
 
 interface MovieHeroProps {
   movie: Movie;
-  onBookClick: () => void;
+  onBookClick?: () => void;
   onTrailerClick: (trailerUrl: string) => void;
 }
 
 export const MovieHero: React.FC<MovieHeroProps> = ({
   movie,
-  onBookClick,
   onTrailerClick
 }) => {
   return (

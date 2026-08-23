@@ -8,8 +8,7 @@ import {
   Eye, 
   MapPin, 
   ChevronDown, 
-  Clock, 
-  Calendar
+  Clock
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';

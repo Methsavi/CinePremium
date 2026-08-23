@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { HERO_MOVIE } from '@/data/movies';
-import { getMovieById, getMovies } from '@/services/movieApi';
+import { getMovieById } from '@/services/movieApi';
 import { Movie } from '@/types/movie';
 import { Navbar } from '@/components/Navbar';
 import MovieDetails from './components/MovieDetails';
@@ -51,7 +51,7 @@ export default function SingleMovieListingPage() {
     const el = document.getElementById('showtimes-section');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
-    } else {
+    } else if (movie) {
       navigate('/seat-selection', {
         state: {
           movie,

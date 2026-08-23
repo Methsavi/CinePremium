@@ -6,7 +6,6 @@ import { Navbar } from '../../components/Navbar';
 import { Footer } from '../../components/Footer';
 import { QuickMovieInfoModal } from '../../components/QuickMovieInfoModal';
 import { TrailerModal } from '../../components/TrailerModal';
-import { useAuth } from '../../context/AuthContext';
 import {
   Film,
   Search,
@@ -18,7 +17,6 @@ import {
 
 export function MoviesPage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
 
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -73,7 +71,10 @@ export function MoviesPage() {
     <div className="bg-background text-on-background min-h-screen flex flex-col font-sans antialiased selection:bg-primary selection:text-white">
       {/* Top Navbar */}
       <Navbar
-        onBookNowClick={() => handleBookClick(movies[0] || HERO_MOVIE)}
+        onBookNowClick={() => {
+          if (movies[0]) handleBookClick(movies[0]);
+          else navigate('/');
+        }}
         onSearchClick={() => {
           const el = document.getElementById('movies-search-input');
           el?.focus();

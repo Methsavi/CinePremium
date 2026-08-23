@@ -20,7 +20,6 @@ import {
   Tag,
   Wallet,
   Building,
-  ArrowRight,
   AlertCircle
 } from 'lucide-react';
 

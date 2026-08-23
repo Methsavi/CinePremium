@@ -75,8 +75,8 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
   const [dbHalls, setDbHalls] = useState<any[]>([]);
   const [loadingShowtimes, setLoadingShowtimes] = useState<boolean>(true);
 
-  const [selectedCinema, setSelectedCinema] = useState<Cinema | null>(null);
-  const [selectedShowtime, setSelectedShowtime] = useState<Showtime | null>(null);
+  const [selectedCinema, setSelectedCinema] = useState<Cinema | null>(initialCinema || null);
+  const [selectedShowtime, setSelectedShowtime] = useState<Showtime | null>(initialShowtime || null);
   const [seats, setSeats] = useState<Seat[]>(generateSeats([]));
   const [confirmedBookingId, setConfirmedBookingId] = useState<string>('');
   const [isBooking, setIsBooking] = useState(false);
@@ -274,6 +274,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
   };
 
   const handleConfirmPayment = async () => {
+    if (!selectedCinema || !selectedShowtime) return;
     setIsBooking(true);
     const bookingId = 'CX-' + Math.floor(100000 + Math.random() * 900000);
     
@@ -283,8 +284,8 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
       movieTitle: movie.title,
       cinemaId: selectedCinema.id,
       cinemaName: selectedCinema.name,
-      showtimeId: selectedShowtime!.id,
-      showtimeTime: selectedShowtime!.time,
+      showtimeId: selectedShowtime.id,
+      showtimeTime: selectedShowtime.time,
       date: selectedDate,
       seats: selectedSeats,
       totalAmount

@@ -15,8 +15,7 @@ interface DualDataPoint {
 }
 
 export const LineChartAnalytics: React.FC<LineChartAnalyticsProps> = ({ 
-  showtimes = [], 
-  movies = [] 
+  showtimes = []
 }) => {
   // Active hovered point (default to Wed / index 2 like in screenshot)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(2);

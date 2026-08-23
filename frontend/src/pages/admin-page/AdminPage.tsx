@@ -17,7 +17,7 @@ import { io } from "socket.io-client";
 import { 
   Film, Tv, Calendar, ArrowLeft, LayoutDashboard, 
   LogOut, ShieldAlert, ChevronRight,
-  BarChart3, PieChart, MessageSquare, ArrowUpRight, Armchair
+  BarChart3, PieChart, MessageSquare, ArrowUpRight
 } from "lucide-react";
 
 type ActiveTab = "overview" | "movies" | "halls" | "showtimes" | "feedbacks";

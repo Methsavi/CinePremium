@@ -1,6 +1,6 @@
 import React from 'react';
 import { Movie } from '../types/movie';
-import { X, Star, Clock, Calendar, Ticket, Play, Sparkles, Film } from 'lucide-react';
+import { X, Star, Clock, Calendar, Ticket, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MovieFeedbackSection } from './MovieFeedbackSection';
 

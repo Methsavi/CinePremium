@@ -7,12 +7,9 @@ import {
   Film,
   Home,
   ArrowLeft,
-  Sparkles,
   Compass,
   Tv,
-  Ticket,
-  Search,
-  HelpCircle
+  Ticket
 } from 'lucide-react';
 
 export function NotFoundPage() {

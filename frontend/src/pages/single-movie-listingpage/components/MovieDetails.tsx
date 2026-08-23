@@ -6,7 +6,7 @@ type MovieDetailsProps = {
   movie: Movie;
   onBookClick: (movie: Movie) => void;
   onTrailerClick: (trailerUrl: string) => void;
-  onSelectShowtime: (cinema: Cinema, showtimeId: string) => void;
+  onSelectShowtime?: (showtimeData: any) => void;
 };
 
 export default function MovieDetails({

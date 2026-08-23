@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { HERO_MOVIE } from '@/data/movies';
 import { getMovies } from '@/services/movieApi';
 import { Movie } from '@/types/movie';
@@ -16,7 +16,6 @@ import { RefreshCw } from 'lucide-react';
 
 export function HomePage() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   // Database Movies State
   const [dbMovies, setDbMovies] = useState<Movie[]>([]);
@@ -83,7 +82,7 @@ export function HomePage() {
 
   const { addNotification } = useNotification();
 
-  const handleRemindMe = (movie: Movie) => {
+  const handleRemindMe = () => {
     addNotification({ message: 'Reminder Set', type: 'info' });
   };
 
