@@ -8,6 +8,7 @@ import { LineChartAnalytics } from "./components/LineChartAnalytics";
 import { getMovies } from "../../services/movieApi";
 import { getHalls } from "../../services/hallApi";
 import { getShowtimes } from "../../services/showtimeApi";
+import { bookingApi } from "../../services/bookingApi";
 import { Movie } from "../../types/movie";
 import { CinemaHall } from "../../types/hall";
 import { Showtime } from "../../types/showtime";
@@ -38,20 +39,26 @@ export function AdminPage() {
   const [moviesList, setMoviesList] = useState<Movie[]>([]);
   const [hallsList, setHallsList] = useState<CinemaHall[]>([]);
   const [showtimesList, setShowtimesList] = useState<Showtime[]>([]);
+  const [bookingsList, setBookingsList] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   // Load all live database records
   const loadDatabaseData = async () => {
     setLoadingData(true);
     try {
-      const [movies, halls, showtimes] = await Promise.all([
+      const activeToken = token || localStorage.getItem('savi_auth_token');
+      const [movies, halls, showtimes, bookingsRes] = await Promise.all([
         getMovies().catch(() => [] as Movie[]),
         getHalls().catch(() => [] as CinemaHall[]),
-        getShowtimes().catch(() => [] as Showtime[])
+        getShowtimes().catch(() => [] as Showtime[]),
+        activeToken
+          ? bookingApi.getAllBookings(activeToken).catch(() => ({ data: { bookings: [] } }))
+          : Promise.resolve({ data: { bookings: [] } })
       ]);
       setMoviesList(movies);
       setHallsList(halls);
       setShowtimesList(showtimes);
+      setBookingsList(bookingsRes?.data?.bookings || []);
     } catch (err) {
       console.error("Failed to load admin data from database:", err);
     } finally {
@@ -62,7 +69,7 @@ export function AdminPage() {
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "cinema_manager") return;
     loadDatabaseData();
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, token]);
 
   useEffect(() => {
     if (!token || user?.role !== "cinema_manager") return;
@@ -104,14 +111,27 @@ export function AdminPage() {
 
     const totalShowtimes = showtimesList.length;
 
-    // Screen Format Distribution
+    // Real active showtimes scheduled for today
+    const todayStr = new Date().toISOString().split('T')[0];
+    const activeTodayShowtimes = showtimesList.filter(st => {
+      const d = st.showDate || (st as any).date;
+      return d && d.startsWith(todayStr);
+    }).length;
+
+    // Real bookings counts
+    const confirmedBookingsCount = bookingsList.filter(b => b.status === "confirmed").length;
+    const totalTicketsSold = bookingsList
+      .filter(b => b.status === "confirmed")
+      .reduce((acc, b) => acc + (Array.isArray(b.seats) ? b.seats.length : 1), 0);
+
+    // Screen Format Distribution from real DB halls
     const formatCounts: Record<string, number> = {};
     hallsList.forEach((h) => {
       const fmt = h.screenType || "Standard 2D";
       formatCounts[fmt] = (formatCounts[fmt] || 0) + 1;
     });
 
-    // Genre Distribution
+    // Genre Distribution from real DB movies
     const genreCounts: Record<string, number> = {};
     moviesList.forEach((m) => {
       (m.genres || []).forEach((g) => {
@@ -126,10 +146,13 @@ export function AdminPage() {
       totalHalls,
       totalCapacity,
       totalShowtimes,
+      activeTodayShowtimes,
+      confirmedBookingsCount,
+      totalTicketsSold,
       formatCounts,
       genreCounts
     };
-  }, [moviesList, hallsList, showtimesList]);
+  }, [moviesList, hallsList, showtimesList, bookingsList]);
 
   // Guard loading state
   if (authLoading) {
@@ -398,7 +421,7 @@ export function AdminPage() {
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
                     <ArrowUpRight className="w-3.5 h-3.5" />
-                    <span>+15% active slots</span>
+                    <span>{stats.activeTodayShowtimes} Active Screening{stats.activeTodayShowtimes === 1 ? '' : 's'} Today</span>
                   </div>
                 </div>
 
@@ -414,7 +437,7 @@ export function AdminPage() {
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    <span>Real-time Active Seats</span>
+                    <span>{stats.totalTicketsSold} Confirmed Ticket{stats.totalTicketsSold === 1 ? '' : 's'} Booked</span>
                   </div>
                 </div>
               </div>
@@ -424,7 +447,7 @@ export function AdminPage() {
                 
                 {/* Line Chart (2 Cols) */}
                 <div className="lg:col-span-2">
-                  <LineChartAnalytics showtimes={showtimesList} movies={moviesList} />
+                  <LineChartAnalytics showtimes={showtimesList} bookings={bookingsList} movies={moviesList} />
                 </div>
 
                 {/* Recent Activity / Movie Activity (1 Col) */}

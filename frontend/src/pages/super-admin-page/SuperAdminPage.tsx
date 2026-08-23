@@ -9,6 +9,7 @@ import { getMovies } from "../../services/movieApi";
 import { getHalls } from "../../services/hallApi";
 import { getShowtimes } from "../../services/showtimeApi";
 import { getRegisteredUsers, deleteUser, updateUser } from "../../services/userApi";
+import { bookingApi } from "../../services/bookingApi";
 import { useAuth } from "../../context/AuthContext";
 import { useNotification } from "../../context/NotificationContext";
 import { io } from "socket.io-client";
@@ -42,6 +43,7 @@ export default function SuperAdminPage() {
   const [moviesList, setMoviesList] = useState<Movie[]>([]);
   const [hallsList, setHallsList] = useState<CinemaHall[]>([]);
   const [showtimesList, setShowtimesList] = useState<Showtime[]>([]);
+  const [bookingsList, setBookingsList] = useState<any[]>([]);
 
   // Users management states
   const [usersList, setUsersList] = useState<User[]>([]);
@@ -55,14 +57,19 @@ export default function SuperAdminPage() {
   const loadStats = async () => {
     setLoadingStats(true);
     try {
-      const [users, movies, halls, showtimes] = await Promise.all([
-        getRegisteredUsers(token).catch(() => []),
+      const activeToken = token || localStorage.getItem('savi_auth_token');
+      const [users, movies, halls, showtimes, bookingsRes] = await Promise.all([
+        getRegisteredUsers(activeToken).catch(() => []),
         getMovies().catch(() => []),
         getHalls().catch(() => []),
-        getShowtimes().catch(() => [])
+        getShowtimes().catch(() => []),
+        activeToken
+          ? bookingApi.getAllBookings(activeToken).catch(() => ({ data: { bookings: [] } }))
+          : Promise.resolve({ data: { bookings: [] } })
       ]);
       
       setUserCount(users.length);
+      setUsersList(users);
       
       setMovieCount(movies.length);
       setHallCount(halls.length);
@@ -71,6 +78,7 @@ export default function SuperAdminPage() {
       setMoviesList(movies);
       setHallsList(halls);
       setShowtimesList(showtimes);
+      setBookingsList(bookingsRes?.data?.bookings || []);
     } catch (err) {
       console.error("Failed to load statistics:", err);
     } finally {
@@ -455,7 +463,7 @@ export default function SuperAdminPage() {
                 
                 {/* Line Chart (2 Cols) */}
                 <div className="lg:col-span-2">
-                  <LineChartAnalytics showtimes={showtimesList} movies={moviesList} />
+                  <LineChartAnalytics showtimes={showtimesList} bookings={bookingsList} movies={moviesList} />
                 </div>
 
                 {/* Recently Registered Users Activity (1 Col, Matching Screenshot) */}

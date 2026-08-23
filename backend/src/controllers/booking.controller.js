@@ -72,6 +72,16 @@ export const getUserBookings = async (req, res) => {
   }
 };
 
+export const getAllBookings = async (req, res) => {
+  try {
+    const bookings = await BookingModel.find().sort({ createdAt: -1 });
+    res.status(200).json({ bookings });
+  } catch (error) {
+    console.error('[BookingController] getAllBookings error:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
 export const cancelBooking = async (req, res) => {
   try {
     const { id } = req.params;

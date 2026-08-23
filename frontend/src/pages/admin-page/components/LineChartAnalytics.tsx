@@ -1,77 +1,89 @@
 import React, { useState, useMemo } from 'react';
-import { Showtime } from '../../../types/showtime';
-import { Movie } from '../../../types/movie';
+import { TrendingUp } from 'lucide-react';
 
 interface LineChartAnalyticsProps {
-  showtimes?: Showtime[];
-  movies?: Movie[];
+  bookings?: any[];
+  showtimes?: any[];
+  movies?: any[];
 }
 
-interface DualDataPoint {
+interface BookingDataPoint {
   day: string;
   shortDay: string;
-  series1: number; // e.g. Screenings / Translations
-  series2: number; // e.g. Bookings / Sessions
+  bookings: number;
 }
 
 export const LineChartAnalytics: React.FC<LineChartAnalyticsProps> = ({ 
-  showtimes = []
+  bookings = []
 }) => {
-  // Active hovered point (default to Wed / index 2 like in screenshot)
+  // Active hovered point (default to middle/Wednesday)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(2);
 
-  // 7 days trend data
-  const data: DualDataPoint[] = useMemo(() => {
-    const days = [
-      { day: 'Monday', shortDay: 'Mon', s1: 150, s2: 80 },
-      { day: 'Tuesday', shortDay: 'Tue', s1: 230, s2: 120 },
-      { day: 'Wednesday', shortDay: 'Wed', s1: 180, s2: 150 },
-      { day: 'Thursday', shortDay: 'Thu', s1: 290, s2: 170 },
-      { day: 'Friday', shortDay: 'Fri', s1: 210, s2: 160 },
-      { day: 'Saturday', shortDay: 'Sat', s1: 340, s2: 220 },
-      { day: 'Sunday', shortDay: 'Sun', s1: 400, s2: 270 },
-    ];
+  // 7 days real database booking growth trend
+  const data: BookingDataPoint[] = useMemo(() => {
+    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const shortNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-    // Scale slightly with dynamic showtimes/movies count if available
-    const baseMult = showtimes.length > 0 ? Math.max(1, showtimes.length / 4) : 1;
+    // Real counts mapped Monday=0 ... Sunday=6
+    const dayBookings = [0, 0, 0, 0, 0, 0, 0];
 
-    return days.map(d => ({
-      day: d.day,
-      shortDay: d.shortDay,
-      series1: Math.round(d.s1 * baseMult),
-      series2: Math.round(d.s2 * baseMult),
+    // Compute real ticket reservations per day from database bookings
+    bookings.forEach((bk) => {
+      const dateStr = bk.date || bk.createdAt;
+      if (dateStr) {
+        const parts = typeof dateStr === 'string' ? dateStr.split('T')[0].split('-') : [];
+        let d: Date;
+        if (parts.length === 3) {
+          d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        } else {
+          d = new Date(dateStr);
+        }
+        if (!isNaN(d.getTime())) {
+          const jsDay = d.getDay(); // 0 is Sunday
+          const dayIdx = jsDay === 0 ? 6 : jsDay - 1;
+          const seatCount = Array.isArray(bk.seats) ? bk.seats.length : 1;
+          dayBookings[dayIdx] += seatCount;
+        }
+      }
+    });
+
+    return dayNames.map((dayName, index) => ({
+      day: dayName,
+      shortDay: shortNames[index],
+      bookings: dayBookings[index],
     }));
-  }, [showtimes.length]);
+  }, [bookings]);
+
+  const totalBookings = useMemo(() => {
+    return data.reduce((acc, d) => acc + d.bookings, 0);
+  }, [data]);
 
   const chartWidth = 650;
-  const chartHeight = 280;
+  const chartHeight = 270;
   const paddingLeft = 45;
   const paddingRight = 25;
-  const paddingTop = 35;
+  const paddingTop = 30;
   const paddingBottom = 35;
 
   const innerWidth = chartWidth - paddingLeft - paddingRight;
   const innerHeight = chartHeight - paddingTop - paddingBottom;
 
   const maxVal = useMemo(() => {
-    const rawMax = Math.max(...data.map(d => Math.max(d.series1, d.series2)));
-    return Math.ceil((rawMax * 1.15) / 100) * 100 || 400;
+    const rawMax = Math.max(...data.map(d => d.bookings), 1);
+    if (rawMax <= 5) return 6;
+    if (rawMax <= 10) return 12;
+    if (rawMax <= 20) return 24;
+    if (rawMax <= 50) return 60;
+    if (rawMax <= 100) return 120;
+    return Math.ceil((rawMax * 1.2) / 10) * 10;
   }, [data]);
 
   // Generate Bezier path points
-  const points1 = useMemo(() => {
+  const points = useMemo(() => {
     return data.map((d, index) => {
       const x = paddingLeft + (index / (data.length - 1)) * innerWidth;
-      const y = paddingTop + innerHeight - (d.series1 / maxVal) * innerHeight;
-      return { x, y, value: d.series1, day: d.day, shortDay: d.shortDay };
-    });
-  }, [data, maxVal, innerWidth, innerHeight, paddingLeft, paddingTop]);
-
-  const points2 = useMemo(() => {
-    return data.map((d, index) => {
-      const x = paddingLeft + (index / (data.length - 1)) * innerWidth;
-      const y = paddingTop + innerHeight - (d.series2 / maxVal) * innerHeight;
-      return { x, y, value: d.series2, day: d.day, shortDay: d.shortDay };
+      const y = paddingTop + innerHeight - (d.bookings / maxVal) * innerHeight;
+      return { x, y, value: d.bookings, day: d.day, shortDay: d.shortDay };
     });
   }, [data, maxVal, innerWidth, innerHeight, paddingLeft, paddingTop]);
 
@@ -92,46 +104,53 @@ export const LineChartAnalytics: React.FC<LineChartAnalyticsProps> = ({
     return d;
   };
 
-  const pathD1 = useMemo(() => getCurvedPath(points1), [points1]);
-  const pathD2 = useMemo(() => getCurvedPath(points2), [points2]);
+  const pathD = useMemo(() => getCurvedPath(points), [points]);
 
-  const areaD1 = useMemo(() => {
-    if (!pathD1 || points1.length === 0) return '';
-    const lastX = points1[points1.length - 1].x;
-    const firstX = points1[0].x;
+  const areaD = useMemo(() => {
+    if (!pathD || points.length === 0) return '';
+    const lastX = points[points.length - 1].x;
+    const firstX = points[0].x;
     const bottomY = paddingTop + innerHeight;
-    return `${pathD1} L ${lastX},${bottomY} L ${firstX},${bottomY} Z`;
-  }, [pathD1, points1, paddingTop, innerHeight]);
+    return `${pathD} L ${lastX},${bottomY} L ${firstX},${bottomY} Z`;
+  }, [pathD, points, paddingTop, innerHeight]);
 
-  const areaD2 = useMemo(() => {
-    if (!pathD2 || points2.length === 0) return '';
-    const lastX = points2[points2.length - 1].x;
-    const firstX = points2[0].x;
-    const bottomY = paddingTop + innerHeight;
-    return `${pathD2} L ${lastX},${bottomY} L ${firstX},${bottomY} Z`;
-  }, [pathD2, points2, paddingTop, innerHeight]);
-
-  const yTicks = [400, 300, 200, 100, 0];
+  const yTicks = useMemo(() => {
+    return [
+      maxVal,
+      Math.round(maxVal * 0.75),
+      Math.round(maxVal * 0.5),
+      Math.round(maxVal * 0.25),
+      0
+    ];
+  }, [maxVal]);
 
   const activeIndex = hoveredIndex ?? 2;
-  const activePt1 = points1[activeIndex];
-  const activePt2 = points2[activeIndex];
+  const activePt = points[activeIndex];
 
   return (
     <div className="bg-[#0d0d10] border border-white/10 rounded-2xl p-5 shadow-md flex flex-col justify-between relative overflow-hidden">
       
-      {/* Top Legend Pill matching the screenshot */}
-      <div className="flex items-center justify-end">
-        <div className="inline-flex items-center gap-3 bg-zinc-900/90 border border-white/10 rounded-full px-3.5 py-1.5 text-xs shadow-inner">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#e50914] shadow-[0_0_8px_rgba(229,9,20,0.7)]" />
-            <span className="text-zinc-300 font-medium text-[11px]">Screenings</span>
+      {/* Top Header Bar with Live Badge */}
+      <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+            <TrendingUp className="w-4 h-4" />
           </div>
-          <span className="text-zinc-600">|</span>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-            <span className="text-zinc-300 font-medium text-[11px]">Bookings</span>
+          <div>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+              Booking Growth
+            </h4>
+            <span className="text-[10px] text-zinc-400">
+              Live weekly customer reservations from database
+            </span>
           </div>
+        </div>
+
+        <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1 text-xs">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.7)] animate-pulse" />
+          <span className="text-emerald-300 font-bold text-[11px]">
+            {totalBookings} Total Ticket{totalBookings === 1 ? '' : 's'}
+          </span>
         </div>
       </div>
 
@@ -142,35 +161,24 @@ export const LineChartAnalytics: React.FC<LineChartAnalyticsProps> = ({
           className="w-full h-56 sm:h-64 overflow-visible"
         >
           <defs>
-            {/* Gradient 1 (Crimson Red Glow) */}
-            <linearGradient id="areaGrad1" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#e50914" stopOpacity="0.35" />
-              <stop offset="80%" stopColor="#e50914" stopOpacity="0.04" />
-              <stop offset="100%" stopColor="#e50914" stopOpacity="0" />
-            </linearGradient>
-
-            {/* Gradient 2 (Emerald Green Glow) */}
-            <linearGradient id="areaGrad2" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#10b981" stopOpacity="0.28" />
-              <stop offset="80%" stopColor="#10b981" stopOpacity="0.03" />
+            {/* Emerald Green Area Glow */}
+            <linearGradient id="bookingAreaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#10b981" stopOpacity="0.32" />
+              <stop offset="75%" stopColor="#10b981" stopOpacity="0.04" />
               <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
             </linearGradient>
 
-            <linearGradient id="lineGrad1" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#ff4d5a" />
-              <stop offset="100%" stopColor="#e50914" />
-            </linearGradient>
-
-            <linearGradient id="lineGrad2" x1="0" y1="0" x2="1" y2="0">
+            {/* Glowing Stroke Line */}
+            <linearGradient id="bookingLineGrad" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#34d399" />
               <stop offset="100%" stopColor="#10b981" />
             </linearGradient>
           </defs>
 
-          {/* Dotted Gridlines & Minimal Y-Labels */}
+          {/* Dotted Gridlines & Y-Labels */}
           {yTicks.map((val) => {
-            const y = paddingTop + innerHeight - (val / 400) * innerHeight;
-            if (val === 0) return null; // Don't draw baseline label clutter
+            const y = paddingTop + innerHeight - (val / maxVal) * innerHeight;
+            if (val === 0) return null;
             return (
               <g key={val}>
                 <line
@@ -198,42 +206,30 @@ export const LineChartAnalytics: React.FC<LineChartAnalyticsProps> = ({
             );
           })}
 
-          {/* Area 1 */}
-          {areaD1 && <path d={areaD1} fill="url(#areaGrad1)" />}
+          {/* Glowing Area Fill */}
+          {areaD && <path d={areaD} fill="url(#bookingAreaGrad)" />}
 
-          {/* Area 2 */}
-          {areaD2 && <path d={areaD2} fill="url(#areaGrad2)" />}
-
-          {/* Smooth Line 1 */}
-          {pathD1 && (
+          {/* Smooth Booking Growth Line */}
+          {pathD && (
             <path
-              d={pathD1}
+              d={pathD}
               fill="none"
-              stroke="url(#lineGrad1)"
+              stroke="url(#bookingLineGrad)"
               strokeWidth="3.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+              style={{
+                filter: 'drop-shadow(0 4px 12px rgba(16,185,129,0.4))'
+              }}
             />
           )}
 
-          {/* Smooth Line 2 */}
-          {pathD2 && (
-            <path
-              d={pathD2}
-              fill="none"
-              stroke="url(#lineGrad2)"
-              strokeWidth="3.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          )}
-
-          {/* Vertical Dotted Cursor Line */}
-          {activePt1 && (
+          {/* Vertical Dotted Cursor Guide */}
+          {activePt && (
             <line
-              x1={activePt1.x}
-              y1={paddingTop - 10}
-              x2={activePt1.x}
+              x1={activePt.x}
+              y1={paddingTop - 5}
+              x2={activePt.x}
               y2={paddingTop + innerHeight}
               stroke="#52525b"
               strokeDasharray="3 3"
@@ -242,38 +238,45 @@ export const LineChartAnalytics: React.FC<LineChartAnalyticsProps> = ({
             />
           )}
 
-          {/* Active Node 1 Dot */}
-          {activePt1 && (
+          {/* Active Node Dot */}
+          {activePt && (
             <circle
-              cx={activePt1.x}
-              cy={activePt1.y}
-              r="4.5"
-              fill="#ffffff"
-              stroke="#e50914"
-              strokeWidth="3"
-            />
-          )}
-
-          {/* Active Node 2 Dot */}
-          {activePt2 && (
-            <circle
-              cx={activePt2.x}
-              cy={activePt2.y}
-              r="4.5"
+              cx={activePt.x}
+              cy={activePt.y}
+              r="5"
               fill="#ffffff"
               stroke="#10b981"
-              strokeWidth="3"
+              strokeWidth="3.5"
+              style={{
+                filter: 'drop-shadow(0 0 8px rgba(16,185,129,0.9))'
+              }}
             />
           )}
 
-          {/* Invisible Click/Hover capture zones across columns */}
-          {points1.map((p, idx) => (
+          {/* X-Axis Days Labels */}
+          {points.map((p, idx) => (
+            <text
+              key={idx}
+              x={p.x}
+              y={paddingTop + innerHeight + 22}
+              textAnchor="middle"
+              fill={idx === activeIndex ? "#ffffff" : "#71717a"}
+              fontSize="11"
+              fontWeight={idx === activeIndex ? "700" : "500"}
+              fontFamily="sans-serif"
+            >
+              {p.shortDay}
+            </text>
+          ))}
+
+          {/* Invisible Hover capture zones */}
+          {points.map((p, idx) => (
             <rect
               key={idx}
               x={p.x - (innerWidth / (data.length - 1)) / 2}
               y={paddingTop - 20}
               width={innerWidth / (data.length - 1)}
-              height={innerHeight + 40}
+              height={innerHeight + 45}
               fill="transparent"
               className="cursor-pointer"
               onMouseEnter={() => setHoveredIndex(idx)}
@@ -281,37 +284,29 @@ export const LineChartAnalytics: React.FC<LineChartAnalyticsProps> = ({
           ))}
         </svg>
 
-        {/* Floating Tooltip Card matching the screenshot style */}
-        {activePt1 && activePt2 && (
+        {/* Floating Tooltip Card */}
+        {activePt && (
           <div 
-            className="absolute z-20 bg-zinc-950/90 backdrop-blur-xl border border-white/15 rounded-xl p-3.5 shadow-2xl space-y-2 pointer-events-none transition-all duration-150"
+            className="absolute z-20 bg-zinc-950/95 backdrop-blur-xl border border-white/15 rounded-xl p-3 shadow-2xl space-y-1.5 pointer-events-none transition-all duration-150"
             style={{
-              left: `${(activePt1.x / chartWidth) * 100}%`,
-              top: `${Math.min(70, Math.max(20, (activePt2.y / chartHeight) * 100))}%`,
+              left: `${(activePt.x / chartWidth) * 100}%`,
+              top: `${Math.min(65, Math.max(15, (activePt.y / chartHeight) * 100))}%`,
               transform: activeIndex > 3 ? 'translate(-105%, -20%)' : 'translate(10px, -20%)',
-              minWidth: '135px'
+              minWidth: '130px'
             }}
           >
             <div className="text-xs font-bold text-white tracking-wide">
-              {data[activeIndex].shortDay}
+              {data[activeIndex].day}
             </div>
 
-            <div className="space-y-1.5 text-xs">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#e50914]" />
-                  <span className="text-zinc-400 text-[11px]">Screenings</span>
-                </div>
-                <span className="font-bold text-white font-mono">{activePt1.value}</span>
+            <div className="flex items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#10b981]" />
+                <span className="text-zinc-400 text-[11px]">Bookings</span>
               </div>
-
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#10b981]" />
-                  <span className="text-zinc-400 text-[11px]">Bookings</span>
-                </div>
-                <span className="font-bold text-white font-mono">{activePt2.value}</span>
-              </div>
+              <span className="font-bold text-emerald-400 font-mono">
+                {activePt.value} {activePt.value === 1 ? 'ticket' : 'tickets'}
+              </span>
             </div>
           </div>
         )}

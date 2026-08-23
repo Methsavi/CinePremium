@@ -14,6 +14,11 @@ export const bookingApi = {
       headers: { Authorization: `Bearer ${token}` }
     }),
   
+  getAllBookings: (token: string) =>
+    axios.get(`${BOOKINGS_API}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+  
   getOccupiedSeats: (showtimeId: string, date: string) =>
     axios.get(`${BOOKINGS_API}/occupied-seats`, {
       params: { showtimeId, date }
