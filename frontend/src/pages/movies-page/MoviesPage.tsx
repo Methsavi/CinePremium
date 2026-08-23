@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMovies } from '../../services/movieApi';
-import { NOW_PLAYING_MOVIES, HERO_MOVIE } from '../../data/movies';
 import { Movie } from '../../types/movie';
 import { Navbar } from '../../components/Navbar';
 import { Footer } from '../../components/Footer';
@@ -43,15 +42,10 @@ export function MoviesPage() {
     try {
       setLoading(true);
       const data = await getMovies();
-      if (data && data.length > 0) {
-        setMovies(data);
-      } else {
-        // Fallback to sample movies if database is empty
-        setMovies(NOW_PLAYING_MOVIES);
-      }
+      setMovies(data || []);
     } catch (err) {
-      console.warn('Could not fetch from database API, using fallback data:', err);
-      setMovies(NOW_PLAYING_MOVIES);
+      console.error('Failed to fetch movies from database API:', err);
+      setMovies([]);
     } finally {
       setLoading(false);
     }
@@ -125,9 +119,9 @@ export function MoviesPage() {
       <main className="flex-1 pt-24 pb-20 px-4 sm:px-6 md:px-12 max-w-[1400px] mx-auto w-full space-y-8">
         
         {/* ── Page Header / Hero Banner ── */}
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#0c1324] via-[#151b2d] to-[#0c1324] border border-white/10 p-6 sm:p-10 shadow-2xl">
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-[#0d0d10] via-zinc-950 to-[#0d0d10] border border-white/10 p-6 sm:p-10 shadow-2xl">
           {/* Ambient Lighting */}
-          <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none -z-0" />
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none -z-0" />
           <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-red-600/10 rounded-full blur-3xl pointer-events-none -z-0" />
 
           <div className="relative z-10 max-w-3xl space-y-3">
@@ -151,20 +145,20 @@ export function MoviesPage() {
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
             
             {/* Search Input */}
-            <div className="relative flex-1 max-w-lg">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant" />
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 id="movies-search-input"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search movies by title, tagline, genres..."
-                className="w-full bg-[#0c1324] border border-[#2e3447] text-white placeholder-on-surface-variant text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-primary transition-all"
+                className="w-full bg-zinc-950 border border-white/10 text-white placeholder:text-zinc-500 text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-red-500 transition-all"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-white"
                 >
                   Clear
                 </button>
@@ -172,33 +166,33 @@ export function MoviesPage() {
             </div>
 
             {/* Status Filter Buttons */}
-            <div className="flex items-center gap-1.5 bg-[#0c1324] border border-[#2e3447] p-1 rounded-xl">
+            <div className="flex items-center gap-1.5 bg-zinc-950 border border-white/10 p-1 rounded-xl">
               <button
                 onClick={() => setSelectedStatus('all')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   selectedStatus === 'all'
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'text-on-surface-variant hover:text-white'
+                    ? 'bg-red-600 text-white shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 All ({movies.length})
               </button>
               <button
                 onClick={() => setSelectedStatus('now_showing')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   selectedStatus === 'now_showing'
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-on-surface-variant hover:text-white'
+                    ? 'bg-red-600 text-white shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 Now Showing
               </button>
               <button
                 onClick={() => setSelectedStatus('coming_soon')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   selectedStatus === 'coming_soon'
-                    ? 'bg-amber-600 text-white shadow-sm'
-                    : 'text-on-surface-variant hover:text-white'
+                    ? 'bg-red-600 text-white shadow-sm'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 Coming Soon
@@ -208,11 +202,11 @@ export function MoviesPage() {
             {/* Sort & View Mode Controls */}
             <div className="flex items-center gap-2 sm:gap-3 justify-between lg:justify-end">
               <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-on-surface-variant hidden sm:inline" />
+                <SlidersHorizontal className="w-3.5 h-3.5 text-zinc-400 hidden sm:inline" />
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-[#0c1324] border border-[#2e3447] text-white text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:border-primary"
+                  className="bg-zinc-950 border border-white/10 text-white text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:border-red-500 cursor-pointer"
                 >
                   <option value="rating">Top Rated</option>
                   <option value="title">Title (A - Z)</option>
@@ -221,12 +215,12 @@ export function MoviesPage() {
               </div>
 
               {/* View Toggle */}
-              <div className="flex items-center bg-[#0c1324] border border-[#2e3447] rounded-xl p-1 gap-1">
+              <div className="flex items-center bg-zinc-950 border border-white/10 rounded-xl p-1 gap-1">
                 <button
                   onClick={() => setViewMode('grid')}
                   title="Grid View"
                   className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                    viewMode === 'grid' ? 'bg-white/15 text-white' : 'text-on-surface-variant hover:text-white'
+                    viewMode === 'grid' ? 'bg-red-600 text-white' : 'text-zinc-400 hover:text-white'
                   }`}
                 >
                   <LayoutGrid className="w-4 h-4" />
@@ -235,7 +229,7 @@ export function MoviesPage() {
                   onClick={() => setViewMode('compact')}
                   title="Compact List View"
                   className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                    viewMode === 'compact' ? 'bg-white/15 text-white' : 'text-on-surface-variant hover:text-white'
+                    viewMode === 'compact' ? 'bg-red-600 text-white' : 'text-zinc-400 hover:text-white'
                   }`}
                 >
                   <List className="w-4 h-4" />
@@ -246,9 +240,9 @@ export function MoviesPage() {
               <button
                 onClick={fetchMoviesData}
                 title="Refresh Movies from Database"
-                className="p-2 bg-[#0c1324] hover:bg-[#151b2d] border border-[#2e3447] rounded-xl text-on-surface-variant hover:text-white transition-colors cursor-pointer"
+                className="p-2 bg-zinc-950 hover:bg-zinc-900 border border-white/10 rounded-xl text-zinc-400 hover:text-white transition-colors cursor-pointer"
               >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-primary' : ''}`} />
+                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-red-500' : ''}`} />
               </button>
             </div>
           </div>
@@ -259,10 +253,10 @@ export function MoviesPage() {
               <button
                 key={genre}
                 onClick={() => setSelectedGenre(genre)}
-                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   selectedGenre === genre
-                    ? 'bg-white/20 text-white border border-white/30 shadow-[0_0_10px_rgba(255,255,255,0.15)]'
-                    : 'bg-[#0c1324] text-on-surface-variant hover:text-white border border-[#2e3447]'
+                    ? 'bg-red-600 text-white border border-red-500 shadow-[0_0_12px_rgba(229,9,20,0.4)]'
+                    : 'bg-zinc-950 text-zinc-400 hover:text-white border border-white/10'
                 }`}
               >
                 {genre}
@@ -273,15 +267,15 @@ export function MoviesPage() {
 
         {/* ── Movies Display Section ── */}
         {loading ? (
-          <div className="p-20 text-center text-on-surface-variant flex flex-col items-center justify-center gap-4 bg-surface-container/30 rounded-3xl border border-outline-variant/40">
-            <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin shadow-lg" />
+          <div className="p-20 text-center text-zinc-400 flex flex-col items-center justify-center gap-4 bg-[#0d0d10] rounded-3xl border border-white/10">
+            <div className="w-10 h-10 border-3 border-red-600 border-t-transparent rounded-full animate-spin shadow-lg" />
             <p className="text-sm font-semibold text-white">Fetching cinema database records...</p>
           </div>
         ) : filteredAndSortedMovies.length === 0 ? (
-          <div className="p-16 text-center text-on-surface-variant flex flex-col items-center justify-center gap-3 bg-surface-container/30 rounded-3xl border border-outline-variant/40">
-            <Film className="w-12 h-12 text-on-surface-variant opacity-40" />
+          <div className="p-16 text-center text-zinc-400 flex flex-col items-center justify-center gap-3 bg-[#0d0d10] rounded-3xl border border-white/10">
+            <Film className="w-12 h-12 text-zinc-600" />
             <h3 className="text-lg font-bold text-white">No Movies Matched Your Filter</h3>
-            <p className="text-xs text-on-surface-variant max-w-sm">
+            <p className="text-xs text-zinc-400 max-w-sm">
               Try adjusting your search terms, clearing genre filters, or switching statuses.
             </p>
             <button
@@ -290,7 +284,7 @@ export function MoviesPage() {
                 setSelectedGenre('All');
                 setSelectedStatus('all');
               }}
-              className="mt-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl shadow-md cursor-pointer hover:bg-primary/90 transition-all"
+              className="mt-2 px-4 py-2 bg-red-600 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer hover:bg-red-700 transition-all"
             >
               Reset All Filters
             </button>
@@ -301,12 +295,12 @@ export function MoviesPage() {
             {filteredAndSortedMovies.map((movie) => (
               <div
                 key={movie.id}
-                className="group relative bg-[#151b2d] border border-[#2e3447] hover:border-primary/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
+                className="group relative bg-[#0d0d10] border border-white/10 hover:border-red-600/60 rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_15px_35px_rgba(229,9,20,0.25)] transition-all duration-300 flex flex-col justify-between"
               >
                 {/* Poster Header */}
                 <div
                   onClick={() => setQuickInfoMovie(movie)}
-                  className="relative h-72 sm:h-80 w-full overflow-hidden bg-[#0c1324] cursor-pointer"
+                  className="relative h-72 sm:h-80 w-full overflow-hidden bg-black cursor-pointer"
                 >
                   <img
                     src={movie.posterUrl || movie.backdropUrl}
@@ -314,24 +308,18 @@ export function MoviesPage() {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#151b2d] via-transparent to-black/40 opacity-80 group-hover:opacity-90 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d10] via-transparent to-black/40 opacity-70 group-hover:opacity-90 transition-opacity" />
 
                   {/* Status Badge */}
                   <div className="absolute top-3 left-3">
-                    <span
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                        movie.status === 'now_showing'
-                          ? 'bg-emerald-500/90 text-white shadow-md'
-                          : 'bg-amber-500/90 text-white shadow-md'
-                      }`}
-                    >
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-600 text-white shadow-md">
                       {movie.status === 'now_showing' ? 'Now Showing' : 'Coming Soon'}
                     </span>
                   </div>
 
                   {/* Rating Badge */}
                   {movie.rating && (
-                    <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-full text-amber-300 text-xs font-bold border border-white/10 shadow-lg">
+                    <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-full text-amber-300 text-xs font-bold border border-white/10 shadow-lg">
                       <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                       <span>{movie.rating}</span>
                     </div>
@@ -340,34 +328,34 @@ export function MoviesPage() {
                   {/* Duration & Age Rating */}
                   <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-white">
                     {movie.duration && (
-                      <span className="flex items-center gap-1 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-md text-[11px] text-[#c7c4d7]">
-                        <Clock className="w-3 h-3 text-[#908fa0]" />
+                      <span className="flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded-md text-[11px] text-zinc-300">
+                        <Clock className="w-3 h-3 text-red-500" />
                         {movie.duration}
                       </span>
                     )}
                     {movie.ageRating && (
-                      <span className="px-2 py-0.5 rounded bg-black/60 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded bg-black/70 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
                         {movie.ageRating}
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* Movie Details */}
-                <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                {/* Movie Details with Fade Shadow */}
+                <div className="p-4 flex-1 flex flex-col justify-between space-y-3 bg-gradient-to-b from-[#0d0d10] via-black to-[#0d0d10] border-t border-white/5">
                   <div>
                     <h3
                       onClick={() => setQuickInfoMovie(movie)}
-                      className="text-base font-bold text-white group-hover:text-primary transition-colors line-clamp-1 cursor-pointer"
+                      className="text-base font-black text-white group-hover:text-red-500 transition-colors line-clamp-1 cursor-pointer uppercase tracking-tight"
                     >
                       {movie.title}
                     </h3>
                     {movie.tagline && (
-                      <p className="text-xs text-[#c0c1ff] italic line-clamp-1 mt-0.5">
+                      <p className="text-xs text-zinc-400 italic line-clamp-1 mt-0.5">
                         "{movie.tagline}"
                       </p>
                     )}
-                    <p className="text-xs text-[#908fa0] line-clamp-2 mt-1.5">
+                    <p className="text-xs text-zinc-400 line-clamp-2 mt-1.5 leading-relaxed">
                       {movie.synopsis}
                     </p>
                   </div>
@@ -378,7 +366,7 @@ export function MoviesPage() {
                       {movie.genres.slice(0, 3).map((genre, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-0.5 bg-[#0c1324] text-[#c7c4d7] border border-[#2e3447] rounded-md text-[10px] font-medium"
+                          className="px-2 py-0.5 bg-zinc-900 text-zinc-300 border border-white/10 rounded-md text-[10px] font-semibold"
                         >
                           {genre}
                         </span>
@@ -387,29 +375,25 @@ export function MoviesPage() {
                   )}
 
                   {/* Action Buttons */}
-                  <div className="pt-2 border-t border-[#2e3447] grid grid-cols-2 gap-2">
+                  <div className="pt-2 border-t border-white/10 grid grid-cols-2 gap-2">
                     {movie.trailerUrl && (
                       <button
                         onClick={() => {
                           setTrailerTitle(movie.title);
                           setTrailerUrl(movie.trailerUrl || null);
                         }}
-                        className="flex items-center justify-center gap-1 py-2 px-2 text-xs font-semibold text-white bg-[#0c1324] hover:bg-[#191f31] border border-[#2e3447] rounded-xl transition-all cursor-pointer"
+                        className="flex items-center justify-center gap-1 py-2 px-2 text-xs font-bold text-white bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded-xl transition-all cursor-pointer"
                       >
-                        <Play className="w-3 h-3 fill-current text-primary" />
+                        <Play className="w-3 h-3 fill-current text-red-500" />
                         <span>Trailer</span>
                       </button>
                     )}
 
                     <button
                       onClick={() => handleBookClick(movie)}
-                      className={`flex items-center justify-center gap-1 py-2 px-2 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-md ${
+                      className={`flex items-center justify-center gap-1 py-2 px-2 text-xs font-black rounded-xl transition-all cursor-pointer shadow-md ${
                         movie.trailerUrl ? 'col-span-1' : 'col-span-2'
-                      } ${
-                        movie.status === 'now_showing'
-                          ? 'bg-primary hover:bg-primary/90 text-white'
-                          : 'bg-amber-600 hover:bg-amber-500 text-white'
-                      }`}
+                      } bg-red-600 hover:bg-red-700 text-white shadow-red-600/30`}
                     >
                       <Ticket className="w-3.5 h-3.5" />
                       <span>{movie.status === 'now_showing' ? 'Book Now' : 'Notify Me'}</span>
@@ -425,7 +409,7 @@ export function MoviesPage() {
             {filteredAndSortedMovies.map((movie) => (
               <div
                 key={movie.id}
-                className="bg-[#151b2d] border border-[#2e3447] hover:border-primary/40 rounded-2xl p-4 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all"
+                className="bg-[#0d0d10] border border-white/10 hover:border-red-600/50 rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,0,0,0.8)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all"
               >
                 <div
                   onClick={() => setQuickInfoMovie(movie)}
@@ -439,13 +423,7 @@ export function MoviesPage() {
                   />
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
-                          movie.status === 'now_showing'
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                        }`}
-                      >
+                      <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-red-600 text-white">
                         {movie.status === 'now_showing' ? 'Live' : 'Upcoming'}
                       </span>
                       {movie.rating && (
@@ -456,15 +434,15 @@ export function MoviesPage() {
                       )}
                     </div>
 
-                    <h4 className="font-bold text-white text-base truncate hover:text-primary transition-colors">
+                    <h4 className="font-black text-white text-base truncate hover:text-red-500 transition-colors uppercase tracking-tight">
                       {movie.title}
                     </h4>
 
                     {movie.tagline && (
-                      <p className="text-xs text-[#c0c1ff] italic truncate">"{movie.tagline}"</p>
+                      <p className="text-xs text-zinc-400 italic truncate">"{movie.tagline}"</p>
                     )}
 
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-on-surface-variant pt-0.5">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400 pt-0.5">
                       {movie.duration && <span>{movie.duration}</span>}
                       {movie.genres && (
                         <span>· {movie.genres.join(', ')}</span>
@@ -474,27 +452,23 @@ export function MoviesPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-[#2e3447]">
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
                   {movie.trailerUrl && (
                     <button
                       onClick={() => {
                         setTrailerTitle(movie.title);
                         setTrailerUrl(movie.trailerUrl || null);
                       }}
-                      className="p-2 bg-[#0c1324] hover:bg-[#191f31] border border-[#2e3447] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                      className="p-2 bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Play className="w-3.5 h-3.5 fill-current text-primary" />
+                      <Play className="w-3.5 h-3.5 fill-current text-red-500" />
                       <span className="hidden sm:inline">Trailer</span>
                     </button>
                   )}
 
                   <button
                     onClick={() => handleBookClick(movie)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md flex items-center gap-1.5 cursor-pointer transition-all ${
-                      movie.status === 'now_showing'
-                        ? 'bg-primary hover:bg-primary/90'
-                        : 'bg-amber-600 hover:bg-amber-500'
-                    }`}
+                    className="px-4 py-2 rounded-xl text-xs font-black text-white bg-red-600 hover:bg-red-700 shadow-md flex items-center gap-1.5 cursor-pointer transition-all"
                   >
                     <Ticket className="w-3.5 h-3.5" />
                     <span>{movie.status === 'now_showing' ? 'Book Tickets' : 'Remind Me'}</span>

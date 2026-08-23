@@ -31,8 +31,7 @@ export function LoginPage() {
       setSuccessMsg('Login successful! Redirecting to home...');
       addNotification({
         type: 'success',
-        title: 'Welcome Back! 👋',
-        message: `Signed in successfully as ${email.trim()}.`
+        message: 'Logged In Successfully'
       });
       setTimeout(() => {
         navigate('/');

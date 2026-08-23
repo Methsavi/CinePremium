@@ -5,7 +5,6 @@ import {
   Menu, X, Home, CreditCard, Bell,
   Sparkles, Clock
 } from 'lucide-react';
-import { USER_AVATAR } from '../data/movies';
 import logo from '../assets/logo.png';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -185,12 +184,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* ── 1. LOGO & NAME ── */}
           <div
             onClick={handleHomeClick}
-            className="flex min-w-0 items-center gap-1.5 sm:gap-2.5 group cursor-pointer select-none"
+            className="flex min-w-0 items-center gap-2 sm:gap-2.5 group cursor-pointer select-none"
           >
-            <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl from-primary/25 to-inverse-primary/30 border border-primary/40 shadow-[0_0_15px_rgba(229,9,20,0.25)] transition-all duration-200">
-              <img src={logo} alt="CinePremium" className="w-full h-full rounded-xl object-contain" />
-              <div className="absolute inset-0 rounded-xl bg-primary/10 blur-sm pointer-events-none" />
-            </div>
+            <img 
+              src={logo} 
+              alt="CinePremium" 
+              className="w-8 h-8 sm:w-9 sm:h-9 object-contain group-hover:scale-105 transition-transform" 
+            />
             <div className="flex flex-col">
               <span className="font-display text-lg sm:text-2xl font-black tracking-tight text-white group-hover:text-primary transition-colors truncate">
                 Cine<span className="text-primary">Premium</span>
@@ -282,7 +282,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               {/* Notification Popover Dropdown */}
               {isNotificationOpen && (
-                <div className="liquid-glass-dropdown absolute right-0 mt-3 w-80 sm:w-96 rounded-3xl p-4 z-50 animate-in fade-in zoom-in-95 duration-150 border border-white/20 shadow-2xl bg-[#0c1324]/95 backdrop-blur-2xl">
+                <div className="liquid-glass-dropdown absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl p-4 z-50 animate-in fade-in zoom-in-95 duration-150 border border-white/20 shadow-2xl bg-[#0d0d10]/95 backdrop-blur-2xl">
                   {/* Header */}
                   <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
                     <div className="flex items-center gap-2 text-white font-bold text-xs">
@@ -382,11 +382,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="liquid-glass-btn flex items-center gap-2 p-1 sm:pr-2.5 rounded-full cursor-pointer transition-all border border-white/15 hover:border-primary/40"
                 >
-                  <img
-                    src={USER_AVATAR}
-                    alt={user.name}
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-primary/50"
-                  />
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary text-white font-black flex items-center justify-center text-xs shadow-md border border-primary/50">
+                    {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
                   <span className="hidden sm:inline font-medium text-xs text-white max-w-[80px] truncate">
                     {user.name.split(' ')[0]}
                   </span>
@@ -395,16 +393,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 {/* Profile Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="liquid-glass-dropdown absolute right-0 mt-3 w-64 rounded-2xl p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150 border border-white/20 bg-[#0c1324]/95 backdrop-blur-2xl shadow-2xl">
+                  <div className="liquid-glass-dropdown absolute right-0 mt-3 w-64 rounded-2xl p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150 border border-white/20 bg-[#0d0d10]/95 backdrop-blur-2xl shadow-2xl">
                     {/* User Info Card */}
                     <div className="px-3 py-2.5 border-b border-white/10 mb-1.5 rounded-xl bg-white/[0.03]">
                       <div className="font-bold text-sm text-white truncate">{user.name}</div>
-                      <div className="text-[11px] text-on-surface-variant truncate">{user.email}</div>
-                      <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/15 border border-primary/30 text-[10px] font-bold uppercase text-primary tracking-wider">
+                      <div className="text-[11px] text-zinc-400 truncate">{user.email}</div>
+                      <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-600/15 border border-red-500/30 text-[10px] font-bold uppercase text-red-400 tracking-wider">
                         {user.role === 'admin' ? (
-                          <Shield className="w-3 h-3 text-purple-400" />
+                          <Shield className="w-3 h-3 text-red-500" />
                         ) : user.role === 'cinema_manager' ? (
-                          <Shield className="w-3 h-3 text-indigo-400" />
+                          <Shield className="w-3 h-3 text-red-400" />
                         ) : (
                           <UserIcon className="w-3 h-3" />
                         )}
@@ -419,9 +417,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setIsDropdownOpen(false);
                           handleMyBookingsClick();
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-on-surface-variant hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
                       >
-                        <Ticket className="w-4 h-4 text-primary" />
+                        <Ticket className="w-4 h-4 text-red-500" />
                         <span>My Tickets & Bookings</span>
                       </button>
 
@@ -431,9 +429,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                             setIsDropdownOpen(false);
                             navigate('/admin');
                           }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-on-surface-variant hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
                         >
-                          <Shield className="w-4 h-4 text-indigo-400" />
+                          <Shield className="w-4 h-4 text-red-400" />
                           <span>Cinema Manager Panel</span>
                         </button>
                       )}
@@ -444,9 +442,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                             setIsDropdownOpen(false);
                             navigate('/super-admin');
                           }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-on-surface-variant hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
                         >
-                          <Shield className="w-4 h-4 text-purple-400" />
+                          <Shield className="w-4 h-4 text-red-500" />
                           <span>Super Admin Panel</span>
                         </button>
                       )}

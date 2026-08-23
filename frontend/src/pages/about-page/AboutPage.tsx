@@ -3,7 +3,6 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Navbar } from '../../components/Navbar';
 import { Footer } from '../../components/Footer';
 import { MyTicketsModal, BookingRecord } from '../../components/MyTicketsModal';
-import { HERO_MOVIE } from '../../data/movies';
 import { Movie } from '../../types/movie';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -80,8 +79,8 @@ export function AboutPage() {
     <div className="bg-background text-on-background min-h-screen flex flex-col font-sans antialiased selection:bg-primary selection:text-white">
       {/* Top Navbar */}
       <Navbar
-        onBookNowClick={() => handleBookClick(HERO_MOVIE)}
-        onSearchClick={() => navigate('/')}
+        onBookNowClick={() => navigate('/movies')}
+        onSearchClick={() => navigate('/movies')}
         onOpenMyTickets={() => setIsMyTicketsOpen(true)}
       />
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ShowtimeList from "./ShowtimeList";
 import ShowtimeAddForm from "./ShowtimeAddForm";
-import { PlusCircle } from "lucide-react";
+import { Plus } from "lucide-react";
 
 function ShowtimeManagePage() {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -14,21 +14,21 @@ function ShowtimeManagePage() {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner / Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-[#151b2d] border border-[#2e3447] rounded-xl">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-lg font-bold text-[#dce1fb]">Movie Forecasting & Showtime Management</h3>
-          <p className="text-xs text-[#908fa0]">
-            Assign movies to cinema halls, set showtime slots, and configure tier-based ticket pricing for forecasting.
+          <h2 className="text-xl font-bold text-white tracking-tight">Showtime Schedules</h2>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            Assign movies to cinema halls, set screening time slots, and configure ticket prices
           </p>
         </div>
 
         <button
           onClick={() => setShowAddForm(true)}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#c0c1ff] hover:bg-white text-[#1000a9] font-bold text-sm rounded-lg transition-all shadow-md hover:shadow-lg cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-white/10 hover:border-red-500/50 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-sm"
         >
-          <PlusCircle className="w-4 h-4" />
-          Schedule Movie & Ticket Prices
+          <Plus className="w-4 h-4 text-red-500" />
+          <span>Schedule Showtime</span>
         </button>
       </div>
 
@@ -40,7 +40,7 @@ function ShowtimeManagePage() {
         />
       )}
 
-      {/* Showtime List Grid */}
+      {/* Showtime List */}
       <ShowtimeList onRefreshTrigger={refreshTrigger} />
     </div>
   );

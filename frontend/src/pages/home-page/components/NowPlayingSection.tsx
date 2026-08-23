@@ -95,11 +95,11 @@ export const NowPlayingSection: React.FC<NowPlayingSectionProps> = ({
 
         <div className="flex items-center gap-3">
           {/* Navigation Arrows */}
-          <div className="flex items-center gap-1.5 bg-[#0c1324] p-1 rounded-full border border-white/10 shadow-inner">
+          <div className="flex items-center gap-1.5 bg-zinc-950 p-1 rounded-full border border-white/10 shadow-inner">
             <button
               onClick={() => scroll('left')}
               disabled={!canScrollLeft}
-              className="p-2 rounded-full text-on-surface-variant hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
+              className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
               title="Previous Movies"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -107,7 +107,7 @@ export const NowPlayingSection: React.FC<NowPlayingSectionProps> = ({
             <button
               onClick={() => scroll('right')}
               disabled={!canScrollRight}
-              className="p-2 rounded-full text-on-surface-variant hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
+              className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
               title="Next Movies"
             >
               <ChevronRight className="w-4 h-4" />
@@ -117,7 +117,7 @@ export const NowPlayingSection: React.FC<NowPlayingSectionProps> = ({
           {/* View All Button */}
           <button
             onClick={onViewAllClick || (() => navigate('/movies'))}
-            className="text-primary cursor-pointer hover:text-white font-semibold text-xs sm:text-sm flex items-center gap-1 transition-colors px-3 py-1.5 rounded-full hover:bg-primary/10 border border-primary/20"
+            className="text-red-500 cursor-pointer hover:text-white font-bold text-xs sm:text-sm flex items-center gap-1 transition-colors px-3.5 py-1.5 rounded-full hover:bg-red-600/20 border border-red-500/30"
           >
             <span>View All</span>
             <ArrowRight className="w-4 h-4" />
@@ -127,16 +127,16 @@ export const NowPlayingSection: React.FC<NowPlayingSectionProps> = ({
 
       {/* ── Movies Slider Container ── */}
       {movies.length === 0 ? (
-        <div className="p-12 text-center text-on-surface-variant flex flex-col items-center justify-center gap-2 bg-surface rounded-3xl border border-outline-variant/60">
-          <Film className="w-10 h-10 opacity-30 text-primary" />
+        <div className="p-12 text-center text-zinc-400 flex flex-col items-center justify-center gap-2 bg-[#0d0d10] rounded-3xl border border-white/10">
+          <Film className="w-10 h-10 opacity-30 text-red-500" />
           <h4 className="font-semibold text-white">No Movies Currently Found</h4>
-          <p className="text-xs text-on-surface-variant">Check back later or adjust your genre filters.</p>
+          <p className="text-xs text-zinc-400">Check back later or adjust your genre filters.</p>
         </div>
       ) : (
         <div className="relative group">
           {/* Edge Fade Gradients for smooth carousel feel */}
-          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
 
           {/* Scrollable Track */}
           <div
@@ -148,21 +148,21 @@ export const NowPlayingSection: React.FC<NowPlayingSectionProps> = ({
               <div
                 key={movie.id}
                 onClick={() => onMovieClick ? onMovieClick(movie) : navigate(`/movie/${movie.id}`)}
-                className="w-56 sm:w-64 flex-shrink-0 snap-start bg-[#151b2d] border border-[#2e3447] hover:border-primary/60 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between cursor-pointer group/card"
+                className="w-56 sm:w-64 flex-shrink-0 snap-start bg-[#0d0d10] border border-white/10 hover:border-red-600/60 rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_15px_35px_rgba(229,9,20,0.25)] transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between cursor-pointer group/card"
               >
                 {/* Poster Box */}
-                <div className="relative aspect-[2/3] w-full overflow-hidden bg-[#0c1324]">
+                <div className="relative aspect-[2/3] w-full overflow-hidden bg-black">
                   <img
                     src={movie.posterUrl || movie.backdropUrl}
                     alt={movie.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-108"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#151b2d] via-transparent to-black/30 opacity-60 group-hover/card:opacity-80 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d10] via-transparent to-black/40 opacity-70 group-hover/card:opacity-90 transition-opacity" />
 
                   {/* Rating Tag */}
                   {movie.rating && (
-                    <div className="absolute top-2.5 right-2.5 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-xs text-amber-300 flex items-center gap-1 font-bold shadow-md">
+                    <div className="absolute top-2.5 right-2.5 bg-black/80 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-xs text-amber-300 flex items-center gap-1 font-bold shadow-md">
                       <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                       <span>{movie.rating}</span>
                     </div>
@@ -170,46 +170,46 @@ export const NowPlayingSection: React.FC<NowPlayingSectionProps> = ({
 
                   {/* Live Status Pill */}
                   <div className="absolute top-2.5 left-2.5">
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/90 text-white shadow-md">
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-red-600 text-white shadow-md">
                       Live
                     </span>
                   </div>
 
                   {/* Hover Overlay Button */}
-                  <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex flex-col items-center justify-center gap-2 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 p-4">
+                  <div className="absolute inset-0 bg-black/75 backdrop-blur-xs flex flex-col items-center justify-center gap-2 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 p-4">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         onBookMovie(movie);
                       }}
-                      className="liquid-glow-btn text-surface-container-lowest text-xs font-bold px-5 py-2.5 rounded-full flex items-center gap-1.5 shadow-xl hover:scale-105 transition-transform cursor-pointer"
+                      className="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-xl shadow-red-600/40 hover:scale-105 transition-transform cursor-pointer"
                     >
                       <Ticket className="w-3.5 h-3.5 fill-current" />
                       <span>Get Tickets</span>
                     </button>
-                    <span className="text-[10px] text-white/80 font-medium">Click card for details</span>
+                    <span className="text-[10px] text-zinc-300 font-medium">Click card for details</span>
                   </div>
                 </div>
 
-                {/* Movie Details Bottom */}
-                <div className="p-3.5 space-y-1.5 flex-1 flex flex-col justify-between">
+                {/* Movie Details Bottom with Fade Shadow */}
+                <div className="p-3.5 space-y-1.5 flex-1 flex flex-col justify-between bg-gradient-to-b from-[#0d0d10] via-black to-[#0d0d10] border-t border-white/5">
                   <div>
-                    <h4 className="font-bold text-sm sm:text-base text-white truncate group-hover/card:text-primary transition-colors">
+                    <h4 className="font-bold text-sm sm:text-base text-white truncate group-hover/card:text-red-500 transition-colors uppercase tracking-tight">
                       {movie.title}
                     </h4>
                     {movie.tagline && (
-                      <p className="text-[11px] text-[#c0c1ff] italic truncate">
+                      <p className="text-[11px] text-zinc-400 italic truncate">
                         "{movie.tagline}"
                       </p>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-on-surface-variant pt-1 border-t border-white/5">
+                  <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1.5 border-t border-white/5">
                     <span className="truncate max-w-[120px]">
                       {movie.genres && Array.isArray(movie.genres) ? movie.genres.slice(0, 2).join(', ') : 'Cinema'}
                     </span>
                     {movie.duration && (
-                      <span className="text-white/80 font-medium shrink-0">
+                      <span className="text-zinc-300 font-medium shrink-0">
                         {movie.duration}
                       </span>
                     )}

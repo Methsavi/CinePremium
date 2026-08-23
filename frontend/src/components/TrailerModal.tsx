@@ -95,26 +95,26 @@ export const TrailerModal: React.FC<TrailerModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-xl animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-5xl bg-[#0c1324] rounded-3xl border border-[#2e3447] shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-5xl bg-[#0b0b0e] rounded-3xl border border-white/15 shadow-[0_25px_70px_rgba(0,0,0,0.95)] shadow-red-950/20 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ── Modal Header Bar ── */}
-        <div className="flex items-center justify-between px-5 py-3.5 bg-[#151b2d] border-b border-[#2e3447]">
+        <div className="flex items-center justify-between px-5 py-3.5 bg-black/90 border-b border-white/10">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-red-600 flex items-center justify-center text-white shadow-md shadow-red-600/30 shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-red-600 flex items-center justify-center text-white shadow-md shadow-red-600/40 shrink-0">
               <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-bold text-white truncate font-display">
+              <h3 className="text-sm font-bold text-white truncate uppercase tracking-tight">
                 {movieTitle ? `${movieTitle} — Official Trailer` : 'Official Movie Trailer'}
               </h3>
-              <p className="text-[10px] text-[#908fa0] flex items-center gap-1">
-                <Film className="w-3 h-3 text-primary" />
-                <span>CinePremium 4K Laser Cinema Preview</span>
+              <p className="text-[10px] text-zinc-400 flex items-center gap-1">
+                <Film className="w-3 h-3 text-red-500" />
+                <span>CinePremium 4K Laser Preview</span>
               </p>
             </div>
           </div>
@@ -126,7 +126,7 @@ export const TrailerModal: React.FC<TrailerModalProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Watch on YouTube"
-                className="p-2 text-[#908fa0] hover:text-white hover:bg-[#2e3447] rounded-xl transition-all flex items-center gap-1 text-xs"
+                className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-all flex items-center gap-1 text-xs border border-white/10"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span className="hidden sm:inline">Open in YouTube</span>
@@ -136,7 +136,7 @@ export const TrailerModal: React.FC<TrailerModalProps> = ({
             <button
               onClick={onClose}
               title="Close Trailer (Esc)"
-              className="p-2 text-[#908fa0] hover:text-white hover:bg-rose-600 rounded-xl transition-all cursor-pointer"
+              className="p-2 text-zinc-400 hover:text-white hover:bg-red-600 rounded-xl transition-all cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -146,9 +146,9 @@ export const TrailerModal: React.FC<TrailerModalProps> = ({
         {/* ── 16:9 Cinematic Video Container ── */}
         <div className="relative aspect-video w-full bg-black flex items-center justify-center">
           {iframeLoading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-950 text-white z-0">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black text-white z-0">
               <div className="w-10 h-10 border-3 border-red-600 border-t-transparent rounded-full animate-spin" />
-              <span className="text-xs font-semibold text-slate-400">Loading High-Definition Trailer...</span>
+              <span className="text-xs font-semibold text-zinc-400">Loading High-Definition Trailer...</span>
             </div>
           )}
 

@@ -11,6 +11,7 @@ import { ComingSoonSection } from './components/ComingSoonSection';
 import { QuickMovieInfoModal } from '@/components/QuickMovieInfoModal';
 import { TrailerModal } from '@/components/TrailerModal';
 import { Footer } from '@/components/Footer';
+import { useNotification } from '@/context/NotificationContext';
 import { RefreshCw } from 'lucide-react';
 
 export function HomePage() {
@@ -29,7 +30,6 @@ export function HomePage() {
   const [quickInfoMovie, setQuickInfoMovie] = useState<Movie | null>(null);
   const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
   const [trailerTitle, setTrailerTitle] = useState<string>('');
-  const [notificationMsg, setNotificationMsg] = useState<string | null>(null);
 
   // Fetch movies directly from the database API
   useEffect(() => {
@@ -81,9 +81,10 @@ export function HomePage() {
     });
   }, [nowPlayingDbMovies, searchQuery, selectedGenre]);
 
+  const { addNotification } = useNotification();
+
   const handleRemindMe = (movie: Movie) => {
-    setNotificationMsg(`Reminder set for "${movie.title}" (${movie.releaseDate || 'Coming Soon'})!`);
-    setTimeout(() => setNotificationMsg(null), 4000);
+    addNotification({ message: 'Reminder Set', type: 'info' });
   };
 
   // Navigate to the dedicated movie detail page with auditorium showtimes & halls
@@ -93,13 +94,6 @@ export function HomePage() {
 
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col font-sans antialiased">
-      {/* Toast Notification */}
-      {notificationMsg && (
-        <div className="fixed bottom-6 right-6 z-50 bg-primary text-on-primary font-medium text-sm px-5 py-3 rounded-full shadow-2xl animate-in slide-in-from-bottom-5 duration-300">
-          {notificationMsg}
-        </div>
-      )}
-
       {/* Top Navbar */}
       <Navbar
         onBookNowClick={() => navigate('/movies')}

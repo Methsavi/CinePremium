@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Movie, Cinema, Showtime, Seat } from '../types/movie';
-import { CINEMAS } from '../data/movies';
 import { X, Calendar, MapPin, Ticket, CheckCircle, Armchair, ChevronRight, ArrowLeft, QrCode, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { bookingApi } from '../services/bookingApi';
 import { io, Socket } from 'socket.io-client';
 
 const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.BACKEND_URL?.replace(/\/$/, '') || 'http://localhost:5000';
+
+const DEFAULT_CINEMA: Cinema = {
+  id: 'c1',
+  name: 'CinePremium Grand Hall',
+  location: 'Colombo, Sri Lanka',
+  distance: '1.5 km',
+  showtimes: [
+    { id: 'st1', time: '11:30 AM', format: 'IMAX 3D', price: 22, hall: 'Hall 1' },
+    { id: 'st2', time: '02:45 PM', format: 'Dolby Cinema', price: 18, hall: 'Hall 2' },
+  ]
+};
 
 interface QuickBookingModalProps {
   movie: Movie | null;
@@ -64,8 +74,8 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
   const { token } = useAuth();
   const [step, setStep] = useState<'showtime' | 'seats' | 'confirmation'>('showtime');
   const [selectedDate, setSelectedDate] = useState(DATES[0].fullDate);
-  const [selectedCinema, setSelectedCinema] = useState<Cinema>(() => initialCinema || CINEMAS[0]);
-  const [selectedShowtime, setSelectedShowtime] = useState<Showtime | null>(() => initialShowtime || (initialCinema ? initialCinema.showtimes[0] : CINEMAS[0].showtimes[0]));
+  const [selectedCinema, setSelectedCinema] = useState<Cinema>(() => initialCinema || DEFAULT_CINEMA);
+  const [selectedShowtime, setSelectedShowtime] = useState<Showtime | null>(() => initialShowtime || (initialCinema ? initialCinema.showtimes[0] : DEFAULT_CINEMA.showtimes[0]));
   const [seats, setSeats] = useState<Seat[]>(generateSeats([]));
   const [confirmedBookingId, setConfirmedBookingId] = useState<string>('');
   const [isBooking, setIsBooking] = useState(false);
@@ -213,16 +223,16 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-xl animate-in fade-in duration-300">
-      <div className="relative w-full max-w-4xl bg-slate-900 border border-white/15 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-xl animate-in fade-in duration-300">
+      <div className="relative w-full max-w-4xl bg-[#0d0d10] border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-5 border-b border-white/10 bg-slate-950/50">
+        <div className="flex items-center justify-between p-5 border-b border-white/10 bg-zinc-950/80">
           <div className="flex items-center gap-3">
             {step === 'seats' && (
               <button
                 onClick={() => setStep('showtime')}
-                className="p-1.5 rounded-lg bg-white/5 text-slate-300 hover:text-white hover:bg-white/10"
+                className="p-1.5 rounded-lg bg-zinc-900 text-zinc-300 hover:text-white hover:bg-zinc-800"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -232,7 +242,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
                 <Ticket className="w-5 h-5 text-red-500" />
                 {movie.title}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-zinc-400">
                 {step === 'showtime' && 'Step 1: Select Date, Cinema & Showtime'}
                 {step === 'seats' && 'Step 2: Choose Your Seats'}
                 {step === 'confirmation' && 'Booking Confirmed!'}
@@ -242,7 +252,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-full bg-white/5 text-slate-400 hover:text-white hover:bg-red-600 transition-all"
+            className="p-2 rounded-full bg-white/5 text-zinc-400 hover:text-white hover:bg-red-600 transition-all"
           >
             <X className="w-5 h-5" />
           </button>
@@ -257,18 +267,18 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
               
               {/* Date Selector */}
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4 text-red-400" /> Select Date
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-red-500" /> Select Date
                 </label>
                 <div className="flex items-center gap-3 overflow-x-auto pb-2">
                   {DATES.map((d) => (
                     <button
                       key={d.fullDate}
                       onClick={() => setSelectedDate(d.fullDate)}
-                      className={`flex flex-col items-center justify-center p-3 min-w-[80px] rounded-2xl border transition-all ${
+                      className={`flex flex-col items-center justify-center p-3 min-w-[80px] rounded-xl border transition-all ${
                         selectedDate === d.fullDate
-                          ? 'bg-gradient-to-b from-red-600 to-rose-600 border-red-400 text-white shadow-lg shadow-red-600/30'
-                          : 'bg-slate-950/60 border-white/10 text-slate-300 hover:bg-slate-800'
+                          ? 'bg-red-600 border-red-500 text-white shadow-lg shadow-red-600/30'
+                          : 'bg-zinc-950 border-white/10 text-zinc-300 hover:bg-zinc-900'
                       }`}
                     >
                       <span className="text-xs font-medium">{d.day}</span>
@@ -280,23 +290,23 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
 
               {/* Cinema & Showtime Cards */}
               <div className="space-y-4">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-amber-400" /> Cinemas & Showtimes in Your City
+                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-red-500" /> Cinemas & Showtimes in Your City
                 </label>
 
-                {CINEMAS.map((cinema) => (
+                {[selectedCinema].map((cinema) => (
                   <div
                     key={cinema.id}
-                    className={`p-4 rounded-2xl border transition-all ${
+                    className={`p-4 rounded-xl border transition-all ${
                       selectedCinema.id === cinema.id
-                        ? 'bg-slate-800/80 border-red-500/50'
-                        : 'bg-slate-950/50 border-white/10'
+                        ? 'bg-zinc-950 border-red-500/50'
+                        : 'bg-zinc-950/50 border-white/10'
                     }`}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                       <div>
                         <h4 className="font-bold text-white text-base">{cinema.name}</h4>
-                        <p className="text-xs text-slate-400">{cinema.location} • {cinema.distance}</p>
+                        <p className="text-xs text-zinc-400">{cinema.location} • {cinema.distance}</p>
                       </div>
                     </div>
 
@@ -313,8 +323,8 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
                             }}
                             className={`px-4 py-2.5 rounded-xl border text-left transition-all ${
                               isSelected
-                                ? 'bg-gradient-to-r from-red-600 to-rose-600 border-red-400 text-white font-bold shadow-lg shadow-red-600/30'
-                                : 'bg-slate-900 border-white/10 text-slate-200 hover:bg-white/10'
+                                ? 'bg-red-600 border-red-500 text-white font-bold shadow-lg shadow-red-600/30'
+                                : 'bg-zinc-900 border-white/10 text-zinc-200 hover:bg-zinc-800'
                             }`}
                           >
                             <div className="text-sm font-bold">{st.time}</div>
@@ -336,18 +346,18 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
               {/* Screen Indicator */}
               <div className="text-center space-y-2">
                 <div className="w-3/4 mx-auto h-2 bg-gradient-to-r from-transparent via-red-500 to-transparent rounded-full shadow-lg shadow-red-500/50" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                   CINEMA SCREEN THIS WAY
                 </span>
               </div>
 
               {/* Seat Map */}
-              <div className="max-w-md mx-auto grid grid-cols-8 gap-2 py-4 bg-slate-950/60 p-4 rounded-2xl border border-white/10">
+              <div className="max-w-md mx-auto grid grid-cols-8 gap-2 py-4 bg-zinc-950 p-4 rounded-xl border border-white/10">
                 {seats.map((seat) => {
-                  let bgClass = 'bg-slate-800 text-slate-300 border-white/10 hover:bg-slate-700';
-                  if (seat.status === 'occupied') bgClass = 'bg-slate-900 text-slate-600 border-transparent cursor-not-allowed';
-                  if (seat.status === 'selected') bgClass = 'bg-red-600 text-white border-red-400 shadow-md shadow-red-600/40 scale-105';
-                  if (seat.type === 'vip' && seat.status === 'available') bgClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30';
+                  let bgClass = 'bg-zinc-900 text-zinc-300 border-white/10 hover:bg-zinc-800';
+                  if (seat.status === 'occupied') bgClass = 'bg-zinc-950 text-zinc-700 border-transparent cursor-not-allowed';
+                  if (seat.status === 'selected') bgClass = 'bg-red-600 text-white border-white shadow-md shadow-red-600/40 scale-105';
+                  if (seat.type === 'vip' && seat.status === 'available') bgClass = 'bg-amber-950/30 text-amber-300 border-amber-500/40 hover:bg-amber-950/50';
 
                   return (
                     <button
@@ -363,13 +373,13 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
               </div>
 
               {/* Seat Legend */}
-              <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-300 border-t border-white/10 pt-4">
+              <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-zinc-300 border-t border-white/10 pt-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-slate-800 border border-white/10" />
+                  <div className="w-4 h-4 rounded bg-zinc-900 border border-white/10" />
                   <span>Standard (Rs. 16)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-amber-500/20 border border-amber-500/40" />
+                  <div className="w-4 h-4 rounded bg-amber-950/30 border border-amber-500/40" />
                   <span>VIP Lounge (Rs. 22)</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -377,7 +387,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
                   <span>Selected</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-slate-900" />
+                  <div className="w-4 h-4 rounded bg-zinc-950 border border-zinc-800" />
                   <span>Occupied</span>
                 </div>
               </div>
@@ -394,15 +404,15 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
 
               <div className="space-y-1">
                 <h3 className="text-2xl font-black text-white">Tickets Confirmed!</h3>
-                <p className="text-slate-400 text-sm">Booking ID: <span className="font-mono font-bold text-red-400">{confirmedBookingId}</span></p>
+                <p className="text-zinc-400 text-sm">Booking ID: <span className="font-mono font-bold text-red-400">{confirmedBookingId}</span></p>
               </div>
 
               {/* Digital Ticket Card */}
-              <div className="max-w-md mx-auto bg-slate-950 border border-white/15 rounded-2xl p-6 text-left space-y-4 shadow-2xl relative overflow-hidden">
+              <div className="max-w-md mx-auto bg-zinc-950 border border-white/15 rounded-xl p-6 text-left space-y-4 shadow-2xl relative overflow-hidden">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <div>
                     <h4 className="font-bold text-white text-base">{movie.title}</h4>
-                    <p className="text-xs text-slate-400">{selectedCinema.name}</p>
+                    <p className="text-xs text-zinc-400">{selectedCinema.name}</p>
                   </div>
                   <span className="px-2.5 py-1 rounded text-xs font-bold bg-red-600 text-white">
                     {selectedShowtime?.format}
@@ -411,22 +421,22 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
 
                 <div className="grid grid-cols-2 gap-4 text-xs">
                   <div>
-                    <span className="text-slate-500 block uppercase font-bold text-[10px]">Date & Time</span>
-                    <span className="text-slate-200 font-semibold">{selectedDate} • {selectedShowtime?.time}</span>
+                    <span className="text-zinc-500 block uppercase font-bold text-[10px]">Date & Time</span>
+                    <span className="text-zinc-200 font-semibold">{selectedDate} • {selectedShowtime?.time}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block uppercase font-bold text-[10px]">Seats</span>
-                    <span className="text-slate-200 font-semibold">{selectedSeats.map(s => s.id).join(', ')}</span>
+                    <span className="text-zinc-500 block uppercase font-bold text-[10px]">Seats</span>
+                    <span className="text-zinc-200 font-semibold">{selectedSeats.map(s => s.id).join(', ')}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-3 border-t border-dashed border-white/15">
                   <div className="flex items-center gap-2">
-                    <QrCode className="w-12 h-12 text-white bg-white/10 p-1 rounded" />
-                    <span className="text-[10px] text-slate-400">Scan at cinema entry gate</span>
+                    <QrCode className="w-12 h-12 text-slate-950 bg-white p-1 rounded" />
+                    <span className="text-[10px] text-zinc-400">Scan at cinema entry gate</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-slate-400 block">Total Paid</span>
+                    <span className="text-xs text-zinc-400 block">Total Paid</span>
                     <span className="text-lg font-black text-emerald-400">Rs. {totalAmount.toFixed(2)}</span>
                   </div>
                 </div>
@@ -437,16 +447,16 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-5 border-t border-white/10 bg-slate-950/80 flex items-center justify-between">
+        <div className="p-5 border-t border-white/10 bg-zinc-950/80 flex items-center justify-between">
           {step === 'showtime' && (
             <>
-              <div className="text-sm text-slate-300">
+              <div className="text-sm text-zinc-300">
                 Showtime: <span className="font-bold text-white">{selectedShowtime?.time} ({selectedShowtime?.format})</span>
               </div>
               <button
                 disabled={!selectedShowtime}
                 onClick={() => setStep('seats')}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold text-sm shadow-lg shadow-red-600/30 hover:scale-105 transition-all"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-600/30 transition-all cursor-pointer"
               >
                 <span>Select Seats</span>
                 <ChevronRight className="w-4 h-4" />
@@ -456,13 +466,13 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
 
           {step === 'seats' && (
             <>
-              <div className="text-sm text-slate-300">
+              <div className="text-sm text-zinc-300">
                 Seats ({selectedSeats.length}): <span className="font-bold text-emerald-400">Rs. {totalAmount.toFixed(2)}</span>
               </div>
               <button
                 disabled={selectedSeats.length === 0 || isBooking}
                 onClick={handleConfirmPayment}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 hover:scale-105 disabled:opacity-50 transition-all"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-600/30 disabled:opacity-50 transition-all cursor-pointer"
               >
                 {isBooking ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -477,14 +487,14 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
           {step === 'confirmation' && (
             <button
               onClick={onClose}
-              className="w-full py-3 rounded-xl bg-red-600 text-white font-bold text-sm hover:bg-red-500 transition-colors shadow-lg"
+              className="w-full py-3 rounded-xl bg-red-600 text-white font-bold text-sm hover:bg-red-700 transition-colors shadow-lg cursor-pointer"
             >
               Done & Return to Homepage
             </button>
-          )}
         </div>
 
       </div>
     </div>
   );
 };
+

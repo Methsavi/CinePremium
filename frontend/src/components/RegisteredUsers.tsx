@@ -118,12 +118,12 @@ function RegisteredUsers() {
         </div>
 
         <div className="bg-surface-container-low/80 border border-outline-variant/40 rounded-2xl p-3.5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0">
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div>
             <div className="text-[10px] uppercase font-semibold text-on-surface-variant tracking-wider">Admins</div>
-            <div className="text-lg font-bold text-purple-300">{stats.admins}</div>
+            <div className="text-lg font-bold text-red-400">{stats.admins}</div>
           </div>
         </div>
 
@@ -166,7 +166,7 @@ function RegisteredUsers() {
             onClick={() => setRoleFilter("admin")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               roleFilter === "admin"
-                ? "bg-purple-500 text-white shadow-sm"
+                ? "bg-red-600 text-white shadow-sm"
                 : "text-on-surface-variant hover:text-on-surface"
             }`}
           >
@@ -232,7 +232,7 @@ function RegisteredUsers() {
                         <div
                           className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 border ${
                             isAdmin
-                              ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
+                              ? "bg-red-600/20 text-red-400 border-red-500/30"
                               : "bg-primary/20 text-primary border-primary/30"
                           }`}
                         >
@@ -254,7 +254,7 @@ function RegisteredUsers() {
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                           isAdmin
-                            ? "bg-purple-500/10 text-purple-300 border-purple-500/30"
+                            ? "bg-red-500/10 text-red-400 border-red-500/30"
                             : "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
                         }`}
                       >

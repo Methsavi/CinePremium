@@ -92,11 +92,12 @@ export const ComingSoonSection: React.FC<ComingSoonSectionProps> = ({ movies, on
 
         <div className="flex items-center gap-3">
           {/* Navigation Arrows */}
-          <div className="flex items-center gap-1.5 bg-[#0c1324] p-1 rounded-full border border-white/10 shadow-inner">
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-1.5 bg-zinc-950 p-1 rounded-full border border-white/10 shadow-inner">
             <button
               onClick={() => scroll('left')}
               disabled={!canScrollLeft}
-              className="p-2 rounded-full text-on-surface-variant hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
+              className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
               title="Previous Upcoming Movies"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -104,7 +105,7 @@ export const ComingSoonSection: React.FC<ComingSoonSectionProps> = ({ movies, on
             <button
               onClick={() => scroll('right')}
               disabled={!canScrollRight}
-              className="p-2 rounded-full text-on-surface-variant hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
+              className="p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer disabled:cursor-not-allowed"
               title="Next Upcoming Movies"
             >
               <ChevronRight className="w-4 h-4" />
@@ -113,7 +114,7 @@ export const ComingSoonSection: React.FC<ComingSoonSectionProps> = ({ movies, on
 
           <button
             onClick={() => navigate('/movies')}
-            className="text-primary cursor-pointer hover:text-white font-semibold text-xs sm:text-sm flex items-center gap-1 transition-colors px-3 py-1.5 rounded-full hover:bg-primary/10 border border-primary/20"
+            className="text-red-500 cursor-pointer hover:text-white font-bold text-xs sm:text-sm flex items-center gap-1 transition-colors px-3.5 py-1.5 rounded-full hover:bg-red-600/20 border border-red-500/30"
           >
             <span>All Releases</span>
             <Calendar className="w-3.5 h-3.5" />
@@ -124,8 +125,8 @@ export const ComingSoonSection: React.FC<ComingSoonSectionProps> = ({ movies, on
       {/* ── Coming Soon Slider Track ── */}
       <div className="relative group">
         {/* Edge Fade Gradients */}
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
 
         <div
           ref={sliderRef}
@@ -136,21 +137,21 @@ export const ComingSoonSection: React.FC<ComingSoonSectionProps> = ({ movies, on
             <div
               key={movie.id}
               onClick={() => onMovieClick ? onMovieClick(movie) : navigate(`/movie/${movie.id}`)}
-              className="w-80 sm:w-[360px] flex-shrink-0 snap-start bg-[#151b2d] border border-[#2e3447] hover:border-amber-500/50 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between cursor-pointer group/card relative"
+              className="w-80 sm:w-[360px] flex-shrink-0 snap-start bg-[#0d0d10] border border-white/10 hover:border-red-600/60 rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_15px_35px_rgba(229,9,20,0.25)] transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between cursor-pointer group/card relative"
             >
               {/* Card Banner with Backdrop Image */}
-              <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-[#0c1324]">
+              <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-black">
                 <img
                   src={movie.backdropUrl || movie.posterUrl}
                   alt={movie.title}
-                  className="w-full h-full object-cover opacity-70 group-hover/card:opacity-90 group-hover/card:scale-108 transition-all duration-500"
+                  className="w-full h-full object-cover opacity-75 group-hover/card:opacity-95 group-hover/card:scale-108 transition-all duration-500"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#151b2d] via-[#151b2d]/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d10] via-black/40 to-transparent" />
 
                 {/* Release Date Pill */}
                 <div className="absolute top-3 left-3">
-                  <span className="px-3 py-1 bg-amber-500/90 text-white backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1">
+                  <span className="px-3 py-1 bg-red-600 text-white backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
                     <span>{movie.releaseDate || 'Coming Soon'}</span>
                   </span>
@@ -158,25 +159,25 @@ export const ComingSoonSection: React.FC<ComingSoonSectionProps> = ({ movies, on
 
                 {/* Rating if available */}
                 {movie.rating ? (
-                  <div className="absolute top-3 right-3 bg-black/75 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-xs text-amber-300 flex items-center gap-1 font-bold">
+                  <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full text-xs text-amber-300 flex items-center gap-1 font-bold shadow-md">
                     <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                     <span>{movie.rating}</span>
                   </div>
                 ) : null}
               </div>
 
-              {/* Card Body Details */}
-              <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+              {/* Card Body Details with Fade Shadow */}
+              <div className="p-5 flex-1 flex flex-col justify-between space-y-3 bg-gradient-to-b from-[#0d0d10] via-black to-[#0d0d10] border-t border-white/5">
                 <div>
-                  <h4 className="text-lg sm:text-xl font-bold text-white group-hover/card:text-amber-300 transition-colors line-clamp-1">
+                  <h4 className="text-lg sm:text-xl font-black text-white group-hover/card:text-red-500 transition-colors line-clamp-1 uppercase tracking-tight">
                     {movie.title}
                   </h4>
                   {movie.tagline && (
-                    <p className="text-xs text-[#c0c1ff] italic line-clamp-1 mt-0.5">
+                    <p className="text-xs text-zinc-400 italic line-clamp-1 mt-0.5">
                       "{movie.tagline}"
                     </p>
                   )}
-                  <p className="text-xs text-[#908fa0] line-clamp-2 mt-2 leading-relaxed">
+                  <p className="text-xs text-zinc-400 line-clamp-2 mt-2 leading-relaxed">
                     {movie.synopsis}
                   </p>
                 </div>
@@ -188,13 +189,13 @@ export const ComingSoonSection: React.FC<ComingSoonSectionProps> = ({ movies, on
                       movie.genres.slice(0, 2).map((genre, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-0.5 bg-[#0c1324] text-[#c7c4d7] border border-[#2e3447] rounded-md text-[10px] font-medium"
+                          className="px-2 py-0.5 bg-zinc-900 text-zinc-300 border border-white/10 rounded-md text-[10px] font-semibold"
                         >
                           {genre}
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs text-[#908fa0]">Premiere</span>
+                      <span className="text-xs text-zinc-400">Premiere</span>
                     )}
                   </div>
 
@@ -203,7 +204,7 @@ export const ComingSoonSection: React.FC<ComingSoonSectionProps> = ({ movies, on
                       e.stopPropagation();
                       onRemindMe(movie);
                     }}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 transition-all cursor-pointer shadow-sm whitespace-nowrap"
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-red-600/15 text-red-400 border border-red-500/30 hover:bg-red-600 hover:text-white transition-all cursor-pointer shadow-sm whitespace-nowrap"
                   >
                     <Bell className="w-3.5 h-3.5" />
                     <span>Remind Me</span>

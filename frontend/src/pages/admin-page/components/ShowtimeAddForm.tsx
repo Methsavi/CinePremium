@@ -10,9 +10,7 @@ import { useNotification } from "../../../context/NotificationContext";
 import {
   Calendar,
   Clock,
-  Banknote,
   X,
-  CheckCircle2,
   AlertCircle,
   Film,
   Tv,
@@ -27,14 +25,6 @@ interface ShowtimeAddFormProps {
   onSuccess: () => void;
   onCancel: () => void;
 }
-
-const SCREEN_TYPE_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  "IMAX 3D":      { bg: "bg-blue-500/10",   border: "border-blue-500/30",   text: "text-blue-300" },
-  "4DX":          { bg: "bg-orange-500/10", border: "border-orange-500/30", text: "text-orange-300" },
-  "Dolby Cinema": { bg: "bg-purple-500/10", border: "border-purple-500/30", text: "text-purple-300" },
-  "Standard 2D":  { bg: "bg-slate-500/10",  border: "border-slate-500/30",  text: "text-slate-300" },
-  "ScreenX":      { bg: "bg-teal-500/10",   border: "border-teal-500/30",   text: "text-teal-300" },
-};
 
 const TIME_SLOTS = [
   { label: "Morning",   icon: "Coffee", slots: ["09:00 AM", "10:30 AM", "11:00 AM"] },
@@ -98,7 +88,7 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
             setTierPrices(
               hallsData[0].seatTiers.map((tier) => ({
                 tierName: tier.tierName,
-                price: 15.0,
+                price: 1500.0,
               }))
             );
           }
@@ -112,7 +102,6 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
     loadData();
   }, []);
 
-  // When hall changes, reset format and tier prices
   const handleHallSelect = (hallId: string) => {
     setSelectedHallId(hallId);
     const hall = halls.find((h) => h.id === hallId);
@@ -120,7 +109,7 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
       setFormat(hall.screenType || "Standard 2D");
       if (hall.seatTiers) {
         setTierPrices(
-          hall.seatTiers.map((tier) => ({ tierName: tier.tierName, price: 15.0 }))
+          hall.seatTiers.map((tier) => ({ tierName: tier.tierName, price: 1500.0 }))
         );
       }
     }
@@ -146,7 +135,6 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
   }, [existingShowtimes, selectedHallId, showDate]);
 
   const isCurrentSlotConflict = conflictingSlots.has(selectedTime);
-
   const selectedMovie = movies.find((m) => m.id === selectedMovieId);
   const selectedHall  = halls.find((h) => h.id === selectedHallId);
 
@@ -179,262 +167,172 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
 
       addNotification({
         type: 'add',
-        title: 'Showtime Scheduled! 📅',
-        message: `Screening for "${selectedMovie?.title || 'Movie'}" in ${selectedHall?.name || 'Hall'} (${selectedTime}, ${showDate}) is now active.`,
-        actionUrl: '/admin',
-        actionLabel: 'View Schedule'
+        message: 'Added Successfully'
       });
 
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create showtime forecasting");
+      setError(err instanceof Error ? err.message : "Failed to create showtime");
       addNotification({
         type: 'error',
-        title: 'Showtime Creation Failed',
-        message: err instanceof Error ? err.message : "Failed to create showtime."
+        message: 'Action Failed'
       });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const screenColors = selectedHall
-    ? SCREEN_TYPE_COLORS[selectedHall.screenType] ?? SCREEN_TYPE_COLORS["Standard 2D"]
-    : SCREEN_TYPE_COLORS["Standard 2D"];
-
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
       onClick={onCancel}
     >
       <div 
-        className="relative w-full max-w-3xl bg-[#151b2d] border border-white/15 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[88vh] my-auto animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-3xl bg-[#0b0b0e]/95 backdrop-blur-2xl border border-white/15 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col max-h-[88vh] my-auto animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Sticky Header */}
-        <div className="flex items-center justify-between px-6 py-4.5 bg-[#0c1324] border-b border-[#2e3447] shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 bg-zinc-950/80 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-primary/15 text-primary border border-primary/30 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-red-600/20 text-red-500 border border-red-500/30 flex items-center justify-center">
               <Calendar className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white font-display">Schedule Movie Showtime</h3>
-              <p className="text-[11px] text-[#908fa0]">Set auditorium screening slots and ticket prices</p>
+              <h3 className="text-base font-bold text-white uppercase tracking-tight">Schedule Movie Showtime</h3>
+              <p className="text-[11px] text-zinc-400">Set auditorium screening slots and ticket prices</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onCancel}
-            className="text-[#908fa0] hover:text-white p-2 rounded-xl hover:bg-[#2e3447] transition-all cursor-pointer"
+            className="text-zinc-400 hover:text-white p-2 rounded-xl hover:bg-zinc-900 transition-all cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {loadingData ? (
-          <div className="p-12 text-center text-[#908fa0] flex flex-col items-center justify-center gap-3 flex-1">
-            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm">Loading movies & auditorium halls...</span>
+          <div className="p-12 text-center text-zinc-400 flex flex-col items-center justify-center gap-3 flex-1">
+            <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs">Loading movies & auditorium halls...</span>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
             {/* Scrollable Form Body */}
             <div className="p-6 sm:p-7 space-y-6 overflow-y-auto flex-1">
               {error && (
-                <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs sm:text-sm rounded-xl flex items-center gap-2">
+                <div className="p-3.5 bg-red-500/10 border border-red-500/30 text-red-400 text-xs sm:text-sm rounded-xl flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
               )}
 
-              {/* ── Step 1: Movie Selection ── */}
-              <section className="space-y-3">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#908fa0] uppercase tracking-wider">
-                  <Film className="w-3.5 h-3.5 text-primary" />
-                  Step 1 — Select Movie
+              {/* ── Movie & Hall Selection ── */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 flex items-center gap-1.5">
+                    <Film className="w-3.5 h-3.5 text-red-500" />
+                    Select Movie *
+                  </label>
+                  <select
+                    value={selectedMovieId}
+                    onChange={(e) => setSelectedMovieId(e.target.value)}
+                    className="w-full bg-zinc-950 border border-white/10 text-white text-xs sm:text-sm rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-red-500 cursor-pointer"
+                  >
+                    {movies.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.title} ({m.duration || "2h"})
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-start">
-                  <div className="space-y-2">
-                    <select
-                      required
-                      value={selectedMovieId}
-                      onChange={(e) => setSelectedMovieId(e.target.value)}
-                      className="w-full bg-[#0c1324] border border-[#2e3447] text-[#dce1fb] rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-[#c0c1ff] transition-colors cursor-pointer"
-                    >
-                      {movies.map((m) => (
-                        <option key={m.id} value={m.id}>
-                          {m.title} — {m.status === "now_showing" ? "Now Showing" : "Coming Soon"}{m.duration ? ` (${m.duration})` : ""}
-                        </option>
-                      ))}
-                    </select>
-
-                    {selectedMovie && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {selectedMovie.genres?.slice(0, 3).map((g) => (
-                          <span key={g} className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold border border-primary/20">
-                            {g}
-                          </span>
-                        ))}
-                        {selectedMovie.ageRating && (
-                          <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 text-[10px] font-bold border border-amber-500/20">
-                            {selectedMovie.ageRating}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Movie Poster Preview */}
-                  {selectedMovie?.posterUrl ? (
-                    <div className="relative w-16 h-24 rounded-xl overflow-hidden border border-[#2e3447] shrink-0 shadow-lg">
-                      <img
-                        src={selectedMovie.posterUrl}
-                        alt={selectedMovie.title}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className={`absolute bottom-0 inset-x-0 py-0.5 text-center text-[8px] font-bold ${selectedMovie.status === "now_showing" ? "bg-emerald-500/90 text-white" : "bg-[#c0c1ff]/90 text-[#1000a9]"}`}>
-                        {selectedMovie.status === "now_showing" ? "LIVE" : "SOON"}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-16 h-24 rounded-xl border border-[#2e3447] bg-[#0c1324] flex items-center justify-center text-[#464554] shrink-0">
-                      <Film className="w-6 h-6" />
-                    </div>
-                  )}
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 flex items-center gap-1.5">
+                    <Tv className="w-3.5 h-3.5 text-red-500" />
+                    Select Cinema Hall *
+                  </label>
+                  <select
+                    value={selectedHallId}
+                    onChange={(e) => handleHallSelect(e.target.value)}
+                    className="w-full bg-zinc-950 border border-white/10 text-white text-xs sm:text-sm rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-red-500 cursor-pointer"
+                  >
+                    {halls.map((h) => (
+                      <option key={h.id} value={h.id}>
+                        {h.name} ({h.screenType} · {h.totalCapacity} seats)
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              </section>
+              </div>
 
-              <div className="border-t border-[#2e3447]" />
-
-              {/* ── Step 2: Cinema Hall ── */}
-              <section className="space-y-3">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#908fa0] uppercase tracking-wider">
-                  <Tv className="w-3.5 h-3.5 text-primary" />
-                  Step 2 — Assign Cinema Hall
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {halls.map((hall) => {
-                    const colors = SCREEN_TYPE_COLORS[hall.screenType] ?? SCREEN_TYPE_COLORS["Standard 2D"];
-                    const isSelected = hall.id === selectedHallId;
-                    return (
-                      <button
-                        key={hall.id}
-                        type="button"
-                        onClick={() => handleHallSelect(hall.id)}
-                        className={`relative text-left p-3.5 rounded-2xl border-2 transition-all cursor-pointer group ${
-                          isSelected
-                            ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(192,193,255,0.15)]"
-                            : "border-[#2e3447] bg-[#0c1324] hover:border-[#464554]"
-                        }`}
-                      >
-                        {isSelected && (
-                          <div className="absolute top-2.5 right-2.5">
-                            <CheckCircle2 className="w-4 h-4 text-primary" />
-                          </div>
-                        )}
-                        <div className="font-bold text-[#dce1fb] text-sm truncate pr-5">{hall.name}</div>
-                        <div className={`inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${colors.bg} ${colors.border} ${colors.text}`}>
-                          {hall.screenType}
-                        </div>
-                        <div className="flex items-center gap-1 mt-2 text-[11px] text-[#908fa0]">
-                          <Tv className="w-3 h-3" />
-                          {hall.totalCapacity} seats
-                        </div>
-                        {hall.seatTiers?.length > 0 && (
-                          <div className="mt-2 flex flex-wrap gap-1">
-                            {hall.seatTiers.map((t) => (
-                              <span key={t.tierName} className="text-[9px] px-1.5 py-0.5 rounded-md bg-[#151b2d] text-[#908fa0] border border-[#2e3447]">
-                                {t.tierName} ({t.seatCount})
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Format selector */}
-                <div className="flex items-center gap-3 pt-1">
-                  <label className="text-xs font-semibold text-[#908fa0] uppercase whitespace-nowrap">Format:</label>
-                  <div className="flex flex-wrap gap-2">
-                    {(["IMAX 3D", "4DX", "Dolby Cinema", "Standard 2D", "ScreenX"] as const).map((f) => {
-                      const c = SCREEN_TYPE_COLORS[f];
-                      return (
-                        <button
-                          key={f}
-                          type="button"
-                          onClick={() => setFormat(f)}
-                          className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-                            format === f
-                              ? `${c.bg} ${c.border} ${c.text}`
-                              : "bg-transparent border-[#2e3447] text-[#908fa0] hover:border-[#464554] hover:text-[#dce1fb]"
-                          }`}
-                        >
-                          {f}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </section>
-
-              <div className="border-t border-[#2e3447]" />
-
-              {/* ── Step 3: Date & Time Slots ── */}
-              <section className="space-y-3">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#908fa0] uppercase tracking-wider">
-                  <Clock className="w-3.5 h-3.5 text-primary" />
-                  Step 3 — Pick Date & Time Slot
-                </div>
-
-                {/* Date Picker */}
-                <div className="flex items-center gap-3">
-                  <label className="text-xs font-semibold text-[#908fa0] uppercase whitespace-nowrap flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-primary" /> Date:
+              {/* ── Date & Screening Format ── */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5">
+                    Screening Date *
                   </label>
                   <input
                     type="date"
                     required
                     value={showDate}
                     onChange={(e) => setShowDate(e.target.value)}
-                    className="bg-[#0c1324] border border-[#2e3447] text-[#dce1fb] rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-[#c0c1ff] transition-colors cursor-pointer"
+                    className="w-full bg-zinc-950 border border-white/10 text-white text-xs sm:text-sm rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-red-500"
                   />
                 </div>
 
-                {/* Time Slots by Period */}
-                <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5">
+                    Screening Format
+                  </label>
+                  <select
+                    value={format}
+                    onChange={(e) => setFormat(e.target.value)}
+                    className="w-full bg-zinc-950 border border-white/10 text-white text-xs sm:text-sm rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-red-500 cursor-pointer"
+                  >
+                    <option value="IMAX 3D">IMAX 3D</option>
+                    <option value="Dolby Cinema">Dolby Cinema</option>
+                    <option value="4DX">4DX Experience</option>
+                    <option value="ScreenX">ScreenX 270°</option>
+                    <option value="Standard 2D">Standard 2D</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* ── Time Slots ── */}
+              <div className="space-y-3">
+                <label className="block text-xs font-semibold text-zinc-400 uppercase flex items-center justify-between">
+                  <span>Select Time Slot *</span>
+                  <span className="text-xs text-amber-400 font-bold font-mono">{selectedTime}</span>
+                </label>
+
+                <div className="space-y-2.5">
                   {TIME_SLOTS.map((period) => (
-                    <div key={period.label} className="space-y-1.5">
-                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#908fa0] uppercase">
-                        <PeriodIcon name={period.icon} className="w-3 h-3" />
-                        {period.label}
+                    <div key={period.label} className="p-3 bg-zinc-950 rounded-xl border border-white/10 space-y-2">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-zinc-400">
+                        <PeriodIcon name={period.icon} className="w-3.5 h-3.5 text-red-500" />
+                        <span>{period.label}</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {period.slots.map((slot) => {
-                          const isConflict  = conflictingSlots.has(slot);
-                          const isSelected  = selectedTime === slot;
+                          const isConflict = conflictingSlots.has(slot);
+                          const isSelected = selectedTime === slot;
+
                           return (
                             <button
                               key={slot}
                               type="button"
                               disabled={isConflict}
-                              onClick={() => !isConflict && setSelectedTime(slot)}
-                              title={isConflict ? "Hall already booked at this time" : slot}
-                              className={`relative px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                                isConflict
-                                  ? "opacity-40 cursor-not-allowed border-rose-500/20 bg-rose-500/5 text-rose-400 line-through"
-                                  : isSelected
-                                  ? "border-primary bg-primary/20 text-primary shadow-[0_0_10px_rgba(192,193,255,0.2)]"
-                                  : "border-[#2e3447] bg-[#0c1324] text-[#dce1fb] hover:border-primary/50 hover:bg-primary/5"
+                              onClick={() => setSelectedTime(slot)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                                isSelected
+                                  ? "bg-red-600 text-white shadow-md"
+                                  : isConflict
+                                  ? "bg-zinc-900/50 text-zinc-600 line-through cursor-not-allowed border border-white/5"
+                                  : "bg-zinc-900 text-zinc-300 hover:text-white border border-white/10"
                               }`}
                             >
                               {slot}
-                              {isConflict && (
-                                <AlertTriangle className="inline-block ml-1 w-2.5 h-2.5 text-rose-400" />
-                              )}
                             </button>
                           );
                         })}
@@ -443,117 +341,57 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
                   ))}
                 </div>
 
-                {/* Selected Slot Summary */}
-                <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold ${
-                  isCurrentSlotConflict
-                    ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
-                    : "bg-primary/10 border-primary/20 text-primary"
-                }`}>
-                  <Clock className="w-4 h-4 shrink-0" />
-                  <span>
-                    {isCurrentSlotConflict
-                      ? `⚠ Hall conflict at ${selectedTime} — choose a different slot`
-                      : `Selected: ${selectedTime} on ${showDate}`}
-                  </span>
-                </div>
-              </section>
+                {isCurrentSlotConflict && (
+                  <div className="p-3 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs rounded-xl flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    <span>Selected time slot is already scheduled in this auditorium for {showDate}.</span>
+                  </div>
+                )}
+              </div>
 
-              <div className="border-t border-[#2e3447]" />
-
-              {/* ── Step 4: Tier Pricing ── */}
-              <section className="space-y-3">
-                <div className="flex items-center gap-2 text-xs font-bold text-[#908fa0] uppercase tracking-wider">
-                  <Banknote className="w-3.5 h-3.5 text-emerald-400" />
-                  Step 4 — Ticket Prices per Tier
-                </div>
-
-                {tierPrices.length === 0 ? (
-                  <p className="text-xs text-[#908fa0] italic">No seat tiers defined for selected hall.</p>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {/* ── Tier Ticket Pricing ── */}
+              {tierPrices.length > 0 && (
+                <div className="space-y-3">
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase">
+                    Tier Ticket Pricing (in LKR Rs.)
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {tierPrices.map((tp, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between p-3.5 bg-[#0c1324] border border-[#2e3447] rounded-2xl"
-                      >
-                        <div>
-                          <div className="text-sm font-semibold text-[#dce1fb]">{tp.tierName}</div>
-                          {selectedHall?.seatTiers?.[idx] && (
-                            <div className="text-[10px] text-[#908fa0]">
-                              {selectedHall.seatTiers[idx].seatCount} seats
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[#908fa0] font-bold text-xs">Rs.</span>
+                      <div key={idx} className="p-3 bg-zinc-950 rounded-xl border border-white/10 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-white">{tp.tierName}</span>
+                        <div className="flex items-center gap-1.5 w-32">
+                          <span className="text-xs text-zinc-500 font-bold">Rs.</span>
                           <input
                             type="number"
-                            step="0.50"
                             min="0"
+                            step="50"
                             value={tp.price}
                             onChange={(e) => handlePriceChange(idx, Number(e.target.value))}
-                            placeholder="15.00"
-                            className="w-24 bg-[#151b2d] border border-[#2e3447] text-[#dce1fb] rounded-xl px-3 py-1.5 text-sm text-right focus:outline-none focus:border-[#c0c1ff] transition-colors"
+                            className="w-full bg-transparent border border-white/10 text-white text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-red-500 text-right font-bold"
                           />
                         </div>
                       </div>
                     ))}
                   </div>
-                )}
-              </section>
-
-              {/* ── Summary Banner ── */}
-              {selectedMovie && selectedHall && (
-                <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-[#0c1324] border border-[#2e3447]">
-                  {selectedMovie.posterUrl && (
-                    <img src={selectedMovie.posterUrl} alt="" className="w-10 h-14 object-cover rounded-xl border border-[#2e3447]" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold text-[#dce1fb] truncate">{selectedMovie.title}</div>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
-                      <span className="text-xs text-[#908fa0] flex items-center gap-1">
-                        <Tv className="w-3 h-3 text-primary" /> {selectedHall.name}
-                      </span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${screenColors.bg} ${screenColors.border} ${screenColors.text}`}>
-                        {selectedHall.screenType}
-                      </span>
-                      <span className="text-xs text-amber-300 font-semibold flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-amber-400" /> {selectedTime}
-                      </span>
-                      <span className="text-xs text-[#908fa0]">
-                        <Calendar className="w-3 h-3 inline mr-1 text-primary" />{showDate}
-                      </span>
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
 
-            {/* ── Sticky Footer ── */}
-            <div className="px-6 py-4 bg-[#0c1324] border-t border-[#2e3447] flex items-center justify-end gap-3 shrink-0">
+            {/* Form Actions */}
+            <div className="p-4 bg-zinc-950/80 border-t border-white/10 flex items-center justify-end gap-3 shrink-0">
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#dce1fb] bg-[#191f31] hover:bg-[#2e3447] rounded-xl transition-all cursor-pointer"
+                className="px-5 py-2.5 text-xs font-semibold text-zinc-400 hover:text-white rounded-xl hover:bg-zinc-900 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitting || isCurrentSlotConflict}
-                className="liquid-glow-btn text-surface-container-lowest text-xs sm:text-sm font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="px-6 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-all shadow-md cursor-pointer disabled:opacity-50"
               >
-                {submitting ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-surface-container-lowest border-t-transparent rounded-full animate-spin" />
-                    <span>Scheduling...</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Confirm Showtime</span>
-                  </>
-                )}
+                {submitting ? "Saving Showtime..." : "Save Scheduled Showtime"}
               </button>
             </div>
           </form>

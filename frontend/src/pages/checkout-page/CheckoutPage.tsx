@@ -7,7 +7,6 @@ import { useNotification } from '../../context/NotificationContext';
 import { bookingApi } from '../../services/bookingApi';
 import { Movie } from '../../types/movie';
 import { CinemaHall } from '../../types/hall';
-import { HERO_MOVIE } from '../../data/movies';
 import {
   CreditCard,
   Lock,
@@ -34,7 +33,15 @@ export function CheckoutPage() {
 
   // Retrieve data passed from SeatSelectionPage
   const checkoutData = location.state || {};
-  const movie: Movie = checkoutData.movie || HERO_MOVIE;
+  const movie: Movie = checkoutData.movie || {
+    id: 'db-movie',
+    title: 'CinePremium Feature Screening',
+    posterUrl: '',
+    genres: ['Action', 'Drama'],
+    duration: '2h 00m',
+    rating: 8.5,
+    status: 'now_showing'
+  };
   const hall: CinemaHall = checkoutData.hall || {
     id: 'hall-imax',
     name: 'Hall 1 — IMAX Laser Experience',
@@ -189,13 +196,10 @@ export function CheckoutPage() {
       setConfirmedBookingId(generatedBookingId);
       setPaymentSuccess(true);
 
-      // Trigger real-time popup toast & navbar bell notification
+      // Trigger real-time popup toast
       addNotification({
         type: 'booking',
-        title: 'Booking Confirmed! 🎟️',
-        message: `Successfully booked ${selectedSeats.length} seat(s) for "${movie.title}" at ${hall.name} (${showTime}, ${showDate}). Total: Rs. ${grandTotal.toFixed(2)}.`,
-        actionUrl: '/my-bookings',
-        actionLabel: 'View My Tickets'
+        message: 'Booking Confirmed'
       });
     } catch (err: any) {
       console.error('Payment / Booking error:', err);
@@ -203,8 +207,7 @@ export function CheckoutPage() {
       
       addNotification({
         type: 'error',
-        title: 'Booking Failed',
-        message: err.response?.data?.message || err.message || 'Payment processing could not be completed.'
+        message: 'Payment Failed'
       });
     } finally {
       setIsProcessing(false);
@@ -212,7 +215,7 @@ export function CheckoutPage() {
   };
 
   return (
-    <div className="bg-background text-on-background min-h-screen flex flex-col font-sans antialiased selection:bg-primary selection:text-white">
+    <div className="bg-[#09090b] text-white min-h-screen flex flex-col font-sans antialiased selection:bg-red-600 selection:text-white">
       {/* Top Navbar */}
       <Navbar
         onBookNowClick={() => navigate('/movies')}
@@ -222,20 +225,20 @@ export function CheckoutPage() {
       <main className="flex-1 pt-24 pb-20 px-4 sm:px-6 md:px-12 max-w-[1300px] mx-auto w-full space-y-8">
         
         {/* ── Progress Step Bar ── */}
-        <div className="flex items-center justify-between gap-4 bg-[#151b2d] border border-white/10 p-4 sm:p-5 rounded-3xl shadow-xl">
+        <div className="flex items-center justify-between gap-4 bg-[#0d0d10] border border-white/10 p-4 sm:p-5 rounded-2xl shadow-xl">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 bg-[#0c1324] hover:bg-white/10 border border-[#2e3447] text-white rounded-xl transition-all cursor-pointer"
+              className="p-2 bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-white rounded-xl transition-all cursor-pointer"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-white font-display tracking-tight flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
                 <span>Secure Checkout & Payment</span>
                 <ShieldCheck className="w-5 h-5 text-emerald-400" />
               </h1>
-              <p className="text-xs text-[#908fa0]">
+              <p className="text-xs text-zinc-400">
                 Step 3 of 3 • Review order, enter payment, and receive instant digital tickets
               </p>
             </div>
@@ -249,7 +252,7 @@ export function CheckoutPage() {
 
         {/* ── Payment Success Screen (Modal / View) ── */}
         {paymentSuccess ? (
-          <div className="bg-[#151b2d] border border-emerald-500/40 rounded-3xl p-8 sm:p-12 text-center max-w-2xl mx-auto shadow-2xl space-y-6 animate-in zoom-in-95 duration-300">
+          <div className="bg-[#0d0d10] border border-emerald-500/40 rounded-2xl p-8 sm:p-12 text-center max-w-2xl mx-auto shadow-2xl space-y-6 animate-in zoom-in-95 duration-300">
             <div className="w-20 h-20 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(16,185,129,0.3)]">
               <CheckCircle2 className="w-10 h-10" />
             </div>
@@ -258,18 +261,18 @@ export function CheckoutPage() {
               <span className="text-xs font-black uppercase tracking-widest text-emerald-400">
                 Payment Authorized & Confirmed
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white font-display">
+              <h2 className="text-2xl sm:text-3xl font-black text-white">
                 Your Tickets Are Booked!
               </h2>
-              <p className="text-sm text-on-surface-variant max-w-md mx-auto">
+              <p className="text-sm text-zinc-400 max-w-md mx-auto">
                 Booking Reference: <strong className="text-white font-mono">{confirmedBookingId}</strong>
                 <br />
-                We've sent a digital copy with QR code to <strong className="text-primary">{contactEmail}</strong>.
+                We've sent a digital copy with QR code to <strong className="text-red-400">{contactEmail}</strong>.
               </p>
             </div>
 
             {/* Ticket Summary Card */}
-            <div className="p-4 sm:p-6 bg-[#0c1324] rounded-2xl border border-[#2e3447] text-left flex items-center gap-4">
+            <div className="p-4 sm:p-6 bg-zinc-950 rounded-xl border border-white/10 text-left flex items-center gap-4">
               <img
                 src={movie.posterUrl || movie.backdropUrl}
                 alt={movie.title}
@@ -277,13 +280,13 @@ export function CheckoutPage() {
               />
               <div className="space-y-1 min-w-0 flex-1">
                 <h4 className="font-bold text-base text-white truncate">{movie.title}</h4>
-                <p className="text-xs text-[#908fa0]">{hall.name} • {format}</p>
-                <p className="text-xs text-amber-300 font-semibold">{showDate} at {showTime}</p>
+                <p className="text-xs text-zinc-400">{hall.name} • {format}</p>
+                <p className="text-xs text-zinc-300 font-semibold">{showDate} at {showTime}</p>
                 <div className="flex flex-wrap gap-1 pt-1">
                   {selectedSeats.map((s) => (
                     <span
                       key={s.id}
-                      className="px-2 py-0.5 rounded bg-primary/20 text-primary border border-primary/40 text-[10px] font-bold"
+                      className="px-2 py-0.5 rounded bg-red-600/20 text-red-400 border border-red-500/40 text-[10px] font-bold"
                     >
                       Seat {s.id}
                     </span>
@@ -295,7 +298,7 @@ export function CheckoutPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <button
                 onClick={() => navigate('/my-bookings')}
-                className="liquid-glow-btn w-full sm:w-auto text-surface-container-lowest font-black text-sm px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-xl cursor-pointer"
+                className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-red-600/20 cursor-pointer transition-all"
               >
                 <Ticket className="w-4 h-4" />
                 <span>View My Tickets & QR Passes</span>
@@ -304,7 +307,7 @@ export function CheckoutPage() {
 
               <Link
                 to="/movies"
-                className="liquid-glass-btn w-full sm:w-auto text-white text-sm font-semibold px-6 py-3.5 rounded-2xl text-center"
+                className="w-full sm:w-auto bg-zinc-900 hover:bg-zinc-800 border border-white/10 text-white text-sm font-semibold px-6 py-3.5 rounded-xl text-center transition-all"
               >
                 Browse More Movies
               </Link>
@@ -318,24 +321,24 @@ export function CheckoutPage() {
             <div className="lg:col-span-8 space-y-6">
               
               {errorMessage && (
-                <div className="p-4 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm rounded-2xl flex items-center gap-2 animate-in fade-in">
+                <div className="p-4 bg-red-950/40 border border-red-500/30 text-red-400 text-sm rounded-xl flex items-center gap-2 animate-in fade-in">
                   <AlertCircle className="w-5 h-5 shrink-0" />
                   <span>{errorMessage}</span>
                 </div>
               )}
 
               {/* 1. Contact Details */}
-              <div className="bg-[#151b2d] border border-[#2e3447] rounded-3xl p-6 sm:p-8 shadow-xl space-y-4">
-                <div className="flex items-center gap-2 border-b border-[#2e3447] pb-3">
-                  <span className="w-6 h-6 rounded-full bg-primary text-white text-xs font-black flex items-center justify-center">
+              <div className="bg-[#0d0d10] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4">
+                <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+                  <span className="w-6 h-6 rounded-full bg-red-600 text-white text-xs font-black flex items-center justify-center">
                     1
                   </span>
-                  <h3 className="text-lg font-bold text-white font-display">Contact & Ticket Delivery</h3>
+                  <h3 className="text-lg font-bold text-white">Contact & Ticket Delivery</h3>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#908fa0] uppercase tracking-wider">
+                    <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                       Full Name *
                     </label>
                     <input
@@ -344,12 +347,12 @@ export function CheckoutPage() {
                       value={contactName}
                       onChange={(e) => setContactName(e.target.value)}
                       placeholder="e.g. Alex Henderson"
-                      className="w-full bg-[#0c1324] border border-[#2e3447] rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#908fa0] focus:border-primary focus:outline-none transition-colors"
+                      className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[#908fa0] uppercase tracking-wider">
+                    <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                       Email Address (E-Ticket Delivery) *
                     </label>
                     <input
@@ -358,12 +361,12 @@ export function CheckoutPage() {
                       value={contactEmail}
                       onChange={(e) => setContactEmail(e.target.value)}
                       placeholder="alex@example.com"
-                      className="w-full bg-[#0c1324] border border-[#2e3447] rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#908fa0] focus:border-primary focus:outline-none transition-colors"
+                      className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors"
                     />
                   </div>
 
                   <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-xs font-bold text-[#908fa0] uppercase tracking-wider">
+                    <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                       Mobile Phone (SMS Confirmation)
                     </label>
                     <input
@@ -371,30 +374,30 @@ export function CheckoutPage() {
                       value={contactPhone}
                       onChange={(e) => setContactPhone(e.target.value)}
                       placeholder="+1 (555) 000-0000"
-                      className="w-full bg-[#0c1324] border border-[#2e3447] rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#908fa0] focus:border-primary focus:outline-none transition-colors"
+                      className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
               </div>
 
               {/* 2. Payment Method Selector */}
-              <div className="bg-[#151b2d] border border-[#2e3447] rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
-                <div className="flex items-center justify-between border-b border-[#2e3447] pb-3">
+              <div className="bg-[#0d0d10] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-primary text-white text-xs font-black flex items-center justify-center">
+                    <span className="w-6 h-6 rounded-full bg-red-600 text-white text-xs font-black flex items-center justify-center">
                       2
                     </span>
-                    <h3 className="text-lg font-bold text-white font-display">Select Payment Method</h3>
+                    <h3 className="text-lg font-bold text-white">Select Payment Method</h3>
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-[#908fa0] bg-[#0c1324] px-2.5 py-1 rounded-md border border-[#2e3447]">
+                    <span className="text-[10px] font-bold text-zinc-400 bg-zinc-950 px-2.5 py-1 rounded-md border border-white/10">
                       VISA
                     </span>
-                    <span className="text-[10px] font-bold text-[#908fa0] bg-[#0c1324] px-2.5 py-1 rounded-md border border-[#2e3447]">
+                    <span className="text-[10px] font-bold text-zinc-400 bg-zinc-950 px-2.5 py-1 rounded-md border border-white/10">
                       MC
                     </span>
-                    <span className="text-[10px] font-bold text-[#908fa0] bg-[#0c1324] px-2.5 py-1 rounded-md border border-[#2e3447]">
+                    <span className="text-[10px] font-bold text-zinc-400 bg-zinc-950 px-2.5 py-1 rounded-md border border-white/10">
                       AMEX
                     </span>
                   </div>
@@ -405,39 +408,39 @@ export function CheckoutPage() {
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('card')}
-                    className={`p-3.5 rounded-2xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`p-3.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                       paymentMethod === 'card'
-                        ? 'bg-primary/10 border-primary text-white font-bold shadow-md'
-                        : 'bg-[#0c1324] border-[#2e3447] text-on-surface-variant hover:border-white/20'
+                        ? 'bg-red-600/15 border-red-500 text-white font-bold shadow-md'
+                        : 'bg-zinc-950 border-white/10 text-zinc-400 hover:border-white/20'
                     }`}
                   >
-                    <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-primary' : 'text-[#908fa0]'}`} />
+                    <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-red-500' : 'text-zinc-500'}`} />
                     <span className="text-xs">Credit Card</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('wallet')}
-                    className={`p-3.5 rounded-2xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`p-3.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                       paymentMethod === 'wallet'
-                        ? 'bg-primary/10 border-primary text-white font-bold shadow-md'
-                        : 'bg-[#0c1324] border-[#2e3447] text-on-surface-variant hover:border-white/20'
+                        ? 'bg-red-600/15 border-red-500 text-white font-bold shadow-md'
+                        : 'bg-zinc-950 border-white/10 text-zinc-400 hover:border-white/20'
                     }`}
                   >
-                    <Wallet className={`w-5 h-5 ${paymentMethod === 'wallet' ? 'text-primary' : 'text-[#908fa0]'}`} />
+                    <Wallet className={`w-5 h-5 ${paymentMethod === 'wallet' ? 'text-red-500' : 'text-zinc-500'}`} />
                     <span className="text-xs">Digital Wallet</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('counter')}
-                    className={`p-3.5 rounded-2xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`p-3.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                       paymentMethod === 'counter'
-                        ? 'bg-primary/10 border-primary text-white font-bold shadow-md'
-                        : 'bg-[#0c1324] border-[#2e3447] text-on-surface-variant hover:border-white/20'
+                        ? 'bg-red-600/15 border-red-500 text-white font-bold shadow-md'
+                        : 'bg-zinc-950 border-white/10 text-zinc-400 hover:border-white/20'
                     }`}
                   >
-                    <Building className={`w-5 h-5 ${paymentMethod === 'counter' ? 'text-primary' : 'text-[#908fa0]'}`} />
+                    <Building className={`w-5 h-5 ${paymentMethod === 'counter' ? 'text-red-500' : 'text-zinc-500'}`} />
                     <span className="text-xs">Pay at Cinema</span>
                   </button>
                 </div>
@@ -446,8 +449,8 @@ export function CheckoutPage() {
                 {paymentMethod === 'card' && (
                   <div className="space-y-6 pt-2">
                     {/* Interactive Virtual Card Hologram */}
-                    <div className="relative w-full max-w-sm mx-auto h-48 rounded-2xl p-6 bg-gradient-to-tr from-[#0b0f19] via-[#1a233a] to-[#2a1b2d] border border-white/20 shadow-2xl flex flex-col justify-between overflow-hidden">
-                      <div className="absolute top-0 right-0 w-40 h-40 bg-primary/20 rounded-full blur-2xl pointer-events-none" />
+                    <div className="relative w-full max-w-sm mx-auto h-48 rounded-2xl p-6 bg-gradient-to-tr from-[#09090b] via-[#141418] to-[#25090b] border border-white/15 shadow-2xl flex flex-col justify-between overflow-hidden">
+                      <div className="absolute top-0 right-0 w-40 h-40 bg-red-600/15 rounded-full blur-2xl pointer-events-none" />
                       
                       <div className="flex items-center justify-between relative z-10">
                         <div className="w-10 h-8 rounded-md bg-amber-400/80 border border-amber-300 shadow-inner flex items-center justify-center">
@@ -466,13 +469,13 @@ export function CheckoutPage() {
 
                       <div className="flex items-center justify-between text-xs relative z-10 text-white/80 uppercase font-mono">
                         <div>
-                          <span className="text-[9px] text-[#908fa0] block">Card Holder</span>
+                          <span className="text-[9px] text-zinc-400 block">Card Holder</span>
                           <span className="font-bold text-white tracking-wider truncate max-w-[150px] block">
                             {cardHolder || 'FULL NAME'}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[9px] text-[#908fa0] block">Expires</span>
+                          <span className="text-[9px] text-zinc-400 block">Expires</span>
                           <span className="font-bold text-white tracking-wider">
                             {cardExpiry || 'MM/YY'}
                           </span>
@@ -483,7 +486,7 @@ export function CheckoutPage() {
                     {/* Card Input Fields */}
                     <div className="space-y-4">
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-[#908fa0] uppercase tracking-wider">
+                        <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                           Card Number *
                         </label>
                         <div className="relative">
@@ -493,14 +496,14 @@ export function CheckoutPage() {
                             value={cardNumber}
                             onChange={handleCardNumberChange}
                             placeholder="0000 0000 0000 0000"
-                            className="w-full bg-[#0c1324] border border-[#2e3447] rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#908fa0] focus:border-primary focus:outline-none transition-colors font-mono"
+                            className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors font-mono"
                           />
-                          <CreditCard className="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-[#908fa0]" />
+                          <CreditCard className="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500" />
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-[#908fa0] uppercase tracking-wider">
+                        <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                           Cardholder Name *
                         </label>
                         <input
@@ -509,13 +512,13 @@ export function CheckoutPage() {
                           value={cardHolder}
                           onChange={(e) => setCardHolder(e.target.value)}
                           placeholder="Name as printed on card"
-                          className="w-full bg-[#0c1324] border border-[#2e3447] rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#908fa0] focus:border-primary focus:outline-none transition-colors uppercase"
+                          className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors uppercase"
                         />
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-[#908fa0] uppercase tracking-wider">
+                          <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
                             Expiry Date (MM/YY) *
                           </label>
                           <input
@@ -524,14 +527,14 @@ export function CheckoutPage() {
                             value={cardExpiry}
                             onChange={handleExpiryChange}
                             placeholder="12/28"
-                            className="w-full bg-[#0c1324] border border-[#2e3447] rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#908fa0] focus:border-primary focus:outline-none transition-colors font-mono text-center"
+                            className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors font-mono text-center"
                           />
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-[#908fa0] uppercase tracking-wider flex items-center justify-between">
+                          <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
                             <span>CVV / CVC *</span>
-                            <span className="text-[10px] text-[#908fa0] normal-case">3 digits</span>
+                            <span className="text-[10px] text-zinc-500 normal-case">3 digits</span>
                           </label>
                           <input
                             type="password"
@@ -540,17 +543,17 @@ export function CheckoutPage() {
                             value={cardCvv}
                             onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
                             placeholder="•••"
-                            className="w-full bg-[#0c1324] border border-[#2e3447] rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#908fa0] focus:border-primary focus:outline-none transition-colors font-mono text-center"
+                            className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors font-mono text-center"
                           />
                         </div>
                       </div>
 
-                      <label className="flex items-center gap-2 text-xs text-on-surface-variant cursor-pointer pt-1">
+                      <label className="flex items-center gap-2 text-xs text-zinc-400 cursor-pointer pt-1">
                         <input
                           type="checkbox"
                           checked={saveCard}
                           onChange={(e) => setSaveCard(e.target.checked)}
-                          className="accent-primary rounded w-4 h-4 cursor-pointer"
+                          className="accent-red-600 rounded w-4 h-4 cursor-pointer"
                         />
                         <span>Securely save this card for fast 1-click booking next time</span>
                       </label>
@@ -560,8 +563,8 @@ export function CheckoutPage() {
 
                 {/* ── Wallet Option ── */}
                 {paymentMethod === 'wallet' && (
-                  <div className="p-6 bg-[#0c1324] rounded-2xl border border-[#2e3447] text-center space-y-4">
-                    <p className="text-xs text-on-surface-variant">
+                  <div className="p-6 bg-zinc-950 rounded-xl border border-white/10 text-center space-y-4">
+                    <p className="text-xs text-zinc-400">
                       Authorize payment instantly using your preferred digital wallet.
                     </p>
                     <div className="flex flex-wrap justify-center gap-3">
@@ -571,7 +574,7 @@ export function CheckoutPage() {
                       <div className="px-5 py-2.5 rounded-xl bg-[#202124] text-white font-bold text-xs flex items-center gap-1.5 border border-white/20 shadow-md">
                         <span>Google Pay</span>
                       </div>
-                      <div className="px-5 py-2.5 rounded-xl bg-[#003087] text-white font-bold text-xs flex items-center gap-1.5 shadow-md">
+                      <div className="px-5 py-2.5 rounded-xl bg-zinc-800 text-white font-bold text-xs flex items-center gap-1.5 border border-white/10 shadow-md">
                         <span>PayPal</span>
                       </div>
                     </div>
@@ -580,7 +583,7 @@ export function CheckoutPage() {
 
                 {/* ── Counter Pay Option ── */}
                 {paymentMethod === 'counter' && (
-                  <div className="p-6 bg-[#0c1324] rounded-2xl border border-[#2e3447] space-y-2 text-xs text-on-surface-variant">
+                  <div className="p-6 bg-zinc-950 rounded-xl border border-white/10 space-y-2 text-xs text-zinc-400">
                     <h4 className="font-bold text-white text-sm">Pay at Cinema Box Office</h4>
                     <p>
                       Your seats will be reserved under booking reference for up to <strong>30 minutes before showtime</strong>.
@@ -591,9 +594,9 @@ export function CheckoutPage() {
               </div>
 
               {/* 3. Promo Code Section */}
-              <div className="bg-[#151b2d] border border-[#2e3447] rounded-3xl p-6 shadow-xl space-y-3">
+              <div className="bg-[#0d0d10] border border-white/10 rounded-2xl p-6 shadow-xl space-y-3">
                 <div className="flex items-center gap-2">
-                  <Tag className="w-4 h-4 text-primary" />
+                  <Tag className="w-4 h-4 text-red-500" />
                   <h4 className="text-sm font-bold text-white">Have a Promo Code or Gift Voucher?</h4>
                 </div>
 
@@ -604,13 +607,13 @@ export function CheckoutPage() {
                     disabled={promoApplied}
                     onChange={(e) => setPromoCode(e.target.value)}
                     placeholder="Enter code (e.g. CINE10 or PREMIUM20)"
-                    className="flex-1 bg-[#0c1324] border border-[#2e3447] rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-[#908fa0] focus:border-primary focus:outline-none uppercase font-mono"
+                    className="flex-1 bg-zinc-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none uppercase font-mono"
                   />
                   <button
                     type="button"
                     disabled={promoApplied || !promoCode.trim()}
                     onClick={handleApplyPromo}
-                    className="px-5 py-2.5 bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shrink-0"
+                    className="px-5 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shrink-0"
                   >
                     {promoApplied ? 'Applied' : 'Apply'}
                   </button>
@@ -624,26 +627,26 @@ export function CheckoutPage() {
                 )}
 
                 {promoError && (
-                  <p className="text-xs text-rose-400">{promoError}</p>
+                  <p className="text-xs text-red-400">{promoError}</p>
                 )}
               </div>
             </div>
 
             {/* ── Right Column (4 cols): Sticky Order Summary & Pay CTA ── */}
-            <div className="lg:col-span-4 bg-[#151b2d] border border-[#2e3447] rounded-3xl p-6 shadow-2xl space-y-6 sticky top-24">
+            <div className="lg:col-span-4 bg-[#0d0d10] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-6 sticky top-24">
               
-              <div className="flex items-center justify-between border-b border-[#2e3447] pb-4">
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <div className="flex items-center gap-2">
-                  <Ticket className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-bold text-white font-display">Order Summary</h3>
+                  <Ticket className="w-5 h-5 text-red-500" />
+                  <h3 className="text-lg font-bold text-white">Order Summary</h3>
                 </div>
-                <span className="text-xs font-bold text-[#c0c1ff] bg-[#0c1324] px-2.5 py-1 rounded-full border border-[#2e3447]">
+                <span className="text-xs font-bold text-zinc-300 bg-zinc-900 px-2.5 py-1 rounded-full border border-white/10">
                   {format}
                 </span>
               </div>
 
               {/* Movie Snippet */}
-              <div className="flex items-start gap-3 p-3.5 bg-[#0c1324] rounded-2xl border border-[#2e3447]">
+              <div className="flex items-start gap-3 p-3.5 bg-zinc-950 rounded-xl border border-white/5">
                 <img
                   src={movie.posterUrl || movie.backdropUrl}
                   alt={movie.title}
@@ -651,16 +654,16 @@ export function CheckoutPage() {
                 />
                 <div className="space-y-1 min-w-0 flex-1">
                   <h4 className="font-bold text-sm text-white truncate">{movie.title}</h4>
-                  <p className="text-xs text-on-surface-variant flex items-center gap-1">
-                    <Tv className="w-3 h-3 text-primary shrink-0" />
+                  <p className="text-xs text-zinc-400 flex items-center gap-1">
+                    <Tv className="w-3 h-3 text-red-500 shrink-0" />
                     <span className="truncate">{hall.name}</span>
                   </p>
-                  <p className="text-xs text-amber-300 font-semibold flex items-center gap-1">
-                    <Calendar className="w-3 h-3 shrink-0" />
+                  <p className="text-xs text-zinc-300 font-semibold flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-red-500 shrink-0" />
                     <span>{showDate}</span>
                   </p>
-                  <p className="text-xs text-amber-300 font-semibold flex items-center gap-1">
-                    <Clock className="w-3 h-3 shrink-0" />
+                  <p className="text-xs text-zinc-300 font-semibold flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-red-500 shrink-0" />
                     <span>{showTime}</span>
                   </p>
                 </div>
@@ -668,17 +671,17 @@ export function CheckoutPage() {
 
               {/* Reserved Seats List */}
               <div className="space-y-2">
-                <span className="text-xs font-bold text-[#908fa0] uppercase tracking-wider block">
+                <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                   Reserved Seats ({selectedSeats.length})
                 </span>
                 <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
                   {selectedSeats.map((s) => (
                     <div
                       key={s.id}
-                      className="flex items-center justify-between p-2 rounded-xl bg-[#0c1324] border border-[#2e3447] text-xs"
+                      className="flex items-center justify-between p-2 rounded-xl bg-zinc-950 border border-white/5 text-xs"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-lg bg-primary/20 text-primary border border-primary/40 font-bold flex items-center justify-center text-[10px]">
+                        <span className="w-6 h-6 rounded-lg bg-red-600/20 text-red-400 border border-red-500/40 font-bold flex items-center justify-center text-[10px]">
                           {s.id}
                         </span>
                         <span className="text-white font-medium">{s.tier || 'Standard'} Seat</span>
@@ -690,13 +693,13 @@ export function CheckoutPage() {
               </div>
 
               {/* Price Breakdown */}
-              <div className="p-4 bg-[#0c1324] rounded-2xl border border-[#2e3447] space-y-2 text-xs">
-                <div className="flex items-center justify-between text-on-surface-variant">
+              <div className="p-4 bg-zinc-950 rounded-xl border border-white/5 space-y-2 text-xs">
+                <div className="flex items-center justify-between text-zinc-400">
                   <span>Tickets Subtotal</span>
                   <span className="text-white font-bold">Rs. {ticketsSubtotal.toFixed(2)}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-on-surface-variant">
+                <div className="flex items-center justify-between text-zinc-400">
                   <span>Digital Service & Processing Fee</span>
                   <span className="text-white font-bold">Rs. {bookingFee.toFixed(2)}</span>
                 </div>
@@ -708,7 +711,7 @@ export function CheckoutPage() {
                   </div>
                 )}
 
-                <div className="pt-2 border-t border-[#2e3447] flex items-center justify-between text-sm">
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-sm">
                   <span className="font-bold text-white">Total Payable Amount</span>
                   <span className="font-black text-xl text-emerald-400">
                     Rs. {grandTotal.toFixed(2)}
@@ -720,7 +723,7 @@ export function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isProcessing}
-                className="liquid-glow-btn w-full text-surface-container-lowest font-black text-sm py-4 rounded-2xl flex items-center justify-center gap-2 shadow-2xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:scale-102 transition-all"
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-black text-sm py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-red-600/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isProcessing ? (
                   <>
@@ -735,7 +738,7 @@ export function CheckoutPage() {
                 )}
               </button>
 
-              <div className="text-[11px] text-center text-[#908fa0] space-y-1">
+              <div className="text-[11px] text-center text-zinc-400 space-y-1">
                 <p className="flex items-center justify-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Instant E-Ticket & Scannable QR Code</span>

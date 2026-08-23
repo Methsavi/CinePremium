@@ -41,7 +41,7 @@ export function NotFoundPage() {
         {/* Ambient Cinema Projector Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[380px] bg-gradient-to-b from-primary/20 via-red-900/10 to-transparent blur-3xl pointer-events-none -z-10 rounded-full" />
         <div className="absolute bottom-10 left-1/4 w-[400px] h-[400px] bg-primary/5 blur-3xl pointer-events-none -z-10 rounded-full" />
-        <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] bg-indigo-500/10 blur-3xl pointer-events-none -z-10 rounded-full" />
+        <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] bg-red-600/10 blur-3xl pointer-events-none -z-10 rounded-full" />
 
         <div className="max-w-2xl w-full mx-auto text-center space-y-8 animate-in fade-in zoom-in-95 duration-300">
           {/* Cinema 404 Status Pill */}

@@ -93,7 +93,7 @@ export const QuickFilterBar: React.FC<QuickFilterBarProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-800">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
         {GENRES_LIST.map((genre: string) => (
           <button
             key={genre}

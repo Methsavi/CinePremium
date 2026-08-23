@@ -1,44 +1,44 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { HERO_MOVIE, NOW_PLAYING_MOVIES, COMING_SOON_FEATURE, COMING_SOON_STACK } from '@/data/movies';
+import { HERO_MOVIE } from '@/data/movies';
 import { getMovieById, getMovies } from '@/services/movieApi';
 import { Movie } from '@/types/movie';
 import { Navbar } from '@/components/Navbar';
 import MovieDetails from './components/MovieDetails';
 import { TrailerModal } from '@/components/TrailerModal';
 import { Footer } from '@/components/Footer';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Film, ArrowLeft } from 'lucide-react';
 
 export default function SingleMovieListingPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const allFallbackMovies = [HERO_MOVIE, ...NOW_PLAYING_MOVIES, COMING_SOON_FEATURE, ...COMING_SOON_STACK];
-  const initialMovie = allFallbackMovies.find((m) => m.id === id) || HERO_MOVIE;
-
-  const [movie, setMovie] = useState<Movie>(initialMovie);
+  const [movie, setMovie] = useState<Movie | null>(id === HERO_MOVIE.id ? HERO_MOVIE : null);
   const [loading, setLoading] = useState<boolean>(true);
   const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const loadMovie = async () => {
       if (!id) return;
+      if (id === HERO_MOVIE.id) {
+        setMovie(HERO_MOVIE);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        // Try getting single movie by ID from backend
         const fetchedMovie = await getMovieById(id);
         if (fetchedMovie) {
           setMovie(fetchedMovie);
         } else {
-          // Fallback search in list
           const allDb = await getMovies();
-          const found = allDb.find((m) => m.id === id);
-          if (found) setMovie(found);
+          const found = allDb.find((m) => m.id === id || (m as any)._id === id);
+          setMovie(found || null);
         }
       } catch (err) {
-        console.warn('Could not fetch movie from backend API, using local fallback:', err);
-        const fallback = allFallbackMovies.find((m) => m.id === id) || HERO_MOVIE;
-        setMovie(fallback);
+        console.error('Could not fetch movie from backend API:', err);
+        setMovie(null);
       } finally {
         setLoading(false);
       }
@@ -76,7 +76,26 @@ export default function SingleMovieListingPage() {
         {loading && !movie ? (
           <div className="p-32 flex flex-col items-center justify-center gap-4 text-center">
             <RefreshCw className="w-8 h-8 animate-spin text-primary" />
-            <p className="text-sm font-semibold text-white">Loading movie screening details...</p>
+            <p className="text-sm font-semibold text-white">Loading movie screening details from database...</p>
+          </div>
+        ) : !movie ? (
+          <div className="p-24 flex flex-col items-center justify-center gap-5 text-center max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-surface-container border border-outline-variant flex items-center justify-center text-primary shadow-xl">
+              <Film className="w-8 h-8" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-white">Movie Not Found</h2>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                The requested movie does not exist in the database or may have been removed.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/movies')}
+              className="liquid-glow-btn text-surface-container-lowest font-bold text-xs px-5 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer shadow-lg"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Browse All Movies</span>
+            </button>
           </div>
         ) : (
           <MovieDetails

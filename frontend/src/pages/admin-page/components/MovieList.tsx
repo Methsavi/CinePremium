@@ -3,9 +3,8 @@ import { getMovies, deleteMovie } from "../../../services/movieApi";
 import { Movie } from "../../../types/movie";
 import { useNotification } from "../../../context/NotificationContext";
 import { 
-  Film, Trash2, Search, Star, Clock, AlertCircle, 
-  CheckCircle2, RefreshCw, Edit3, LayoutGrid, List, 
-  Calendar, Sparkles
+  Film, Trash2, Search, AlertCircle, 
+  RefreshCw, Edit2, LayoutGrid, List, Eye, X, Calendar, Play
 } from "lucide-react";
 import MoviesEditForm from "./MoviesEditForm";
 
@@ -22,7 +21,7 @@ export function MovieList({ onRefreshTrigger }: MovieListProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
-  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [viewingMovie, setViewingMovie] = useState<Movie | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
   const fetchMoviesList = async () => {
@@ -50,22 +49,15 @@ export function MovieList({ onRefreshTrigger }: MovieListProps) {
       setDeletingId(id);
       await deleteMovie(id);
       setMovies((prev) => prev.filter((m) => m.id !== id));
-      setActionSuccess(`Movie "${title}" deleted successfully.`);
-      setTimeout(() => setActionSuccess(null), 4000);
 
       addNotification({
         type: 'delete',
-        title: 'Movie Deleted 🗑️',
-        message: `Movie "${title}" was permanently removed from the catalog.`,
-        actionUrl: '/movies',
-        actionLabel: 'Check Catalog'
+        message: 'Deleted Successfully'
       });
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to delete movie");
       addNotification({
         type: 'error',
-        title: 'Deletion Failed',
-        message: err instanceof Error ? err.message : "Failed to delete movie."
+        message: 'Action Failed'
       });
     } finally {
       setDeletingId(null);
@@ -86,133 +78,121 @@ export function MovieList({ onRefreshTrigger }: MovieListProps) {
 
   return (
     <div className="space-y-6">
-      {/* ── Search, Filters & View Toggle Bar ── */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#151b2d] p-4 rounded-2xl border border-[#2e3447] shadow-md">
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-          {/* Search Input */}
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
-            <input
-              type="text"
-              placeholder="Search movies by title, genre..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#0c1324] border border-[#2e3447] text-[#dce1fb] placeholder-[#908fa0] text-xs sm:text-sm rounded-xl pl-9 pr-4 py-2.5 focus:outline-none focus:border-[#c0c1ff] transition-colors"
-            />
-          </div>
+      {/* ── Table Card Container ── */}
+      <div className="bg-[#0d0d10] border border-white/10 rounded-xl overflow-hidden shadow-md">
+        {/* Card Header Toolbar */}
+        <div className="p-5 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+            {/* Search Input */}
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <input
+                type="text"
+                placeholder="Search movies..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-transparent border border-white/15 text-white placeholder:text-zinc-500 text-xs sm:text-sm rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-red-500 transition-colors"
+              />
+            </div>
 
-          {/* Status Filter */}
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full sm:w-auto bg-[#0c1324] border border-[#2e3447] text-[#dce1fb] text-xs sm:text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#c0c1ff] transition-colors cursor-pointer"
-          >
-            <option value="all">All Statuses ({movies.length})</option>
-            <option value="now_showing">
-              Now Showing ({movies.filter((m) => m.status === "now_showing").length})
-            </option>
-            <option value="coming_soon">
-              Coming Soon ({movies.filter((m) => m.status === "coming_soon").length})
-            </option>
-          </select>
-        </div>
-
-        {/* Right: View Mode Toggle & Refresh */}
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <div className="flex items-center bg-[#0c1324] border border-[#2e3447] p-1 rounded-xl">
-            <button
-              onClick={() => setViewMode("list")}
-              title="List View"
-              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                viewMode === "list"
-                  ? "bg-primary text-white shadow-sm"
-                  : "text-[#908fa0] hover:text-white"
-              }`}
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full sm:w-auto bg-zinc-950 border border-white/10 text-white text-xs sm:text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-red-500 transition-colors cursor-pointer"
             >
-              <List className="w-4 h-4" />
-            </button>
+              <option value="all">All Statuses ({movies.length})</option>
+              <option value="now_showing">
+                Now Showing ({movies.filter((m) => m.status === "now_showing").length})
+              </option>
+              <option value="coming_soon">
+                Coming Soon ({movies.filter((m) => m.status === "coming_soon").length})
+              </option>
+            </select>
+          </div>
+
+          {/* Right Controls */}
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <div className="flex items-center bg-zinc-950 border border-white/10 p-1 rounded-lg">
+              <button
+                onClick={() => setViewMode("list")}
+                title="List View"
+                className={`p-1.5 rounded-md transition-all cursor-pointer ${
+                  viewMode === "list"
+                    ? "bg-red-600 text-white shadow-sm"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                <List className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode("grid")}
+                title="Grid View"
+                className={`p-1.5 rounded-md transition-all cursor-pointer ${
+                  viewMode === "grid"
+                    ? "bg-red-600 text-white shadow-sm"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+            </div>
+
             <button
-              onClick={() => setViewMode("grid")}
-              title="Grid View"
-              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                viewMode === "grid"
-                  ? "bg-primary text-white shadow-sm"
-                  : "text-[#908fa0] hover:text-white"
-              }`}
+              onClick={fetchMoviesList}
+              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold bg-zinc-950 hover:bg-zinc-900 text-white border border-white/10 rounded-lg transition-colors cursor-pointer"
             >
-              <LayoutGrid className="w-4 h-4" />
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-red-500" : ""}`} />
+              <span>Refresh</span>
             </button>
           </div>
-
-          <button
-            onClick={fetchMoviesList}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-[#0c1324] hover:bg-[#191f31] text-[#dce1fb] border border-[#2e3447] rounded-xl transition-colors cursor-pointer"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-primary" : ""}`} />
-            <span>Refresh</span>
-          </button>
         </div>
-      </div>
 
-      {/* Notifications */}
-      {actionSuccess && (
-        <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs sm:text-sm flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>{actionSuccess}</span>
-        </div>
-      )}
-
-      {error && (
-        <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-xl text-xs sm:text-sm flex items-center gap-2 animate-in fade-in">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {/* Loading state */}
-      {loading ? (
-        <div className="p-16 text-center text-[#908fa0] flex flex-col items-center justify-center gap-3 bg-[#151b2d] rounded-2xl border border-[#2e3447]">
-          <RefreshCw className="w-8 h-8 animate-spin text-primary" />
-          <span className="text-sm font-semibold text-white">Loading live movie records from database...</span>
-        </div>
-      ) : filteredMovies.length === 0 ? (
-        <div className="p-16 bg-[#151b2d] rounded-2xl border border-[#2e3447] text-center text-[#908fa0] flex flex-col items-center gap-3 shadow-lg">
-          <div className="w-14 h-14 rounded-2xl bg-[#0c1324] border border-[#2e3447] flex items-center justify-center text-primary">
-            <Film className="w-7 h-7" />
+        {error && (
+          <div className="mx-5 mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
           </div>
-          <div className="space-y-1">
-            <p className="text-base font-bold text-white">No Movies Found</p>
-            <p className="text-xs text-[#908fa0]">Try creating a new movie or adjusting your search filters.</p>
+        )}
+
+        {/* Loading / Empty / Content */}
+        {loading ? (
+          <div className="p-16 text-center text-zinc-400 flex flex-col items-center justify-center gap-3">
+            <RefreshCw className="w-8 h-8 animate-spin text-red-500" />
+            <span className="text-xs">Loading live movie records from database...</span>
           </div>
-        </div>
-      ) : viewMode === "list" ? (
-        /* ── Modern Structured List / Table View ── */
-        <div className="bg-[#151b2d] border border-[#2e3447] rounded-2xl shadow-xl overflow-hidden">
+        ) : filteredMovies.length === 0 ? (
+          <div className="p-16 text-center text-zinc-500 flex flex-col items-center gap-2">
+            <Film className="w-10 h-10 text-zinc-700" />
+            <p className="text-sm font-semibold text-zinc-300">No Movies Found</p>
+            <p className="text-xs text-zinc-500">Try creating a new movie or adjusting your search filters.</p>
+          </div>
+        ) : viewMode === "list" ? (
+          /* ── Minimalist Table View (Minimum Details) ── */
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-[#2e3447] bg-[#0c1324]/80 text-[#908fa0] uppercase tracking-wider font-bold text-[10px]">
-                  <th className="py-3.5 px-4">Movie Details</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4">Rating & Duration</th>
-                  <th className="py-3.5 px-4">Genres</th>
-                  <th className="py-3.5 px-4">Release Date</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
+                <tr className="border-t border-b border-white/10 text-xs font-semibold text-zinc-400">
+                  <th className="px-6 py-3.5">Movie</th>
+                  <th className="px-6 py-3.5">Genre</th>
+                  <th className="px-6 py-3.5">Status</th>
+                  <th className="px-6 py-3.5">Duration</th>
+                  <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2e3447]">
+              <tbody className="divide-y divide-white/5">
                 {filteredMovies.map((movie) => (
                   <tr
                     key={movie.id}
-                    className="hover:bg-[#192036] transition-colors group"
+                    className="hover:bg-white/[0.02] transition-colors"
                   >
                     {/* Poster + Title */}
-                    <td className="py-3 px-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3 min-w-[200px]">
                         <img
                           src={movie.posterUrl || movie.backdropUrl}
                           alt={movie.title}
-                          className="w-10 h-14 object-cover rounded-lg border border-[#2e3447] shrink-0 shadow-sm"
+                          className="w-9 h-12 object-cover rounded-md border border-white/10 shrink-0 shadow-sm"
                           onError={(e) => {
                             if (movie.backdropUrl && e.currentTarget.src !== movie.backdropUrl) {
                               e.currentTarget.src = movie.backdropUrl;
@@ -220,96 +200,60 @@ export function MovieList({ onRefreshTrigger }: MovieListProps) {
                           }}
                         />
                         <div className="space-y-0.5 min-w-0">
-                          <h4 className="font-bold text-white text-sm truncate">{movie.title}</h4>
-                          {movie.tagline && (
-                            <p className="text-[11px] text-[#c0c1ff] italic truncate max-w-xs">
-                              "{movie.tagline}"
-                            </p>
-                          )}
-                          <span className="text-[10px] text-[#908fa0] block font-mono">
-                            ID: {movie.id.slice(-8)}
-                          </span>
+                          <h4 className="font-semibold text-white text-sm truncate uppercase tracking-tight">{movie.title}</h4>
                         </div>
                       </div>
                     </td>
 
-                    {/* Status Badge */}
-                    <td className="py-3 px-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-                          movie.status === "now_showing"
-                            ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
-                            : "bg-amber-500/15 text-amber-300 border-amber-500/30"
-                        }`}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full ${
-                          movie.status === "now_showing" ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
-                        }`} />
-                        <span>{movie.status === "now_showing" ? "Now Showing" : "Coming Soon"}</span>
+                    {/* Genre */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-xs text-zinc-300 font-medium">
+                        {movie.genres && movie.genres.length > 0 ? movie.genres.join("\\") : "Feature"}
                       </span>
                     </td>
 
-                    {/* Rating & Duration */}
-                    <td className="py-3 px-4 whitespace-nowrap">
-                      <div className="space-y-1">
-                        {movie.rating ? (
-                          <div className="flex items-center gap-1 text-amber-300 font-bold">
-                            <Star className="w-3.5 h-3.5 fill-amber-400" />
-                            <span>{movie.rating}</span>
-                          </div>
-                        ) : (
-                          <span className="text-[#908fa0]">Unrated</span>
-                        )}
-                        <div className="flex items-center gap-1 text-[#908fa0] text-[11px]">
-                          <Clock className="w-3 h-3" />
-                          <span>{movie.duration || "N/A"}</span>
-                        </div>
-                      </div>
+                    {/* Status: Green text for Now Showing, Yellow text for Upcoming, NO background */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {movie.status === "now_showing" ? (
+                        <span className="text-xs font-semibold text-emerald-400">
+                          Now Showing
+                        </span>
+                      ) : (
+                        <span className="text-xs font-semibold text-yellow-400">
+                          Upcoming
+                        </span>
+                      )}
                     </td>
 
-                    {/* Genres */}
-                    <td className="py-3 px-4">
-                      <div className="flex flex-wrap gap-1 max-w-xs">
-                        {movie.genres && movie.genres.length > 0 ? (
-                          movie.genres.map((g, idx) => (
-                            <span
-                              key={idx}
-                              className="px-2 py-0.5 rounded-md bg-[#0c1324] border border-[#2e3447] text-[10px] text-[#c7c4d7]"
-                            >
-                              {g}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-[#908fa0] italic">—</span>
-                        )}
-                      </div>
+                    {/* Duration */}
+                    <td className="px-6 py-4 whitespace-nowrap text-xs text-zinc-400">
+                      <span>{movie.duration || "2h 15m"}</span>
                     </td>
 
-                    {/* Release Date */}
-                    <td className="py-3 px-4 whitespace-nowrap text-[#dce1fb]">
-                      <div className="flex items-center gap-1 text-xs">
-                        <Calendar className="w-3.5 h-3.5 text-primary" />
-                        <span>{movie.releaseDate || "Now Active"}</span>
-                      </div>
-                    </td>
-
-                    {/* Action buttons */}
-                    <td className="py-3 px-4 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-2">
+                    {/* Action buttons (View Details, Edit, Delete) */}
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => setViewingMovie(movie)}
+                          className="p-1.5 text-zinc-400 hover:text-white rounded-md hover:bg-zinc-800 transition-colors cursor-pointer"
+                          title="View Full Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => setEditingMovie(movie)}
-                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl transition-colors cursor-pointer"
+                          className="p-1.5 text-zinc-400 hover:text-white rounded-md hover:bg-zinc-800 transition-colors cursor-pointer"
+                          title="Edit Movie"
                         >
-                          <Edit3 className="w-3.5 h-3.5" />
-                          <span>Edit</span>
+                          <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(movie.id, movie.title)}
                           disabled={deletingId === movie.id}
-                          className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
+                          className="p-1.5 text-zinc-400 hover:text-red-500 rounded-md hover:bg-red-500/10 transition-colors cursor-pointer disabled:opacity-50"
+                          title="Delete Movie"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>{deletingId === movie.id ? "..." : "Delete"}</span>
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -318,99 +262,195 @@ export function MovieList({ onRefreshTrigger }: MovieListProps) {
               </tbody>
             </table>
           </div>
-        </div>
-      ) : (
-        /* ── Card Grid View ── */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMovies.map((movie) => (
-            <div
-              key={movie.id}
-              className="bg-[#151b2d] border border-[#2e3447] rounded-2xl overflow-hidden shadow-lg flex flex-col hover:border-primary/40 transition-all"
-            >
-              {/* Poster Header */}
-              <div className="relative h-48 w-full bg-[#0c1324] overflow-hidden">
-                <img
-                  src={movie.posterUrl || movie.backdropUrl}
-                  alt={movie.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#151b2d] via-transparent to-black/40" />
+        ) : (
+          /* ── Grid View ── */
+          <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredMovies.map((movie) => (
+              <div
+                key={movie.id}
+                className="bg-black/60 border border-white/10 rounded-xl overflow-hidden shadow-md flex flex-col hover:border-red-600/50 transition-all"
+              >
+                {/* Poster Header */}
+                <div className="relative h-44 w-full bg-black overflow-hidden">
+                  <img
+                    src={movie.posterUrl || movie.backdropUrl}
+                    alt={movie.title}
+                    className="w-full h-full object-cover opacity-80"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d10] via-transparent to-black/40" />
 
-                <span
-                  className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider border shadow-md ${
-                    movie.status === "now_showing"
-                      ? "bg-emerald-500/90 text-white border-emerald-400"
-                      : "bg-amber-500/90 text-white border-amber-400"
-                  }`}
-                >
-                  {movie.status === "now_showing" ? "Now Showing" : "Coming Soon"}
-                </span>
+                  <span className={`absolute top-3 right-3 text-xs font-bold drop-shadow-md ${
+                    movie.status === "now_showing" ? "text-emerald-400" : "text-yellow-400"
+                  }`}>
+                    {movie.status === "now_showing" ? "Now Showing" : "Upcoming"}
+                  </span>
+                </div>
 
-                <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-[#dce1fb]">
-                  {movie.rating ? (
-                    <div className="flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-lg text-amber-300 font-bold border border-white/10">
-                      <Star className="w-3.5 h-3.5 fill-amber-400" />
-                      <span>{movie.rating}</span>
+                {/* Body */}
+                <div className="p-4 flex-1 flex flex-col justify-between space-y-3 bg-[#0d0d10]">
+                  <div>
+                    <h4 className="text-base font-bold text-white uppercase tracking-tight line-clamp-1">{movie.title}</h4>
+                    <p className="text-xs text-zinc-400 mt-0.5">{movie.duration || "2h 15m"} · {movie.genres?.join("\\")}</p>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/10 flex items-center justify-end">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setViewingMovie(movie)}
+                        className="p-1.5 text-zinc-400 hover:text-white rounded-md hover:bg-zinc-800 transition-colors cursor-pointer"
+                        title="View Full Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setEditingMovie(movie)}
+                        className="p-1.5 text-zinc-400 hover:text-white rounded-md hover:bg-zinc-800 transition-colors cursor-pointer"
+                        title="Edit Movie"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(movie.id, movie.title)}
+                        disabled={deletingId === movie.id}
+                        className="p-1.5 text-zinc-400 hover:text-red-500 rounded-md hover:bg-red-500/10 transition-colors cursor-pointer"
+                        title="Delete Movie"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                  ) : null}
-                  {movie.duration && (
-                    <div className="flex items-center gap-1 bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[#c7c4d7] border border-white/10">
-                      <Clock className="w-3.5 h-3.5 text-primary" />
-                      <span>{movie.duration}</span>
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-              {/* Body */}
-              <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-                <div>
-                  <h4 className="text-base font-bold text-white line-clamp-1">{movie.title}</h4>
-                  {movie.tagline && (
-                    <p className="text-xs text-[#c0c1ff] italic mb-1 line-clamp-1">"{movie.tagline}"</p>
-                  )}
-                  <p className="text-xs text-[#908fa0] line-clamp-2 mt-1">{movie.synopsis}</p>
-                </div>
+      {/* ── View Full Details Modal ── */}
+      {viewingMovie && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
+          onClick={() => setViewingMovie(null)}
+        >
+          <div 
+            className="relative w-full max-w-2xl bg-[#0b0b0e]/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh] my-auto animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header / Backdrop */}
+            <div className="relative h-48 bg-zinc-950 overflow-hidden shrink-0 border-b border-white/10">
+              {viewingMovie.backdropUrl || viewingMovie.posterUrl ? (
+                <img 
+                  src={viewingMovie.backdropUrl || viewingMovie.posterUrl} 
+                  alt={viewingMovie.title}
+                  className="w-full h-full object-cover opacity-50"
+                />
+              ) : null}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b0e] via-transparent to-black/60" />
 
-                {movie.genres && movie.genres.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {movie.genres.map((genre, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2.5 py-0.5 bg-[#0c1324] text-[#c7c4d7] border border-[#2e3447] rounded-lg text-[10px] font-medium"
-                      >
-                        {genre}
-                      </span>
-                    ))}
-                  </div>
+              <button
+                onClick={() => setViewingMovie(null)}
+                className="absolute top-4 right-4 text-zinc-400 hover:text-white p-2 rounded-xl bg-black/60 hover:bg-black transition-all cursor-pointer z-10"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="absolute bottom-4 left-6 right-6 flex items-end gap-4">
+                {viewingMovie.posterUrl && (
+                  <img 
+                    src={viewingMovie.posterUrl} 
+                    alt={viewingMovie.title} 
+                    className="w-16 h-24 object-cover rounded-lg border-2 border-white/20 shadow-xl shrink-0"
+                  />
                 )}
-
-                {/* Footer */}
-                <div className="pt-3 border-t border-[#2e3447] flex items-center justify-between">
-                  <span className="text-[11px] text-[#908fa0] font-mono">
-                    ID: {movie.id.slice(-6)}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setEditingMovie(movie)}
-                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-xl transition-colors cursor-pointer"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>Edit</span>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(movie.id, movie.title)}
-                      disabled={deletingId === movie.id}
-                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>{deletingId === movie.id ? "..." : "Delete"}</span>
-                    </button>
-                  </div>
+                <div className="space-y-1 min-w-0">
+                  <h3 className="text-xl font-bold text-white uppercase tracking-tight truncate">
+                    {viewingMovie.title}
+                  </h3>
+                  {viewingMovie.tagline && (
+                    <p className="text-xs text-zinc-300 italic truncate">"{viewingMovie.tagline}"</p>
+                  )}
                 </div>
               </div>
             </div>
-          ))}
+
+            {/* Modal Body Details */}
+            <div className="p-6 space-y-5 overflow-y-auto flex-1 text-xs sm:text-sm">
+              {/* Metadata Info */}
+              <div className="flex flex-wrap items-center gap-4 pt-1">
+                <span className={`text-xs font-bold ${
+                  viewingMovie.status === "now_showing" ? "text-emerald-400" : "text-yellow-400"
+                }`}>
+                  {viewingMovie.status === "now_showing" ? "Now Showing" : "Upcoming"}
+                </span>
+
+                {viewingMovie.rating && (
+                  <span className="text-xs font-bold text-amber-400">
+                    {viewingMovie.rating} / 10
+                  </span>
+                )}
+
+                {viewingMovie.duration && (
+                  <span className="text-xs text-zinc-300 font-medium">
+                    {viewingMovie.duration}
+                  </span>
+                )}
+
+                {viewingMovie.releaseDate && (
+                  <span className="text-xs text-zinc-400">
+                    {viewingMovie.releaseDate}
+                  </span>
+                )}
+              </div>
+
+              {/* Genres (No background, joined with \) */}
+              {viewingMovie.genres && viewingMovie.genres.length > 0 && (
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">
+                    Genres
+                  </span>
+                  <span className="text-xs text-zinc-300 font-medium">
+                    {viewingMovie.genres.join("\\")}
+                  </span>
+                </div>
+              )}
+
+              {/* Synopsis */}
+              <div className="space-y-1.5">
+                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">
+                  Synopsis / Overview
+                </span>
+                <p className="text-zinc-300 leading-relaxed bg-zinc-950 p-4 rounded-xl border border-white/5">
+                  {viewingMovie.synopsis || "No synopsis available for this title."}
+                </p>
+              </div>
+
+              {/* Watch Trailer Button */}
+              {viewingMovie.trailerUrl && (
+                <div className="pt-1">
+                  <a 
+                    href={viewingMovie.trailerUrl} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-md hover:shadow-red-600/30 transition-all cursor-pointer"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-white" />
+                    <span>Watch Trailer</span>
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-zinc-950 border-t border-white/10 flex items-center justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewingMovie(null)}
+                className="px-5 py-2 text-xs font-bold text-white bg-zinc-900 hover:bg-zinc-800 border border-white/10 rounded-lg transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -421,8 +461,6 @@ export function MovieList({ onRefreshTrigger }: MovieListProps) {
           onSuccess={() => {
             setEditingMovie(null);
             fetchMoviesList();
-            setActionSuccess("Movie updated successfully.");
-            setTimeout(() => setActionSuccess(null), 4000);
           }}
           onCancel={() => setEditingMovie(null)}
         />
