@@ -2,6 +2,7 @@ import app from './app.js';
 import { config } from './config/env.js';
 import { connectDB } from './config/db.js';
 import { UserModel } from './models/user.model.js';
+import { autoSeedDatabase } from './config/autoSeed.js';
 import { Server } from 'socket.io';
 import { setupSeatSocket } from './socket/seatSocket.js';
 
@@ -18,6 +19,7 @@ process.on('uncaughtException', (err) => {
 const startServer = async () => {
   await connectDB();
   await UserModel.seedDefaultUsers();
+  await autoSeedDatabase();
 
   server = app.listen(config.port, () => {
     console.log(`🚀 Server running in ${config.nodeEnv} mode on http://localhost:${config.port}`);
@@ -25,8 +27,10 @@ const startServer = async () => {
 
   const io = new Server(server, {
     cors: {
-      origin: config.corsOrigin || '*',
-      methods: ['GET', 'POST'],
+      origin: (origin, callback) => {
+        callback(null, true);
+      },
+      methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
       credentials: true
     }
   });

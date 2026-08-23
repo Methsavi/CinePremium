@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ApiResponse, User } from '../types/auth';
 
-const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.BACKEND_URL?.replace(/\/$/, '') || 'http://localhost:5000';
+const BASE_URL = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || import.meta.env.BACKEND_URL || 'http://localhost:5000').replace(/\/$/, '');
 const USERS_API = `${BASE_URL}/api/v1/users`;
 
 /**

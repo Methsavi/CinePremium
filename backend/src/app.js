@@ -12,8 +12,23 @@ const app = express();
 // Security HTTP headers
 app.use(helmet());
 
-// Enable CORS
-app.use(cors({ origin: config.corsOrigin, credentials: true }));
+// Enable CORS with dynamic origin matching for Vercel and localhost
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://cine-premium-two.vercel.app',
+  ...(config.corsOrigin ? config.corsOrigin.split(',').map(o => o.trim()) : [])
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*') || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
 
 // Request logging
 app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));

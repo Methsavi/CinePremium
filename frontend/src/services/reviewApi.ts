@@ -2,7 +2,7 @@ import axios from 'axios';
 import { FeedbackReview } from '../types/review';
 import { ApiResponse } from '../types/auth';
 
-const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.BACKEND_URL?.replace(/\/$/, '') || 'http://localhost:5000';
+const BASE_URL = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || import.meta.env.BACKEND_URL || 'http://localhost:5000').replace(/\/$/, '');
 const REVIEWS_API = `${BASE_URL}/api/v1/reviews`;
 
 export const reviewApi = {
