@@ -156,12 +156,12 @@ export function AdminPage() {
       {/* ── SIDEBAR NAVIGATION ── */}
       <aside className="w-64 bg-[#0c1324] border-r border-[#2e3447] flex flex-col justify-between shrink-0 h-screen sticky top-0 z-30 shadow-2xl">
         <div>
-          {/* Logo & Brand Header */}
-          <div className="h-20 px-5 border-b border-[#2e3447] flex items-center gap-3 bg-[#0c1324]">
+          {/* Logo & Brand Header (Matched with Top Bar) */}
+          <div className="h-20 px-6 border-b border-[#2e3447] flex items-center gap-3.5 bg-[#0c1324] shrink-0">
             <img 
               src={logo} 
               alt="CinePremium Logo" 
-              className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(229,9,20,0.4)]" 
+              className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(229,9,20,0.4)] shrink-0" 
             />
             <div className="min-w-0">
               <h1 className="text-sm font-black tracking-tight text-white font-display truncate">
@@ -276,10 +276,10 @@ export function AdminPage() {
       </aside>
 
       {/* ── MAIN CONTENT AREA ── */}
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto">
+      <main className="flex-1 flex flex-col h-screen min-w-0 overflow-hidden bg-[#070d1f]">
         
-        {/* Top Header Bar */}
-        <header className="h-20 border-b border-[#2e3447] bg-[#0c1324]/90 backdrop-blur-xl px-6 sm:px-8 flex items-center justify-between sticky top-0 z-20 shadow-md">
+        {/* Top Header Bar (Fixed & Stable Padding) */}
+        <header className="h-20 border-b border-[#2e3447] bg-[#0c1324] px-6 flex items-center justify-between shrink-0 z-20 shadow-md">
           <div>
             <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-tight font-display">
               {activeTab === "overview" && "Manager Overview Dashboard"}
@@ -328,8 +328,8 @@ export function AdminPage() {
           </div>
         </header>
 
-        {/* Dynamic Views */}
-        <div className="flex-1 p-6 sm:p-8 max-w-7xl w-full mx-auto space-y-8 animate-in fade-in duration-200">
+        {/* Dynamic Views (Scrollable Body with stable gutter) */}
+        <div className="flex-1 overflow-y-auto min-h-0 [scrollbar-gutter:stable] p-6 max-w-7xl w-full mx-auto space-y-8 animate-in fade-in duration-200">
           
           {/* ════ OVERVIEW DASHBOARD ════ */}
           {activeTab === "overview" && (

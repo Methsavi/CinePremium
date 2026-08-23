@@ -231,14 +231,14 @@ export default function SuperAdminPage() {
   return (
     <div className="min-h-screen bg-[#070d1f] text-[#dce1fb] flex overflow-hidden font-sans">
       {/* Sidebar Navigation */}
-      <aside className="w-64 bg-[#0c1324] border-r border-[#2e3447] flex flex-col justify-between shrink-0 h-screen sticky top-0 z-30">
+      <aside className="w-64 bg-[#0c1324] border-r border-[#2e3447] flex flex-col justify-between shrink-0 h-screen sticky top-0 z-30 shadow-2xl">
         <div>
-          {/* Logo Header */}
-          <div className="h-20 px-5 border-b border-[#2e3447] flex items-center gap-3 bg-[#0c1324]">
+          {/* Logo Header (Matched with Top Bar) */}
+          <div className="h-20 px-6 border-b border-[#2e3447] flex items-center gap-3.5 bg-[#0c1324] shrink-0">
             <img 
               src={logo} 
               alt="CinePremium Logo" 
-              className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]" 
+              className="w-9 h-9 object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.4)] shrink-0" 
             />
             <div className="min-w-0">
               <h1 className="text-sm font-black tracking-tight text-white font-display truncate">
@@ -341,35 +341,50 @@ export default function SuperAdminPage() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-        {/* Top Header Bar */}
-        <header className="h-20 border-b border-[#2e3447] bg-[#0c1324]/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20">
+      <main className="flex-1 flex flex-col h-screen min-w-0 overflow-hidden bg-[#070d1f]">
+        {/* Top Header Bar (Fixed & Stable Padding) */}
+        <header className="h-20 border-b border-[#2e3447] bg-[#0c1324] px-6 flex items-center justify-between shrink-0 z-20 shadow-md">
           <div>
-            <h2 className="text-lg font-bold text-white uppercase tracking-tight">
+            <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-tight font-display">
               {activeTab === "overview" && "System Administration Overview"}
               {activeTab === "users" && "User Accounts & Role Permissions"}
               {activeTab === "movies" && "Movie Database Management"}
               {activeTab === "halls" && "Cinema Hall Seating Config"}
               {activeTab === "showtimes" && "Showtimes & Ticket Rates Planning"}
             </h2>
-            <p className="text-[11px] text-[#908fa0]">
-              Super Admin clearance granted to <span className="text-purple-400 font-semibold">{user.name}</span>
+            <p className="text-[11px] text-[#908fa0] flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+              <span>Super Admin clearance granted to</span>
+              <strong className="text-purple-400 font-semibold">{user.name}</strong>
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="bg-[#151b2d] border border-[#2e3447] rounded-xl px-3 py-1.5 flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-purple-500/20 text-purple-300 font-bold flex items-center justify-center text-xs border border-purple-500/30">
+            <Link
+              to="/"
+              className="hidden md:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#151b2d] hover:bg-[#1f263b] border border-[#2e3447] text-xs font-semibold text-[#dce1fb] transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-purple-400" />
+              <span>Live Site</span>
+            </Link>
+
+            <div className="bg-[#151b2d] border border-[#2e3447] rounded-2xl px-3 py-1.5 flex items-center gap-2.5 shadow-sm">
+              <div className="w-7 h-7 rounded-xl bg-purple-600 text-white font-black flex items-center justify-center text-xs shadow-md">
                 {user.name.charAt(0).toUpperCase()}
               </div>
-              <span className="text-xs font-semibold text-white">{user.name}</span>
-              <span className="text-[9px] font-bold bg-purple-500/10 text-purple-400 px-1.5 py-0.5 rounded uppercase border border-purple-500/20">Super Admin</span>
+              <div className="hidden sm:block text-left">
+                <span className="text-xs font-bold text-white block leading-none">{user.name}</span>
+                <span className="text-[9px] text-[#908fa0] font-mono">{user.email || "admin@cinepremium.com"}</span>
+              </div>
+              <span className="text-[9px] font-black bg-purple-500/15 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded-full uppercase">
+                Super Admin
+              </span>
             </div>
           </div>
         </header>
 
-        {/* Content Container (Reveals active view) */}
-        <div className="flex-1 p-8 max-w-7xl w-full mx-auto animate-in fade-in duration-200">
+        {/* Content Container (Scrollable Body with stable gutter) */}
+        <div className="flex-1 overflow-y-auto min-h-0 [scrollbar-gutter:stable] p-6 max-w-7xl w-full mx-auto space-y-8 animate-in fade-in duration-200">
           
           {/* Dashboard Overview */}
           {activeTab === "overview" && (
