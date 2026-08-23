@@ -6,6 +6,7 @@ import movieRoutes from './movie.routes.js';
 import hallRoutes from './hall.routes.js';
 import showtimeRoutes from './showtime.routes.js';
 import bookingRoutes from './booking.routes.js';
+import reviewRoutes from './review.routes.js';
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use('/movies', movieRoutes);
 router.use('/halls', hallRoutes);
 router.use('/showtimes', showtimeRoutes);
 router.use('/bookings', bookingRoutes);
+router.use('/reviews', reviewRoutes);
 
 export default router;
