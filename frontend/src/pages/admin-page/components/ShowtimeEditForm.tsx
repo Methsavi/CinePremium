@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { createShowtime } from "../../../services/showtimeApi";
+import { updateShowtime } from "../../../services/showtimeApi";
 import { getMovies } from "../../../services/movieApi";
 import { getHalls } from "../../../services/hallApi";
 import { getShowtimes } from "../../../services/showtimeApi";
@@ -21,9 +21,11 @@ import {
   Moon,
   Coffee,
   AlertTriangle,
+  Edit3,
 } from "lucide-react";
 
-interface ShowtimeAddFormProps {
+interface ShowtimeEditFormProps {
+  showtime: Showtime;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -53,28 +55,31 @@ function PeriodIcon({ name, className }: { name: string; className: string }) {
   }
 }
 
-function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
+function ShowtimeEditForm({ showtime, onSuccess, onCancel }: ShowtimeEditFormProps) {
   const { addNotification } = useNotification();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [halls, setHalls]   = useState<CinemaHall[]>([]);
   const [existingShowtimes, setExistingShowtimes] = useState<Showtime[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
-  // Form inputs
-  const [selectedMovieId, setSelectedMovieId] = useState("");
-  const [selectedHallId, setSelectedHallId]   = useState("");
-  const [showDate, setShowDate]               = useState(() => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
-  });
-  const [selectedTime, setSelectedTime]       = useState("07:30 PM");
-  const [format, setFormat]                   = useState("Standard 2D");
-  const [tierPrices, setTierPrices]           = useState<{ tierName: string; price: number }[]>([]);
+  // Form inputs initialized from showtime prop
+  const [selectedMovieId, setSelectedMovieId] = useState(() =>
+    typeof showtime.movie === "object" ? showtime.movie?.id || "" : showtime.movie || ""
+  );
+  const [selectedHallId, setSelectedHallId]   = useState(() =>
+    typeof showtime.hall === "object" ? showtime.hall?.id || "" : showtime.hall || ""
+  );
+  const [showDate, setShowDate]               = useState(showtime.showDate || "");
+  const [selectedTime, setSelectedTime]       = useState(showtime.showTime || "07:30 PM");
+  const [format, setFormat]                   = useState(showtime.format || "Standard 2D");
+  const [tierPrices, setTierPrices]           = useState<{ tierName: string; price: number }[]>(
+    showtime.tierPrices || []
+  );
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState<string | null>(null);
 
-  // Fetch movies and halls on mount
+  // Fetch all movies, halls, and showtimes
   useEffect(() => {
     async function loadData() {
       try {
@@ -88,31 +93,29 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
         setHalls(hallsData);
         setExistingShowtimes(showtimesData);
 
-        if (moviesData.length > 0) {
-          setSelectedMovieId(moviesData[0].id);
-        }
-        if (hallsData.length > 0) {
-          setSelectedHallId(hallsData[0].id);
-          setFormat(hallsData[0].screenType || "Standard 2D");
-          if (hallsData[0].seatTiers) {
+        // If tier prices empty in showtime, initialize from hall
+        if ((!showtime.tierPrices || showtime.tierPrices.length === 0) && hallsData.length > 0) {
+          const currentHall = hallsData.find(
+            (h) => h.id === (typeof showtime.hall === "object" ? showtime.hall?.id : showtime.hall)
+          );
+          if (currentHall?.seatTiers) {
             setTierPrices(
-              hallsData[0].seatTiers.map((tier) => ({
-                tierName: tier.tierName,
-                price: 15.0,
+              currentHall.seatTiers.map((t) => ({
+                tierName: t.tierName,
+                price: t.price || 15.0,
               }))
             );
           }
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load movie/hall data");
+        setError(err instanceof Error ? err.message : "Failed to load data");
       } finally {
         setLoadingData(false);
       }
     }
     loadData();
-  }, []);
+  }, [showtime]);
 
-  // When hall changes, reset format and tier prices
   const handleHallSelect = (hallId: string) => {
     setSelectedHallId(hallId);
     const hall = halls.find((h) => h.id === hallId);
@@ -132,18 +135,19 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
     );
   };
 
-  // Detect conflicts: same hall + same date + same time already booked
+  // Detect conflicts excluding the current record
   const conflictingSlots = useMemo(() => {
     if (!selectedHallId || !showDate) return new Set<string>();
     const taken = new Set<string>();
     for (const st of existingShowtimes) {
+      if (st.id === showtime.id) continue; // Skip current record
       const hallId = typeof st.hall === "object" ? st.hall?.id : st.hall;
       if (hallId === selectedHallId && st.showDate === showDate) {
         taken.add(st.showTime);
       }
     }
     return taken;
-  }, [existingShowtimes, selectedHallId, showDate]);
+  }, [existingShowtimes, selectedHallId, showDate, showtime.id]);
 
   const isCurrentSlotConflict = conflictingSlots.has(selectedTime);
 
@@ -165,7 +169,7 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
 
     try {
       setSubmitting(true);
-      await createShowtime({
+      await updateShowtime(showtime.id, {
         movieId: selectedMovieId,
         hallId: selectedHallId,
         showDate,
@@ -178,20 +182,20 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
       });
 
       addNotification({
-        type: 'add',
-        title: 'Showtime Scheduled! 📅',
-        message: `Screening for "${selectedMovie?.title || 'Movie'}" in ${selectedHall?.name || 'Hall'} (${selectedTime}, ${showDate}) is now active.`,
+        type: 'info',
+        title: 'Showtime Updated 📅',
+        message: `Screening for "${selectedMovie?.title || 'Movie'}" in ${selectedHall?.name || 'Hall'} (${selectedTime}, ${showDate}) was updated.`,
         actionUrl: '/admin',
         actionLabel: 'View Schedule'
       });
 
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create showtime forecasting");
+      setError(err instanceof Error ? err.message : "Failed to update showtime forecasting");
       addNotification({
         type: 'error',
-        title: 'Showtime Creation Failed',
-        message: err instanceof Error ? err.message : "Failed to create showtime."
+        title: 'Showtime Update Failed',
+        message: err instanceof Error ? err.message : "Failed to update showtime."
       });
     } finally {
       setSubmitting(false);
@@ -214,12 +218,12 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
         {/* Sticky Header */}
         <div className="flex items-center justify-between px-6 py-4.5 bg-[#0c1324] border-b border-[#2e3447] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-primary/15 text-primary border border-primary/30 flex items-center justify-center">
-              <Calendar className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+              <Edit3 className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white font-display">Schedule Movie Showtime</h3>
-              <p className="text-[11px] text-[#908fa0]">Set auditorium screening slots and ticket prices</p>
+              <h3 className="text-base font-bold text-white font-display">Edit Scheduled Showtime</h3>
+              <p className="text-[11px] text-[#908fa0]">Modify screening slot or ticket tier pricing</p>
             </div>
           </div>
           <button
@@ -234,7 +238,7 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
         {loadingData ? (
           <div className="p-12 text-center text-[#908fa0] flex flex-col items-center justify-center gap-3 flex-1">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm">Loading movies & auditorium halls...</span>
+            <span className="text-sm">Loading showtime information...</span>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -325,13 +329,13 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
                         onClick={() => handleHallSelect(hall.id)}
                         className={`relative text-left p-3.5 rounded-2xl border-2 transition-all cursor-pointer group ${
                           isSelected
-                            ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(192,193,255,0.15)]"
+                            ? "border-amber-400 bg-amber-400/10 shadow-[0_0_15px_rgba(251,191,36,0.15)]"
                             : "border-[#2e3447] bg-[#0c1324] hover:border-[#464554]"
                         }`}
                       >
                         {isSelected && (
                           <div className="absolute top-2.5 right-2.5">
-                            <CheckCircle2 className="w-4 h-4 text-primary" />
+                            <CheckCircle2 className="w-4 h-4 text-amber-400" />
                           </div>
                         )}
                         <div className="font-bold text-[#dce1fb] text-sm truncate pr-5">{hall.name}</div>
@@ -427,8 +431,8 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
                                 isConflict
                                   ? "opacity-40 cursor-not-allowed border-rose-500/20 bg-rose-500/5 text-rose-400 line-through"
                                   : isSelected
-                                  ? "border-primary bg-primary/20 text-primary shadow-[0_0_10px_rgba(192,193,255,0.2)]"
-                                  : "border-[#2e3447] bg-[#0c1324] text-[#dce1fb] hover:border-primary/50 hover:bg-primary/5"
+                                  ? "border-amber-400 bg-amber-400/20 text-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.2)]"
+                                  : "border-[#2e3447] bg-[#0c1324] text-[#dce1fb] hover:border-[#c0c1ff]/50 hover:bg-[#c0c1ff]/5"
                               }`}
                             >
                               {slot}
@@ -447,7 +451,7 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
                 <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold ${
                   isCurrentSlotConflict
                     ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
-                    : "bg-primary/10 border-primary/20 text-primary"
+                    : "bg-amber-500/10 border-amber-500/20 text-amber-300"
                 }`}>
                   <Clock className="w-4 h-4 shrink-0" />
                   <span>
@@ -546,12 +550,12 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
                 {submitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-surface-container-lowest border-t-transparent rounded-full animate-spin" />
-                    <span>Scheduling...</span>
+                    <span>Updating Showtime...</span>
                   </>
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Confirm Showtime</span>
+                    <span>Save Changes</span>
                   </>
                 )}
               </button>
@@ -563,4 +567,4 @@ function ShowtimeAddForm({ onSuccess, onCancel }: ShowtimeAddFormProps) {
   );
 }
 
-export default ShowtimeAddForm;
+export default ShowtimeEditForm;

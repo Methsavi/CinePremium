@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getShowtimes, deleteShowtime } from "../../../services/showtimeApi";
 import { Showtime } from "../../../types/showtime";
+import { useNotification } from "../../../context/NotificationContext";
 import {
   Calendar,
   Clock,
@@ -11,10 +12,12 @@ import {
   AlertCircle,
   Film,
   Tv,
-  DollarSign,
+  Banknote,
   LayoutGrid,
   List,
+  Edit3,
 } from "lucide-react";
+import ShowtimeEditForm from "./ShowtimeEditForm";
 
 interface ShowtimeListProps {
   onRefreshTrigger?: number;
@@ -46,11 +49,13 @@ function formatDateLabel(dateStr: string): string {
 }
 
 function ShowtimeList({ onRefreshTrigger }: ShowtimeListProps) {
+  const { addNotification } = useNotification();
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingShowtime, setEditingShowtime] = useState<Showtime | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "schedule">("schedule");
 
@@ -75,13 +80,31 @@ function ShowtimeList({ onRefreshTrigger }: ShowtimeListProps) {
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to cancel this scheduled showtime?")) return;
     try {
+      const stToDelete = showtimes.find((s) => s.id === id);
+      const title = stToDelete?.movie?.title || "Screening";
+      const time = stToDelete?.showTime || "";
+      const date = stToDelete?.showDate || "";
+
       setDeletingId(id);
       await deleteShowtime(id);
       setShowtimes((prev) => prev.filter((s) => s.id !== id));
       setActionSuccess("Showtime cancelled successfully.");
       setTimeout(() => setActionSuccess(null), 4000);
+
+      addNotification({
+        type: 'delete',
+        title: 'Showtime Cancelled 🗑️',
+        message: `Showtime for "${title}" (${time}, ${date}) was removed from the projection schedule.`,
+        actionUrl: '/admin',
+        actionLabel: 'View Schedule'
+      });
     } catch (err) {
       alert(err instanceof Error ? err.message : "Failed to delete showtime");
+      addNotification({
+        type: 'error',
+        title: 'Cancellation Failed',
+        message: err instanceof Error ? err.message : "Failed to cancel showtime."
+      });
     } finally {
       setDeletingId(null);
     }
@@ -262,7 +285,7 @@ function ShowtimeList({ onRefreshTrigger }: ShowtimeListProps) {
                         </div>
 
                         {/* Tier Prices */}
-                        {st.tierPrices?.length > 0 && (
+                        {st.tierPrices && st.tierPrices.length > 0 && (
                           <div className="hidden sm:flex flex-wrap gap-1.5 max-w-[160px]">
                             {st.tierPrices.map((tp, idx) => (
                               <span
@@ -270,21 +293,30 @@ function ShowtimeList({ onRefreshTrigger }: ShowtimeListProps) {
                                 className="px-2 py-0.5 rounded-md bg-[#0c1324] border border-[#2e3447] text-[10px] text-[#c7c4d7] flex items-center gap-1"
                               >
                                 {tp.tierName}:{" "}
-                                <strong className="text-emerald-400">${tp.price.toFixed(2)}</strong>
+                                <strong className="text-emerald-400">Rs. {tp.price.toFixed(2)}</strong>
                               </span>
                             ))}
                           </div>
                         )}
 
-                        {/* Delete */}
-                        <button
-                          onClick={() => handleDelete(st.id)}
-                          disabled={deletingId === st.id}
-                          className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-md transition-colors disabled:opacity-50 cursor-pointer opacity-0 group-hover:opacity-100"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          {deletingId === st.id ? "..." : "Remove"}
-                        </button>
+                        {/* Action Buttons */}
+                        <div className="flex-shrink-0 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => setEditingShowtime(st)}
+                            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 rounded-md transition-colors cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(st.id)}
+                            disabled={deletingId === st.id}
+                            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-md transition-colors disabled:opacity-50 cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            {deletingId === st.id ? "..." : "Remove"}
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
@@ -354,7 +386,7 @@ function ShowtimeList({ onRefreshTrigger }: ShowtimeListProps) {
                 {st.tierPrices?.length > 0 && (
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-1 text-[11px] font-semibold text-[#908fa0] uppercase">
-                      <DollarSign className="w-3 h-3 text-emerald-400" />
+                      <Banknote className="w-3.5 h-3.5 text-emerald-400" />
                       Tier Prices
                     </div>
                     <div className="flex flex-wrap gap-1.5">
@@ -364,7 +396,7 @@ function ShowtimeList({ onRefreshTrigger }: ShowtimeListProps) {
                           className="px-2.5 py-1 rounded-md bg-[#0c1324] border border-[#2e3447] text-[11px] text-[#c7c4d7] flex items-center gap-1"
                         >
                           <span>{tp.tierName}:</span>
-                          <strong className="text-emerald-400">${tp.price.toFixed(2)}</strong>
+                          <strong className="text-emerald-400">Rs. {tp.price.toFixed(2)}</strong>
                         </span>
                       ))}
                     </div>
@@ -374,19 +406,42 @@ function ShowtimeList({ onRefreshTrigger }: ShowtimeListProps) {
                 {/* Actions Footer */}
                 <div className="pt-3 border-t border-[#2e3447] flex items-center justify-between">
                   <span className="text-[11px] text-[#908fa0]">ID: {st.id.slice(-6)}</span>
-                  <button
-                    onClick={() => handleDelete(st.id)}
-                    disabled={deletingId === st.id}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-md transition-colors disabled:opacity-50 cursor-pointer"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    {deletingId === st.id ? "Cancelling..." : "Cancel Showing"}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setEditingShowtime(st)}
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 rounded-md transition-colors cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(st.id)}
+                      disabled={deletingId === st.id}
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-md transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      {deletingId === st.id ? "Cancelling..." : "Cancel Showing"}
+                    </button>
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
+      )}
+
+      {/* Edit Showtime Modal */}
+      {editingShowtime && (
+        <ShowtimeEditForm
+          showtime={editingShowtime}
+          onSuccess={() => {
+            setEditingShowtime(null);
+            fetchShowtimesList();
+            setActionSuccess("Showtime updated successfully.");
+            setTimeout(() => setActionSuccess(null), 4000);
+          }}
+          onCancel={() => setEditingShowtime(null)}
+        />
       )}
     </div>
   );
