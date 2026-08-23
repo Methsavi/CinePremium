@@ -47,6 +47,20 @@ export async function createHall(payload: CreateHallPayload): Promise<CinemaHall
   }
 }
 
+export async function updateHall(id: string, payload: Partial<CreateHallPayload>): Promise<CinemaHall> {
+  try {
+    const response = await axios.put<ApiResponse<CinemaHall>>(`${HALLS_API}/${id}`, payload);
+    return response.data.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      'Failed to update cinema hall'
+    );
+  }
+}
+
 export async function deleteHall(id: string): Promise<void> {
   try {
     await axios.delete(`${HALLS_API}/${id}`);
@@ -64,5 +78,6 @@ export const hallApi = {
   getHalls,
   getHallById,
   createHall,
+  updateHall,
   deleteHall,
 };

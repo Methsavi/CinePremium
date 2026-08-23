@@ -19,6 +19,20 @@ export async function getShowtimes(): Promise<Showtime[]> {
   }
 }
 
+export async function getShowtimeById(id: string): Promise<Showtime> {
+  try {
+    const response = await axios.get<ApiResponse<Showtime>>(`${SHOWTIMES_API}/${id}`);
+    return response.data.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      'Failed to fetch showtime'
+    );
+  }
+}
+
 export async function createShowtime(payload: CreateShowtimePayload): Promise<Showtime> {
   try {
     const response = await axios.post<ApiResponse<Showtime>>(SHOWTIMES_API, payload);
@@ -29,6 +43,20 @@ export async function createShowtime(payload: CreateShowtimePayload): Promise<Sh
       error.response?.data?.error ||
       error.message ||
       'Failed to create showtime forecasting'
+    );
+  }
+}
+
+export async function updateShowtime(id: string, payload: Partial<CreateShowtimePayload>): Promise<Showtime> {
+  try {
+    const response = await axios.put<ApiResponse<Showtime>>(`${SHOWTIMES_API}/${id}`, payload);
+    return response.data.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      'Failed to update showtime forecasting'
     );
   }
 }
@@ -48,6 +76,8 @@ export async function deleteShowtime(id: string): Promise<void> {
 
 export const showtimeApi = {
   getShowtimes,
+  getShowtimeById,
   createShowtime,
+  updateShowtime,
   deleteShowtime,
 };

@@ -51,6 +51,24 @@ export async function addMovie(formData: FormData): Promise<Movie> {
   }
 }
 
+export async function updateMovie(id: string, formData: FormData): Promise<Movie> {
+  try {
+    const response = await axios.put<ApiResponse<Movie>>(`${MOVIES_API}/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      'Failed to update movie'
+    );
+  }
+}
+
 export async function deleteMovie(id: string): Promise<void> {
   try {
     await axios.delete(`${MOVIES_API}/${id}`);
@@ -68,5 +86,6 @@ export const movieApi = {
   getMovies,
   getMovieById,
   addMovie,
+  updateMovie,
   deleteMovie,
 };
