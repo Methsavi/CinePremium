@@ -87,7 +87,7 @@ export const MyTicketsModal: React.FC<MyTicketsModalProps> = ({
                     <QrCode className="w-10 h-10 text-white bg-white/10 p-1 rounded" />
                     <div className="text-right">
                       <span className="text-[10px] text-slate-400 block font-mono">ID: {booking.id}</span>
-                      <span className="text-base font-black text-emerald-400">${booking.totalAmount.toFixed(2)}</span>
+                      <span className="text-base font-black text-emerald-400">Rs. {booking.totalAmount.toFixed(2)}</span>
                     </div>
                   </div>
 
