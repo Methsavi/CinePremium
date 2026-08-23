@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Database Service (MongoDB)
+  mongodb:
+    image: mongo:7.0
+    container_name: cinepremium-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - cinepremium-net
+
+  # Backend Service (Node.js Express + Socket.IO)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cinepremium-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/cinepremium
+      - JWT_SECRET=cinepremium-secure-jwt-key-2026-production
+      - CORS_ORIGIN=http://localhost:80,http://localhost:5173,*
+    depends_on:
+      - mongodb
+    networks:
+      - cinepremium-net
+
+  # Frontend Service (React + Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cinepremium-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - cinepremium-net
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  cinepremium-net:
+    driver: bridge
