@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Search, LogIn, UserPlus, LogOut, Ticket, Shield, 
-  User as UserIcon, ChevronDown, Film, Info,
-  Menu, X, Home, Bell,
+  User as UserIcon, ChevronDown,
+  Menu, X, Bell,
   Sparkles, Clock
 } from 'lucide-react';
 import logo from '../assets/logo.png';
@@ -193,58 +193,66 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* ── 2. CENTRAL NAV LINKS (Home, Movies, About Us, My bookings, My Payments) ── */}
-          <nav className="hidden lg:flex items-center liquid-glass-pill p-1 rounded-full border border-white/10 shadow-inner">
+          {/* ── 2. CENTRAL NAV LINKS (Home, Movies, About Us, My bookings) ── */}
+          <nav className="hidden lg:flex items-center gap-8">
             {/* Home */}
             <button
               onClick={handleHomeClick}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
+              className={`relative py-1 text-sm font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
                 activeTab === 'Home' && location.pathname === '/'
-                  ? 'bg-white/15 text-white font-extrabold shadow-sm scale-105'
-                  : 'text-on-surface-variant hover:text-white hover:bg-white/[0.06]'
+                  ? 'text-primary font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
-              <Home className="w-3.5 h-3.5" />
               <span>Home</span>
+              {activeTab === 'Home' && location.pathname === '/' && (
+                <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full shadow-[0_0_8px_rgba(229,9,20,0.8)]" />
+              )}
             </button>
 
             {/* Movies */}
             <button
               onClick={handleMoviesClick}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
-                activeTab === 'Movies'
-                  ? 'bg-white/15 text-white font-extrabold shadow-sm scale-105'
-                  : 'text-on-surface-variant hover:text-white hover:bg-white/[0.06]'
+              className={`relative py-1 text-sm font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
+                activeTab === 'Movies' || location.pathname === '/movies'
+                  ? 'text-primary font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
-              <Film className="w-3.5 h-3.5" />
               <span>Movies</span>
+              {(activeTab === 'Movies' || location.pathname === '/movies') && (
+                <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full shadow-[0_0_8px_rgba(229,9,20,0.8)]" />
+              )}
             </button>
 
             {/* About Us */}
             <button
               onClick={handleAboutClick}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
+              className={`relative py-1 text-sm font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
                 activeTab === 'About Us' || location.pathname === '/about' || location.pathname === '/about-us'
-                  ? 'bg-white/15 text-white font-extrabold shadow-sm scale-105'
-                  : 'text-on-surface-variant hover:text-white hover:bg-white/[0.06]'
+                  ? 'text-primary font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
-              <Info className="w-3.5 h-3.5" />
               <span>About Us</span>
+              {(activeTab === 'About Us' || location.pathname === '/about' || location.pathname === '/about-us') && (
+                <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full shadow-[0_0_8px_rgba(229,9,20,0.8)]" />
+              )}
             </button>
 
             {/* My bookings */}
             <button
               onClick={handleMyBookingsClick}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
+              className={`relative py-1 text-sm font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
                 activeTab === 'My bookings' || location.pathname === '/my-bookings' || location.pathname === '/my-tickets'
-                  ? 'bg-white/15 text-white font-extrabold shadow-sm scale-105'
-                  : 'text-on-surface-variant hover:text-white hover:bg-white/[0.06]'
+                  ? 'text-primary font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
-              <Ticket className="w-3.5 h-3.5" />
               <span>My bookings</span>
+              {(activeTab === 'My bookings' || location.pathname === '/my-bookings' || location.pathname === '/my-tickets') && (
+                <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full shadow-[0_0_8px_rgba(229,9,20,0.8)]" />
+              )}
             </button>
           </nav>
 
@@ -492,56 +500,51 @@ export const Navbar: React.FC<NavbarProps> = ({
             ref={mobileMenuRef}
             className="lg:hidden mt-3 pt-3 border-t border-white/10 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200"
           >
-            {/* 5 Main Nav Buttons in Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {/* 4 Main Nav Buttons */}
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={handleHomeClick}
-                className={`flex items-center gap-2 p-2.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`flex items-center justify-center p-2.5 text-sm font-semibold transition-all border-b-2 ${
                   activeTab === 'Home' && location.pathname === '/'
-                    ? 'liquid-glass-pill-active text-white bg-white/15'
-                    : 'liquid-glass-pill text-on-surface-variant hover:text-white'
+                    ? 'text-primary font-bold border-primary'
+                    : 'text-zinc-400 hover:text-white border-transparent'
                 }`}
               >
-                <Home className="w-4 h-4 text-primary" />
                 <span>Home</span>
               </button>
 
               <button
                 onClick={handleMoviesClick}
-                className={`flex items-center gap-2 p-2.5 rounded-xl text-xs font-semibold transition-all ${
-                  activeTab === 'Movies'
-                    ? 'liquid-glass-pill-active text-white bg-white/15'
-                    : 'liquid-glass-pill text-on-surface-variant hover:text-white'
+                className={`flex items-center justify-center p-2.5 text-sm font-semibold transition-all border-b-2 ${
+                  activeTab === 'Movies' || location.pathname === '/movies'
+                    ? 'text-primary font-bold border-primary'
+                    : 'text-zinc-400 hover:text-white border-transparent'
                 }`}
               >
-                <Film className="w-4 h-4 text-primary" />
                 <span>Movies</span>
               </button>
 
               <button
                 onClick={handleAboutClick}
-                className={`flex items-center gap-2 p-2.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`flex items-center justify-center p-2.5 text-sm font-semibold transition-all border-b-2 ${
                   activeTab === 'About Us' || location.pathname === '/about' || location.pathname === '/about-us'
-                    ? 'liquid-glass-pill-active text-white bg-white/15'
-                    : 'liquid-glass-pill text-on-surface-variant hover:text-white'
+                    ? 'text-primary font-bold border-primary'
+                    : 'text-zinc-400 hover:text-white border-transparent'
                 }`}
               >
-                <Info className="w-4 h-4 text-primary" />
                 <span>About Us</span>
               </button>
 
               <button
                 onClick={handleMyBookingsClick}
-                className={`flex items-center gap-2 p-2.5 rounded-xl text-xs font-semibold transition-all ${
-                  activeTab === 'My bookings'
-                    ? 'liquid-glass-pill-active text-white bg-white/15'
-                    : 'liquid-glass-pill text-on-surface-variant hover:text-white'
+                className={`flex items-center justify-center p-2.5 text-sm font-semibold transition-all border-b-2 ${
+                  activeTab === 'My bookings' || location.pathname === '/my-bookings' || location.pathname === '/my-tickets'
+                    ? 'text-primary font-bold border-primary'
+                    : 'text-zinc-400 hover:text-white border-transparent'
                 }`}
               >
-                <Ticket className="w-4 h-4 text-primary" />
                 <span>My bookings</span>
               </button>
-
             </div>
 
             {onBookNowClick && (
