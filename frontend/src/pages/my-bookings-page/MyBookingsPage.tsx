@@ -145,11 +145,6 @@ export function MyBookingsPage() {
       setBookings((prev) =>
         prev.map((b) => (b.id === id ? { ...b, status: 'cancelled' } : b))
       );
-
-      addNotification({
-        type: 'cancel',
-        message: 'Cancelled Successfully',
-      });
     } catch (err) {
       addNotification({
         type: 'error',

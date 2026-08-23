@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import { 
@@ -67,6 +67,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   });
 
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const recentNotificationsRef = useRef<Map<string, number>>(new Map());
 
   useEffect(() => {
     if (!token) return;
@@ -75,17 +76,21 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const socket = io(baseUrl, { auth: { token } });
 
     socket.on('booking-created', ({ booking }: { booking: { movieTitle?: string; bookingId?: string } }) => {
-      addNotification({
-        type: 'booking',
-        message: `Booking confirmed for ${booking.movieTitle || 'your movie'}${booking.bookingId ? ` (${booking.bookingId})` : ''}.`
-      });
+      if (booking) {
+        addNotification({
+          type: 'booking',
+          message: `Booking confirmed for ${booking.movieTitle || 'your movie'}${booking.bookingId ? ` (${booking.bookingId})` : ''}.`
+        });
+      }
     });
 
     socket.on('booking-cancelled', ({ booking }: { booking: { movieTitle?: string; bookingId?: string } }) => {
-      addNotification({
-        type: 'cancel',
-        message: `Booking cancelled for ${booking.movieTitle || 'your movie'}${booking.bookingId ? ` (${booking.bookingId})` : ''}.`
-      });
+      if (booking) {
+        addNotification({
+          type: 'cancel',
+          message: `Booking cancelled for ${booking.movieTitle || 'your movie'}${booking.bookingId ? ` (${booking.bookingId})` : ''}.`
+        });
+      }
     });
 
     socket.on('connect_error', (error) => {
@@ -112,7 +117,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // Add notification function
+  // Add notification function with deduplication
   const addNotification = useCallback((params: {
     title?: string;
     message?: string;
@@ -130,13 +135,32 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       notifType = params.type || 'success';
     }
 
+    const cleanText = text.trim();
+    if (!cleanText) return;
+
+    // Deduplicate identical notifications within 3 seconds
+    const now = Date.now();
+    const cleanKey = cleanText.toLowerCase();
+    const lastSeen = recentNotificationsRef.current.get(cleanKey);
+    if (lastSeen && now - lastSeen < 3000) {
+      return;
+    }
+    recentNotificationsRef.current.set(cleanKey, now);
+
+    // Clean up stale cache
+    for (const [k, time] of recentNotificationsRef.current.entries()) {
+      if (now - time > 10000) {
+        recentNotificationsRef.current.delete(k);
+      }
+    }
+
     // Keep notification text simple & concise
     const id = `notif-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
 
     const newNotif: AppNotification = {
       id,
-      title: text,
-      message: text,
+      title: cleanText,
+      message: cleanText,
       type: notifType,
       timestamp: Date.now(),
       read: false,
@@ -149,7 +173,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // Add toast to top right
     const newToast: ToastItem = {
       id,
-      message: text,
+      message: cleanText,
       type: notifType
     };
 

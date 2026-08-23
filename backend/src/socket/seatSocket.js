@@ -65,10 +65,14 @@ export function broadcastBookingEvent(io, eventName, booking) {
     timestamp: new Date().toISOString()
   };
 
-  io.to('admins').emit(eventName, payload);
+  const rooms = ['admins'];
   if (booking.user) {
-    io.to(`user:${booking.user.toString()}`).emit(eventName, payload);
+    const userStr = booking.user._id ? booking.user._id.toString() : booking.user.toString();
+    rooms.push(`user:${userStr}`);
   }
+
+  // Passing array of rooms to io.to(...) ensures Socket.IO deduplicates recipients so each client receives only ONE event
+  io.to(rooms).emit(eventName, payload);
 }
 
 export function broadcastCatalogEvent(io, eventName, record) {

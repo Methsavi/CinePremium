@@ -193,12 +193,6 @@ export function CheckoutPage() {
 
       setConfirmedBookingId(generatedBookingId);
       setPaymentSuccess(true);
-
-      // Trigger real-time popup toast
-      addNotification({
-        type: 'booking',
-        message: 'Booking Confirmed'
-      });
     } catch (err: any) {
       console.error('Payment / Booking error:', err);
       setErrorMessage(err.response?.data?.message || err.message || 'Payment processing failed. Please try again.');
