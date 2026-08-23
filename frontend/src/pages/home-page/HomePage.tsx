@@ -1,71 +1,94 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { HERO_MOVIE, NOW_PLAYING_MOVIES } from '@/data/movies';
+import { HERO_MOVIE } from '@/data/movies';
+import { getMovies } from '@/services/movieApi';
 import { Movie } from '@/types/movie';
 import { Navbar } from '@/components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { SearchFilterSection } from './components/SearchFilterSection';
 import { NowPlayingSection } from './components/NowPlayingSection';
 import { ComingSoonSection } from './components/ComingSoonSection';
-import { QuickBookingModal } from '@/components/QuickBookingModal';
+import { QuickMovieInfoModal } from '@/components/QuickMovieInfoModal';
 import { TrailerModal } from '@/components/TrailerModal';
-import { MyTicketsModal, BookingRecord } from '@/components/MyTicketsModal';
 import { Footer } from '@/components/Footer';
-import { useAuth } from '@/context/AuthContext';
+import { RefreshCw } from 'lucide-react';
 
 export function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+
+  // Database Movies State
+  const [dbMovies, setDbMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Search & Filter State
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedGenre, setSelectedGenre] = useState<string>('All');
 
-  // Modals
-  const [bookingMovie, setBookingMovie] = useState<Movie | null>(null);
+  // Modals & Notifications
+  const [quickInfoMovie, setQuickInfoMovie] = useState<Movie | null>(null);
   const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
-  const [isMyTicketsOpen, setIsMyTicketsOpen] = useState<boolean>(false);
-  const [userBookings, setUserBookings] = useState<BookingRecord[]>([]);
+  const [trailerTitle, setTrailerTitle] = useState<string>('');
   const [notificationMsg, setNotificationMsg] = useState<string | null>(null);
 
-  // Filtered now playing movies
+  // Fetch movies directly from the database API
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        setLoading(true);
+        const data = await getMovies();
+        setDbMovies(data || []);
+      } catch (err) {
+        console.error('Failed to fetch movies from database API:', err);
+        setDbMovies([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, []);
+
+  // Split movies by database status
+  const nowPlayingDbMovies = useMemo(() => {
+    return dbMovies.filter((movie) => movie.status === 'now_showing');
+  }, [dbMovies]);
+
+  const comingSoonDbMovies = useMemo(() => {
+    return dbMovies.filter((movie) => movie.status === 'coming_soon');
+  }, [dbMovies]);
+
+  // Filtered now playing movies according to search query and selected genre
   const filteredNowPlaying = useMemo(() => {
-    return NOW_PLAYING_MOVIES.filter((movie: Movie) => {
+    return nowPlayingDbMovies.filter((movie: Movie) => {
       // Search filter
       if (searchQuery.trim() !== '') {
         const q = searchQuery.toLowerCase();
-        const matchesTitle = movie.title.toLowerCase().includes(q);
-        const matchesGenre = movie.genres.some((g: string) => g.toLowerCase().includes(q));
-        if (!matchesTitle && !matchesGenre) return false;
+        const matchesTitle = movie.title?.toLowerCase().includes(q);
+        const matchesTagline = movie.tagline?.toLowerCase().includes(q);
+        const matchesGenre = movie.genres && movie.genres.some((g: string) => g.toLowerCase().includes(q));
+        if (!matchesTitle && !matchesTagline && !matchesGenre) return false;
       }
 
       // Genre filter
-      if (selectedGenre !== 'All' && !movie.genres.includes(selectedGenre)) {
-        return false;
+      if (selectedGenre !== 'All') {
+        if (!movie.genres || !movie.genres.includes(selectedGenre)) {
+          return false;
+        }
       }
 
       return true;
     });
-  }, [searchQuery, selectedGenre]);
-
-  const handleBookingSuccess = (newBooking: BookingRecord) => {
-    setUserBookings((prev) => [newBooking, ...prev]);
-  };
-
-  const handleCancelBooking = (bookingId: string) => {
-    setUserBookings((prev) => prev.filter((b) => b.id !== bookingId));
-  };
+  }, [nowPlayingDbMovies, searchQuery, selectedGenre]);
 
   const handleRemindMe = (movie: Movie) => {
-    setNotificationMsg(`Reminder set for "${movie.title}" (${movie.releaseDate})!`);
+    setNotificationMsg(`Reminder set for "${movie.title}" (${movie.releaseDate || 'Coming Soon'})!`);
     setTimeout(() => setNotificationMsg(null), 4000);
   };
 
+  // Navigate to the dedicated movie detail page with auditorium showtimes & halls
   const handleBookClick = (movie: Movie) => {
-    if (!isAuthenticated) {
-      navigate('/login', { state: { returnTo: location.pathname } });
-      return;
-    }
-    setBookingMovie(movie);
+    navigate(`/movie/${movie.id}`);
   };
 
   return (
@@ -79,25 +102,27 @@ export function HomePage() {
 
       {/* Top Navbar */}
       <Navbar
-        onBookNowClick={() => handleBookClick(HERO_MOVIE)}
+        onBookNowClick={() => navigate('/movies')}
         onSearchClick={() => {
           const el = document.getElementById('search-section');
           el?.scrollIntoView({ behavior: 'smooth' });
         }}
-        onOpenMyTickets={() => setIsMyTicketsOpen(true)}
       />
 
       {/* Main Content */}
       <main className="flex-1">
-        {/* Hero Section */}
+        {/* Hero Section (Preserved Mock Data as Requested) */}
         <HeroSection
           onBookClick={() => handleBookClick(HERO_MOVIE)}
-          onTrailerClick={setTrailerUrl}
+          onTrailerClick={(url) => {
+            setTrailerTitle(HERO_MOVIE.title);
+            setTrailerUrl(url);
+          }}
         />
 
-        {/* Content Container */}
+        {/* Database Movies Content Container */}
         <div id="search-section" className="max-w-[1280px] mx-auto px-6 md:px-12 space-y-12 pb-12">
-          {/* Search & Filters */}
+          {/* Search & Genre Filters */}
           <SearchFilterSection
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -105,26 +130,45 @@ export function HomePage() {
             onGenreChange={setSelectedGenre}
           />
 
-          {/* Now Playing Section */}
-          <NowPlayingSection
-            movies={filteredNowPlaying}
-            onBookMovie={handleBookClick}
-          />
+          {/* Now Playing Section (Database records only) */}
+          {loading ? (
+            <div className="p-16 text-center text-on-surface-variant flex flex-col items-center justify-center gap-3 bg-surface rounded-2xl border border-outline-variant/40">
+              <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+              <p className="text-sm font-semibold text-white">Loading now playing movies from database...</p>
+            </div>
+          ) : (
+            <NowPlayingSection
+              movies={filteredNowPlaying}
+              onBookMovie={handleBookClick}
+              onMovieClick={(movie) => setQuickInfoMovie(movie)}
+              onViewAllClick={() => navigate('/movies')}
+            />
+          )}
 
-          {/* Coming Soon Section (Bento Grid) */}
-          <ComingSoonSection onRemindMe={handleRemindMe} />
+          {/* Coming Soon Section (Database records only) */}
+          {!loading && comingSoonDbMovies.length > 0 && (
+            <ComingSoonSection
+              movies={comingSoonDbMovies}
+              onRemindMe={handleRemindMe}
+              onMovieClick={(movie) => setQuickInfoMovie(movie)}
+            />
+          )}
         </div>
       </main>
 
       {/* Shared Footer */}
       <Footer />
 
-      {/* Booking Modal */}
-      {bookingMovie && (
-        <QuickBookingModal
-          movie={bookingMovie}
-          onClose={() => setBookingMovie(null)}
-          onBookingSuccess={handleBookingSuccess}
+      {/* Quick Movie Info Popup Modal */}
+      {quickInfoMovie && (
+        <QuickMovieInfoModal
+          movie={quickInfoMovie}
+          onClose={() => setQuickInfoMovie(null)}
+          onWatchTrailer={(url) => {
+            setTrailerTitle(quickInfoMovie.title);
+            setQuickInfoMovie(null);
+            setTrailerUrl(url);
+          }}
         />
       )}
 
@@ -132,16 +176,8 @@ export function HomePage() {
       {trailerUrl && (
         <TrailerModal
           trailerUrl={trailerUrl}
+          movieTitle={trailerTitle}
           onClose={() => setTrailerUrl(null)}
-        />
-      )}
-
-      {/* My Tickets History Modal */}
-      {isMyTicketsOpen && (
-        <MyTicketsModal
-          bookings={userBookings}
-          onClose={() => setIsMyTicketsOpen(false)}
-          onCancelBooking={handleCancelBooking}
         />
       )}
     </div>
