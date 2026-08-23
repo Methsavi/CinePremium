@@ -25,6 +25,13 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    posterUrl: {
+      type: String,
+    },
+    format: {
+      type: String,
+      default: 'Standard 2D',
+    },
     cinemaId: {
       type: String,
       required: true,
