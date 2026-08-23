@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Film, ArrowRight, ShieldCheck, UserCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useNotification } from '@/context/NotificationContext';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoading, error: authError, clearError } = useAuth();
+  const { addNotification } = useNotification();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,6 +29,11 @@ export function LoginPage() {
     try {
       await login({ email: email.trim(), password });
       setSuccessMsg('Login successful! Redirecting to home...');
+      addNotification({
+        type: 'success',
+        title: 'Welcome Back! 👋',
+        message: `Signed in successfully as ${email.trim()}.`
+      });
       setTimeout(() => {
         navigate('/');
       }, 1000);
