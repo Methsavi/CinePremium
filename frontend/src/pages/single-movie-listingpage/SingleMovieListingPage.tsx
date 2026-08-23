@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { HERO_MOVIE } from '@/data/movies';
-import { getMovieById } from '@/services/movieApi';
+import { getMovieById, getMovies } from '@/services/movieApi';
 import { Movie } from '@/types/movie';
 import { Navbar } from '@/components/Navbar';
 import MovieDetails from './components/MovieDetails';
@@ -33,7 +33,7 @@ export default function SingleMovieListingPage() {
           setMovie(fetchedMovie);
         } else {
           const allDb = await getMovies();
-          const found = allDb.find((m) => m.id === id || (m as any)._id === id);
+          const found = allDb.find((m: Movie) => m.id === id || (m as any)._id === id);
           setMovie(found || null);
         }
       } catch (err) {

@@ -1,4 +1,4 @@
-import { Movie, Cinema } from "@/types/movie";
+import { Movie } from "@/types/movie";
 import { MovieHero } from "./MovieHero";
 import { MovieShowtimes } from "./MovieShowtimes";
 
