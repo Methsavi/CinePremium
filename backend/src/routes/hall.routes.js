@@ -3,6 +3,7 @@ import {
   getHalls,
   getHallById,
   createHall,
+  updateHall,
   deleteHall,
 } from '../controllers/hall.controller.js';
 
@@ -14,6 +15,7 @@ router.route('/')
 
 router.route('/:id')
   .get(getHallById)
+  .put(updateHall)
   .delete(deleteHall);
 
 export default router;

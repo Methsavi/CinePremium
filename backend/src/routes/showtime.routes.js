@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import {
   getShowtimes,
+  getShowtimeById,
   createShowtime,
+  updateShowtime,
   deleteShowtime,
 } from '../controllers/showtime.controller.js';
 
@@ -12,6 +14,8 @@ router.route('/')
   .post(createShowtime);
 
 router.route('/:id')
+  .get(getShowtimeById)
+  .put(updateShowtime)
   .delete(deleteShowtime);
 
 export default router;

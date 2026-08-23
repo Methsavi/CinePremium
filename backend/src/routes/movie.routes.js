@@ -4,6 +4,7 @@ import {
   listMovies,
   viewMovie,
   addMovie,
+  updateMovie,
   removeMovie,
 } from '../controllers/movies.controller.js';
 
@@ -21,6 +22,13 @@ router.route('/')
 
 router.route('/:id')
   .get(viewMovie)
+  .put(
+    upload.fields([
+      { name: 'poster', maxCount: 1 },
+      { name: 'backdrop', maxCount: 1 }
+    ]),
+    updateMovie
+  )
   .delete(removeMovie);
 
 export default router;
