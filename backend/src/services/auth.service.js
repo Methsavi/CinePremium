@@ -28,7 +28,7 @@ export const AuthService = {
     const newUser = await UserModel.create({ name, email, password, role: role || 'user' });
 
     const token = jwt.sign(
-      { id: newUser.id, email: newUser.email, role: newUser.role },
+      { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role },
       config.jwtSecret,
       { expiresIn: '7d' }
     );
@@ -54,7 +54,7 @@ export const AuthService = {
     const { password: _, ...user } = userWithPassword;
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, name: user.name, email: user.email, role: user.role },
       config.jwtSecret,
       { expiresIn: '7d' }
     );
