@@ -8,6 +8,8 @@ export const createBooking = async (req, res) => {
       bookingId, 
       movieId, 
       movieTitle, 
+      posterUrl,
+      format,
       cinemaId, 
       cinemaName, 
       showtimeId, 
@@ -22,6 +24,8 @@ export const createBooking = async (req, res) => {
       user: req.user.id, // Assuming auth middleware attaches user
       movieId,
       movieTitle,
+      posterUrl,
+      format: format || 'Standard 2D',
       cinemaId,
       cinemaName,
       showtimeId,

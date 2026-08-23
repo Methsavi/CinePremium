@@ -51,6 +51,61 @@ export const createShowtime = asyncHandler(async (req, res) => {
   res.status(201).json(new ApiResponse(201, populatedShowtime, 'Showtime scheduled successfully'));
 });
 
+// @desc    Get single showtime by ID
+// @route   GET /api/v1/showtimes/:id
+export const getShowtimeById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const showtime = await Showtime.findById(id)
+    .populate('movie')
+    .populate('hall');
+
+  if (!showtime) {
+    throw new ApiError(404, 'Showtime not found');
+  }
+
+  res.status(200).json(new ApiResponse(200, showtime, 'Showtime fetched successfully'));
+});
+
+// @desc    Update showtime scheduling & pricing
+// @route   PUT /api/v1/showtimes/:id
+export const updateShowtime = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { movieId, hallId, showDate, showTime, format, tierPrices, isActive } = req.body;
+
+  const existingShowtime = await Showtime.findById(id);
+  if (!existingShowtime) {
+    throw new ApiError(404, 'Showtime not found');
+  }
+
+  if (movieId) {
+    const movie = await Movie.findById(movieId);
+    if (!movie) throw new ApiError(404, 'Movie not found');
+  }
+
+  if (hallId) {
+    const hall = await Hall.findById(hallId);
+    if (!hall) throw new ApiError(404, 'Cinema Hall not found');
+  }
+
+  const updateData = {};
+  if (movieId !== undefined) updateData.movie = movieId;
+  if (hallId !== undefined) updateData.hall = hallId;
+  if (showDate !== undefined) updateData.showDate = showDate;
+  if (showTime !== undefined) updateData.showTime = showTime;
+  if (format !== undefined) updateData.format = format;
+  if (tierPrices !== undefined) updateData.tierPrices = tierPrices;
+  if (isActive !== undefined) updateData.isActive = isActive;
+
+  const updatedShowtime = await Showtime.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  })
+    .populate('movie')
+    .populate('hall');
+
+  res.status(200).json(new ApiResponse(200, updatedShowtime, 'Showtime updated successfully'));
+});
+
 // @desc    Delete showtime
 // @route   DELETE /api/v1/showtimes/:id
 export const deleteShowtime = asyncHandler(async (req, res) => {
