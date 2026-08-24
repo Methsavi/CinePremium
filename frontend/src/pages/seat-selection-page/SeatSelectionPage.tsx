@@ -35,22 +35,73 @@ interface SeatData {
 }
 
 const SEAT_TIER_CONFIG = {
-  VIP: { name: 'VIP Recliner', price: 22, color: 'border-amber-500/50 text-amber-300 bg-amber-950/20' },
-  Executive: { name: 'Executive Club', price: 18, color: 'border-zinc-500/50 text-zinc-300 bg-zinc-900/60' },
-  Standard: { name: 'Standard Seat', price: 14, color: 'border-zinc-700/50 text-zinc-400 bg-zinc-950/80' },
-  Couple: { name: 'Couple Lounger', price: 28, color: 'border-red-600/50 text-red-300 bg-red-950/30' },
+  VIP: { name: 'VIP Recliner', color: 'border-amber-500/50 text-amber-300 bg-amber-950/20' },
+  Executive: { name: 'Executive Club', color: 'border-zinc-500/50 text-zinc-300 bg-zinc-900/60' },
+  Standard: { name: 'Standard Seat', color: 'border-zinc-700/50 text-zinc-400 bg-zinc-950/80' },
+  Couple: { name: 'Couple Lounger', color: 'border-red-600/50 text-red-300 bg-red-950/30' },
 };
 
-// Generate realistic cinema hall seating plan
-const generateCinemaHallSeats = (occupiedIds: string[] = []): SeatData[] => {
+interface TierPricesConfig {
+  VIP: number;
+  Executive: number;
+  Standard: number;
+  Couple: number;
+}
+
+const resolveTierPrices = (
+  tierPricesList?: { tierName: string; price: number }[],
+  hallSeatTiers?: { tierName: string; price: number }[]
+): TierPricesConfig => {
+  const tiers = (tierPricesList && tierPricesList.length > 0)
+    ? tierPricesList
+    : (hallSeatTiers && hallSeatTiers.length > 0)
+    ? hallSeatTiers
+    : [];
+
+  if (tiers.length === 0) {
+    return { VIP: 22, Executive: 18, Standard: 14, Couple: 28 };
+  }
+
+  const findPrice = (keywords: string[], fallback: number) => {
+    for (const t of tiers) {
+      const name = (t.tierName || '').toLowerCase();
+      if (keywords.some((k) => name.includes(k.toLowerCase()))) {
+        if (typeof t.price === 'number' && t.price > 0) return Number(t.price);
+      }
+    }
+    return fallback;
+  };
+
+  const validPrices = tiers.map((t) => Number(t.price)).filter((p) => !isNaN(p) && p > 0);
+  const highest = validPrices.length > 0 ? Math.max(...validPrices) : 22;
+  const lowest = validPrices.length > 0 ? Math.min(...validPrices) : 14;
+
+  const vip = findPrice(['vip', 'recliner', 'leather', 'royal', 'pod', 'first'], highest);
+  const standard = findPrice(['standard', 'lounge', 'view', 'front', 'regular', 'economy'], lowest);
+  const executive = findPrice(['executive', 'premium', 'club', 'central', 'panoramic', 'middle'], Math.round((vip + standard) / 2));
+  const couple = findPrice(['couple', 'lounger', 'suite', 'box', 'sofa'], highest > standard ? highest : Math.round(vip * 1.25));
+
+  return {
+    VIP: vip,
+    Executive: executive,
+    Standard: standard,
+    Couple: couple,
+  };
+};
+
+// Generate realistic cinema hall seating plan with dynamic database prices
+const generateCinemaHallSeats = (
+  occupiedIds: string[] = [],
+  prices: TierPricesConfig = { VIP: 22, Executive: 18, Standard: 14, Couple: 28 }
+): SeatData[] => {
   const rows = [
-    { row: 'A', tier: 'VIP' as const, price: 22, count: 10 },
-    { row: 'B', tier: 'VIP' as const, price: 22, count: 10 },
-    { row: 'C', tier: 'Executive' as const, price: 18, count: 12 },
-    { row: 'D', tier: 'Executive' as const, price: 18, count: 12 },
-    { row: 'E', tier: 'Standard' as const, price: 14, count: 12 },
-    { row: 'F', tier: 'Standard' as const, price: 14, count: 12 },
-    { row: 'G', tier: 'Couple' as const, price: 28, count: 8 },
+    { row: 'A', tier: 'VIP' as const, price: prices.VIP, count: 10 },
+    { row: 'B', tier: 'VIP' as const, price: prices.VIP, count: 10 },
+    { row: 'C', tier: 'Executive' as const, price: prices.Executive, count: 12 },
+    { row: 'D', tier: 'Executive' as const, price: prices.Executive, count: 12 },
+    { row: 'E', tier: 'Standard' as const, price: prices.Standard, count: 12 },
+    { row: 'F', tier: 'Standard' as const, price: prices.Standard, count: 12 },
+    { row: 'G', tier: 'Couple' as const, price: prices.Couple, count: 8 },
   ];
 
   const seatsList: SeatData[] = [];
@@ -89,10 +140,25 @@ export function SeatSelectionPage() {
   const format = passedState.format || hall?.screenType || 'Standard 2D';
   const showtimeId = passedState.showtimeId || `st-${movie?.id || 'main'}-${hall?.id || 'hall'}`;
 
-  const [seats, setSeats] = useState<SeatData[]>(() => generateCinemaHallSeats([]));
+  // Dynamically resolve database tier prices
+  const resolvedPrices = useMemo(() => {
+    return resolveTierPrices(passedState.tierPrices, hall?.seatTiers);
+  }, [passedState.tierPrices, hall?.seatTiers]);
+
+  const [seats, setSeats] = useState<SeatData[]>(() => generateCinemaHallSeats([], resolvedPrices));
   const [selectedSeatIds, setSelectedSeatIds] = useState<string[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
+
+  // Sync seat prices whenever database tier pricing resolves
+  useEffect(() => {
+    setSeats((prev) =>
+      prev.map((s) => ({
+        ...s,
+        price: resolvedPrices[s.tier] || s.price,
+      }))
+    );
+  }, [resolvedPrices]);
 
   // Load database records if navigated directly without state
   useEffect(() => {
@@ -125,9 +191,9 @@ export function SeatSelectionPage() {
       try {
         const response = await bookingApi.getOccupiedSeats(showtimeId, showDate);
         const occupiedIds: string[] = response.data?.occupiedSeats || [];
-        setSeats(generateCinemaHallSeats(occupiedIds));
+        setSeats(generateCinemaHallSeats(occupiedIds, resolvedPrices));
       } catch (err) {
-        setSeats(generateCinemaHallSeats([]));
+        setSeats(generateCinemaHallSeats([], resolvedPrices));
       }
     };
 
@@ -212,7 +278,7 @@ export function SeatSelectionPage() {
   }, [seats, selectedSeatIds]);
 
   const ticketsSubtotal = selectedSeatsList.reduce((acc, s) => acc + s.price, 0);
-  const bookingFee = selectedSeatsList.length > 0 ? 1.50 : 0;
+  const bookingFee = selectedSeatsList.length > 0 ? 100.00 : 0;
   const grandTotal = ticketsSubtotal + bookingFee;
 
   const isShowtimeExpired = isShowtimePast(showDate, showTime);
@@ -483,17 +549,22 @@ export function SeatSelectionPage() {
 
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded bg-amber-950/30 border border-amber-500/50" />
-                <span>VIP (Rs. 22)</span>
+                <span>VIP (Rs. {resolvedPrices.VIP})</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded bg-zinc-900/60 border border-zinc-500/50" />
-                <span>Executive (Rs. 18)</span>
+                <span>Executive (Rs. {resolvedPrices.Executive})</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-zinc-950 border border-zinc-700/50" />
+                <span>Standard (Rs. {resolvedPrices.Standard})</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded bg-red-950/30 border border-red-600/50" />
-                <span>Couple (Rs. 28)</span>
+                <span>Couple (Rs. {resolvedPrices.Couple})</span>
               </div>
             </div>
           </div>

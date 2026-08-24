@@ -94,16 +94,24 @@ function ShowtimeList({ onRefreshTrigger }: ShowtimeListProps) {
     }
   };
 
-  const filteredShowtimes = showtimes.filter((st) => {
-    const movieTitle = st.movie?.title || "";
-    const hallName   = st.hall?.name   || "";
-    const format     = st.format       || "";
-    return (
-      movieTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      hallName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      format.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
+  const filteredShowtimes = showtimes
+    .filter((st) => {
+      const movieTitle = st.movie?.title || "";
+      const hallName   = st.hall?.name   || "";
+      const format     = st.format       || "";
+      return (
+        movieTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        hallName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        format.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    })
+    .sort((a, b) => {
+      // Show newly added / latest created showtimes at the top
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (timeA !== timeB) return timeB - timeA;
+      return (b.id || "").localeCompare(a.id || "");
+    });
 
   return (
     <div className="space-y-6">

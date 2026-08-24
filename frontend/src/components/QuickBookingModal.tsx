@@ -27,13 +27,31 @@ interface QuickBookingModalProps {
   }) => void;
 }
 
-const generateSeats = (occupiedIds: string[] = []): Seat[] => {
+const generateSeats = (occupiedIds: string[] = [], tierPrices: any[] = []): Seat[] => {
+  const findPrice = (keywords: string[], fallback: number) => {
+    for (const t of tierPrices) {
+      const name = (t.tierName || '').toLowerCase();
+      if (keywords.some((k) => name.includes(k.toLowerCase()))) {
+        if (typeof t.price === 'number' && t.price > 0) return Number(t.price);
+      }
+    }
+    return fallback;
+  };
+
+  const validPrices = tierPrices.map((t) => Number(t.price)).filter((p) => !isNaN(p) && p > 0);
+  const highest = validPrices.length > 0 ? Math.max(...validPrices) : 22;
+  const lowest = validPrices.length > 0 ? Math.min(...validPrices) : 16;
+
+  const vipPrice = findPrice(['vip', 'recliner', 'leather', 'royal', 'pod'], highest);
+  const standardPrice = findPrice(['standard', 'lounge', 'view', 'front', 'regular'], lowest);
+  const couplePrice = findPrice(['couple', 'lounger', 'suite', 'box', 'sofa'], highest > standardPrice ? highest : Math.round(vipPrice * 1.25));
+
   return Array.from({ length: 48 }, (_, index) => {
     const row = String.fromCharCode(65 + Math.floor(index / 8)); // Rows A-F
     const number = (index % 8) + 1;
     const isVip = row === 'C' || row === 'D';
     const isCouple = row === 'F';
-    const price = isVip ? 22 : isCouple ? 28 : 16;
+    const price = isVip ? vipPrice : isCouple ? couplePrice : standardPrice;
     const type = isVip ? 'vip' : isCouple ? 'couple' : 'standard';
     const seatId = `${row}${number}`;
     const isOccupied = occupiedIds.includes(seatId);
@@ -44,7 +62,7 @@ const generateSeats = (occupiedIds: string[] = []): Seat[] => {
       number,
       type,
       price,
-      status: isOccupied ? 'occupied' : 'available'
+      status: isOccupied ? 'occupied' : 'available',
     };
   });
 };
@@ -161,7 +179,8 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
         id: st.id || st._id,
         time: st.showTime,
         format: st.format || hallObj?.screenType || '3D',
-        price: st.tierPrices?.[0]?.price || 15,
+        price: st.tierPrices?.[0]?.price || hallObj?.seatTiers?.[0]?.price || 15,
+        tierPrices: st.tierPrices || hallObj?.seatTiers || [],
         hall: hallObj?.name || 'Screen 1',
         isPast
       } as any);
@@ -189,10 +208,10 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
       try {
         const response = await bookingApi.getOccupiedSeats(selectedShowtime.id, selectedDate);
         const occupiedIds = response.data.occupiedSeats || [];
-        setSeats(generateSeats(occupiedIds));
+        setSeats(generateSeats(occupiedIds, selectedShowtime.tierPrices || []));
       } catch (error) {
         console.error('Failed to fetch occupied seats', error);
-        setSeats(generateSeats([]));
+        setSeats(generateSeats([], selectedShowtime.tierPrices || []));
       }
     };
     fetchOccupiedSeats();
@@ -207,7 +226,7 @@ export const QuickBookingModal: React.FC<QuickBookingModalProps> = ({
     socket.on('seats-update', ({ occupiedSeats }: { occupiedSeats: string[] }) => {
       setSeats(prev => {
         const locallySelected = new Set(prev.filter(s => s.status === 'selected').map(s => s.id));
-        return generateSeats(occupiedSeats || []).map(seat => {
+        return generateSeats(occupiedSeats || [], selectedShowtime.tierPrices || []).map(seat => {
           if (locallySelected.has(seat.id) && seat.status !== 'occupied') {
             return { ...seat, status: 'selected' };
           }

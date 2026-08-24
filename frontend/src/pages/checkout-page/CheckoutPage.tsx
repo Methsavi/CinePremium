@@ -89,7 +89,7 @@ export function CheckoutPage() {
     return selectedSeats.reduce((acc, s) => acc + (s.price || 15), 0);
   }, [selectedSeats]);
 
-  const bookingFee = selectedSeats.length > 0 ? 1.50 : 0;
+  const bookingFee = selectedSeats.length > 0 ? 100.00 : 0;
   const discountAmount = promoApplied ? (ticketsSubtotal * discountPercent) / 100 : 0;
   const grandTotal = Math.max(0, ticketsSubtotal + bookingFee - discountAmount);
 
@@ -636,7 +636,7 @@ export function CheckoutPage() {
                 </div>
 
                 <div className="flex items-center justify-between text-zinc-400">
-                  <span>Digital Service & Processing Fee</span>
+                  <span>Digital Service & Booking Fee</span>
                   <span className="text-white font-bold">Rs. {bookingFee.toFixed(2)}</span>
                 </div>
 

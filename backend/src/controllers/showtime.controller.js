@@ -12,7 +12,7 @@ export const getShowtimes = asyncHandler(async (req, res) => {
   const showtimes = await Showtime.find({})
     .populate('movie')
     .populate('hall')
-    .sort({ showDate: 1, showTime: 1 });
+    .sort({ createdAt: -1, _id: -1 });
 
   res.status(200).json(new ApiResponse(200, showtimes, 'Showtimes fetched successfully'));
 });
