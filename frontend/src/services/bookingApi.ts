@@ -27,5 +27,10 @@ export const bookingApi = {
   cancelBooking: (token: string, id: string) =>
     axios.patch(`${BOOKINGS_API}/${id}/cancel`, {}, {
       headers: { Authorization: `Bearer ${token}` }
+    }),
+  
+  deleteBooking: (token: string, id: string) =>
+    axios.delete(`${BOOKINGS_API}/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
     })
 };

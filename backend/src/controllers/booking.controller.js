@@ -85,7 +85,12 @@ export const getAllBookings = async (req, res) => {
 export const cancelBooking = async (req, res) => {
   try {
     const { id } = req.params;
-    const booking = await BookingModel.findOne({ bookingId: id, user: req.user.id });
+    const isStaff = req.user?.role === 'admin' || req.user?.role === 'cinema_manager';
+    const query = isStaff
+      ? { $or: [{ bookingId: id }, { _id: id }] }
+      : { bookingId: id, user: req.user.id };
+
+    const booking = await BookingModel.findOne(query);
     
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
@@ -104,6 +109,29 @@ export const cancelBooking = async (req, res) => {
     res.status(200).json({ message: 'Booking cancelled successfully', booking });
   } catch (error) {
     console.error('[BookingController] cancelBooking error:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+export const deleteBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const isStaff = req.user?.role === 'admin' || req.user?.role === 'cinema_manager';
+    if (!isStaff) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    const booking = await BookingModel.findOneAndDelete({ $or: [{ bookingId: id }, { _id: id }] });
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+    const io = req.app.get('io');
+    if (io) {
+      broadcastSeatUpdate(io, booking.showtimeId, booking.date);
+      broadcastBookingEvent(io, 'booking-deleted', booking);
+    }
+    res.status(200).json({ message: 'Booking deleted successfully', booking });
+  } catch (error) {
+    console.error('[BookingController] deleteBooking error:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };

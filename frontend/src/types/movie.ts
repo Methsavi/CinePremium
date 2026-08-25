@@ -6,6 +6,7 @@ export interface Showtime {
   format: string;
   price: number;
   hall: string;
+  tierPrices?: { tierName: string; price: number }[];
 }
 
 export interface Cinema {

@@ -387,9 +387,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className="liquid-glass-btn flex items-center gap-2 p-1 sm:pr-2.5 rounded-full cursor-pointer transition-all border border-white/15 hover:border-primary/40"
                   >
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary text-white font-black flex items-center justify-center text-xs shadow-md border border-primary/50">
-                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                    </div>
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.name}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover shadow-md border border-primary/50"
+                      />
+                    ) : (
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary text-white font-black flex items-center justify-center text-xs shadow-md border border-primary/50">
+                        {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                    )}
                     <span className="hidden sm:inline font-medium text-xs text-white max-w-[80px] truncate">
                       {user.name.split(' ')[0]}
                     </span>
@@ -416,30 +424,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </div>
 
                       {/* Menu Actions */}
-                      <div className="space-y-1">
+                      <div className="space-y-1 pt-1">
                         <button
                           onClick={() => {
                             setIsDropdownOpen(false);
-                            handleMyBookingsClick();
+                            navigate('/profile');
                           }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
                         >
-                          <Ticket className="w-4 h-4 text-red-500" />
-                          <span>My Tickets & Bookings</span>
+                          <UserIcon className="w-4 h-4 text-red-500" />
+                          <span>My Profile</span>
                         </button>
-
-                        {user.role === 'cinema_manager' && (
-                          <button
-                            onClick={() => {
-                              setIsDropdownOpen(false);
-                              navigate('/admin');
-                            }}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
-                          >
-                            <Shield className="w-4 h-4 text-red-400" />
-                            <span>Cinema Manager Panel</span>
-                          </button>
-                        )}
 
                         {user.role === 'admin' && (
                           <button
@@ -447,16 +442,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                               setIsDropdownOpen(false);
                               navigate('/super-admin');
                             }}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors text-left cursor-pointer"
+                            className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-medium text-red-400 hover:text-white hover:bg-red-600/20 rounded-xl transition-colors text-left cursor-pointer"
                           >
                             <Shield className="w-4 h-4 text-red-500" />
-                            <span>Super Admin Panel</span>
+                            <span>Go to admin panel</span>
+                          </button>
+                        )}
+
+                        {user.role === 'cinema_manager' && (
+                          <button
+                            onClick={() => {
+                              setIsDropdownOpen(false);
+                              navigate('/admin');
+                            }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-medium text-amber-400 hover:text-white hover:bg-amber-600/20 rounded-xl transition-colors text-left cursor-pointer"
+                          >
+                            <Shield className="w-4 h-4 text-amber-400" />
+                            <span>Go to manager panel</span>
                           </button>
                         )}
 
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/15 hover:text-red-300 rounded-xl transition-colors text-left cursor-pointer mt-1 border-t border-white/5 pt-2"
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/15 hover:text-red-300 rounded-xl transition-colors text-left cursor-pointer border-t border-white/5 pt-2 mt-1"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Sign Out</span>
@@ -508,9 +516,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-primary text-white font-black flex items-center justify-center text-xs shadow-md border border-primary/50">
-                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                    </div>
+                    {user.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.name}
+                        className="w-8 h-8 rounded-full object-cover shadow-md border border-primary/50"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-primary text-white font-black flex items-center justify-center text-xs shadow-md border border-primary/50">
+                        {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                    )}
                     <div>
                       <div className="font-bold text-xs text-white truncate">{user.name}</div>
                       <div className="text-[10px] text-zinc-400 truncate">{user.email}</div>
@@ -521,14 +537,25 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-1 border-t border-white/5">
+                <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-white/5">
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      navigate('/profile');
+                    }}
+                    className="py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] font-medium text-zinc-200 flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <UserIcon className="w-3.5 h-3.5 text-red-500" />
+                    <span>Profile</span>
+                  </button>
+
                   {user.role === 'admin' && (
                     <button
                       onClick={() => {
                         setIsMobileMenuOpen(false);
                         navigate('/super-admin');
                       }}
-                      className="flex-1 py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] font-medium text-zinc-200 flex items-center justify-center gap-1.5"
+                      className="flex-1 py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] font-medium text-zinc-200 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <Shield className="w-3.5 h-3.5 text-red-500" />
                       <span>Admin Panel</span>
@@ -540,7 +567,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         setIsMobileMenuOpen(false);
                         navigate('/admin');
                       }}
-                      className="flex-1 py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] font-medium text-zinc-200 flex items-center justify-center gap-1.5"
+                      className="flex-1 py-1.5 px-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[11px] font-medium text-zinc-200 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <Shield className="w-3.5 h-3.5 text-red-400" />
                       <span>Manager Panel</span>
@@ -551,7 +578,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setIsMobileMenuOpen(false);
                       handleLogout();
                     }}
-                    className="py-1.5 px-3 rounded-xl bg-red-600/15 hover:bg-red-600/25 text-red-400 text-[11px] font-medium flex items-center justify-center gap-1"
+                    className="py-1.5 px-3 rounded-xl bg-red-600/15 hover:bg-red-600/25 text-red-400 text-[11px] font-medium flex items-center justify-center gap-1 cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>Sign Out</span>

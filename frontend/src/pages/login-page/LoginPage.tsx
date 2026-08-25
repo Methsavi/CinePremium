@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, Film, ArrowRight, ShieldCheck, UserCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle2, Shield } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useNotification } from '@/context/NotificationContext';
+import logo from '@/assets/logo.png';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -41,13 +42,6 @@ export function LoginPage() {
     }
   };
 
-  const fillDemoAccount = (demoEmail: string) => {
-    setEmail(demoEmail);
-    setPassword('password123');
-    setLocalError(null);
-    clearError();
-  };
-
   const displayError = localError || authError;
 
   return (
@@ -58,12 +52,14 @@ export function LoginPage() {
 
       {/* Top Header Navbar */}
       <header className="px-6 md:px-12 py-6 flex items-center justify-between z-10 max-w-[1280px] w-full mx-auto">
-        <Link to="/" className="flex items-center gap-3 group cursor-pointer">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:bg-primary/20 transition-all">
-            <Film className="w-5 h-5 text-primary" />
-          </div>
-          <span className="font-display text-2xl font-bold text-primary tracking-tighter">
-            CinePremium
+        <Link to="/" className="flex items-center gap-3 group cursor-pointer select-none">
+          <img 
+            src={logo} 
+            alt="CinePremium" 
+            className="w-9 h-9 sm:w-10 sm:h-10 object-contain group-hover:scale-105 transition-transform" 
+          />
+          <span className="font-display text-2xl font-bold text-white tracking-tighter">
+            Cine<span className="text-primary">Premium</span>
           </span>
         </Link>
 
@@ -106,45 +102,6 @@ export function LoginPage() {
               </div>
             )}
 
-            {/* Quick Demo Credentials Widget */}
-            <div className="bg-surface-variant/40 border border-outline-variant/40 p-4 rounded-2xl space-y-3">
-              <div className="flex items-center justify-between text-xs font-semibold text-primary uppercase tracking-wider">
-                <span>Quick Demo Login (Password: password123)</span>
-                <span className="text-[10px] text-on-surface-variant font-normal">Click to fill</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => fillDemoAccount('admin@example.com')}
-                  className="flex flex-col items-center gap-1 p-2 rounded-xl bg-surface-container-high/80 hover:bg-primary/20 border border-outline-variant/30 text-center transition-all cursor-pointer"
-                >
-                  <ShieldCheck className="w-4 h-4 text-primary" />
-                  <div className="w-full text-[10px] font-semibold text-on-surface truncate">Admin</div>
-                  <div className="w-full text-[8px] text-on-surface-variant truncate">admin@example.com</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => fillDemoAccount('manager@example.com')}
-                  className="flex flex-col items-center gap-1 p-2 rounded-xl bg-surface-container-high/80 hover:bg-primary/20 border border-outline-variant/30 text-center transition-all cursor-pointer"
-                >
-                  <Film className="w-4 h-4 text-primary" />
-                  <div className="w-full text-[10px] font-semibold text-on-surface truncate">Manager</div>
-                  <div className="w-full text-[8px] text-on-surface-variant truncate">manager@example.com</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => fillDemoAccount('user@example.com')}
-                  className="flex flex-col items-center gap-1 p-2 rounded-xl bg-surface-container-high/80 hover:bg-primary/20 border border-outline-variant/30 text-center transition-all cursor-pointer"
-                >
-                  <UserCheck className="w-4 h-4 text-primary" />
-                  <div className="w-full text-[10px] font-semibold text-on-surface truncate">User</div>
-                  <div className="w-full text-[8px] text-on-surface-variant truncate">user@example.com</div>
-                </button>
-              </div>
-            </div>
-
             {/* Form */}
             <form onSubmit={handleLogin} className="space-y-4">
               {/* Email Input */}
@@ -173,16 +130,12 @@ export function LoginPage() {
                   <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
                     Password
                   </label>
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      alert('Demo reset instructions sent to your email.');
-                    }}
-                    className="text-xs font-medium text-primary hover:underline"
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs font-medium text-primary hover:underline cursor-pointer"
                   >
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-on-surface-variant">
@@ -241,11 +194,22 @@ export function LoginPage() {
             </form>
 
             {/* Footer Navigation Link */}
-            <div className="pt-2 text-center text-sm text-on-surface-variant">
-              Don't have an account?{' '}
-              <Link to="/register" className="font-semibold text-primary hover:underline">
-                Create an Account
-              </Link>
+            <div className="pt-2 text-center text-sm text-on-surface-variant space-y-2">
+              <div>
+                Don't have an account?{' '}
+                <Link to="/register" className="font-semibold text-primary hover:underline">
+                  Create an Account
+                </Link>
+              </div>
+              <div className="pt-2 border-t border-outline-variant/30">
+                <Link
+                  to="/admin-login"
+                  className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant/80 hover:text-primary transition-colors"
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>Admin & Manager Portal</span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

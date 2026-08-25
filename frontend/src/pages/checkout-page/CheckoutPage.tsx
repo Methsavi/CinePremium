@@ -18,8 +18,6 @@ import {
   CheckCircle2,
   Sparkles,
   Tag,
-  Wallet,
-  Building,
   AlertCircle
 } from 'lucide-react';
 
@@ -65,7 +63,6 @@ export function CheckoutPage() {
   const [contactPhone, setContactPhone] = useState('+1 (555) 019-2834');
 
   // Payment Form States
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet' | 'counter'>('card');
   const [cardNumber, setCardNumber] = useState('');
   const [cardHolder, setCardHolder] = useState(user?.name || '');
   const [cardExpiry, setCardExpiry] = useState('');
@@ -146,19 +143,17 @@ export function CheckoutPage() {
       return;
     }
 
-    if (paymentMethod === 'card') {
-      if (cardNumber.replace(/\s/g, '').length < 15) {
-        setErrorMessage('Please enter a valid 16-digit credit/debit card number.');
-        return;
-      }
-      if (!cardExpiry || !cardExpiry.includes('/')) {
-        setErrorMessage('Please enter a valid expiration date (MM/YY).');
-        return;
-      }
-      if (cardCvv.length < 3) {
-        setErrorMessage('Please enter a valid 3 or 4-digit CVV security code.');
-        return;
-      }
+    if (cardNumber.replace(/\s/g, '').length < 15) {
+      setErrorMessage('Please enter a valid 16-digit credit/debit card number.');
+      return;
+    }
+    if (!cardExpiry || !cardExpiry.includes('/')) {
+      setErrorMessage('Please enter a valid expiration date (MM/YY).');
+      return;
+    }
+    if (cardCvv.length < 3) {
+      setErrorMessage('Please enter a valid 3 or 4-digit CVV security code.');
+      return;
     }
 
     try {
@@ -316,14 +311,14 @@ export function CheckoutPage() {
                 </div>
               </div>
 
-              {/* 2. Payment Method Selector */}
+              {/* 2. Payment Method: Credit / Debit Card */}
               <div className="bg-[#0d0d10] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-red-600 text-white text-xs font-black flex items-center justify-center">
                       2
                     </span>
-                    <h3 className="text-lg font-bold text-white">Select Payment Method</h3>
+                    <h3 className="text-lg font-bold text-white">Credit / Debit Card Payment</h3>
                   </div>
 
                   <div className="flex items-center gap-1.5">
@@ -339,194 +334,119 @@ export function CheckoutPage() {
                   </div>
                 </div>
 
-                {/* Tabs */}
-                <div className="grid grid-cols-3 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('card')}
-                    className={`p-3.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
-                      paymentMethod === 'card'
-                        ? 'bg-red-600/15 border-red-500 text-white font-bold shadow-md'
-                        : 'bg-zinc-950 border-white/10 text-zinc-400 hover:border-white/20'
-                    }`}
-                  >
-                    <CreditCard className={`w-5 h-5 ${paymentMethod === 'card' ? 'text-red-500' : 'text-zinc-500'}`} />
-                    <span className="text-xs">Credit Card</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('wallet')}
-                    className={`p-3.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
-                      paymentMethod === 'wallet'
-                        ? 'bg-red-600/15 border-red-500 text-white font-bold shadow-md'
-                        : 'bg-zinc-950 border-white/10 text-zinc-400 hover:border-white/20'
-                    }`}
-                  >
-                    <Wallet className={`w-5 h-5 ${paymentMethod === 'wallet' ? 'text-red-500' : 'text-zinc-500'}`} />
-                    <span className="text-xs">Digital Wallet</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('counter')}
-                    className={`p-3.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
-                      paymentMethod === 'counter'
-                        ? 'bg-red-600/15 border-red-500 text-white font-bold shadow-md'
-                        : 'bg-zinc-950 border-white/10 text-zinc-400 hover:border-white/20'
-                    }`}
-                  >
-                    <Building className={`w-5 h-5 ${paymentMethod === 'counter' ? 'text-red-500' : 'text-zinc-500'}`} />
-                    <span className="text-xs">Pay at Cinema</span>
-                  </button>
-                </div>
-
                 {/* ── Card Payment Form & Interactive Preview ── */}
-                {paymentMethod === 'card' && (
-                  <div className="space-y-6 pt-2">
-                    {/* Interactive Virtual Card Hologram */}
-                    <div className="relative w-full max-w-sm mx-auto h-48 rounded-2xl p-6 bg-gradient-to-tr from-[#09090b] via-[#141418] to-[#25090b] border border-white/15 shadow-2xl flex flex-col justify-between overflow-hidden">
-                      <div className="absolute top-0 right-0 w-40 h-40 bg-red-600/15 rounded-full blur-2xl pointer-events-none" />
-                      
-                      <div className="flex items-center justify-between relative z-10">
-                        <div className="w-10 h-8 rounded-md bg-amber-400/80 border border-amber-300 shadow-inner flex items-center justify-center">
-                          <div className="w-6 h-5 border border-black/30 rounded" />
-                        </div>
-                        <span className="font-mono font-black text-sm text-white tracking-widest">
-                          {cardBrand}
+                <div className="space-y-6 pt-2">
+                  {/* Interactive Virtual Card Hologram */}
+                  <div className="relative w-full max-w-sm mx-auto h-48 rounded-2xl p-6 bg-gradient-to-tr from-[#09090b] via-[#141418] to-[#25090b] border border-white/15 shadow-2xl flex flex-col justify-between overflow-hidden">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-red-600/15 rounded-full blur-2xl pointer-events-none" />
+                    
+                    <div className="flex items-center justify-between relative z-10">
+                      <div className="w-10 h-8 rounded-md bg-amber-400/80 border border-amber-300 shadow-inner flex items-center justify-center">
+                        <div className="w-6 h-5 border border-black/30 rounded" />
+                      </div>
+                      <span className="font-mono font-black text-sm text-white tracking-widest">
+                        {cardBrand}
+                      </span>
+                    </div>
+
+                    <div className="relative z-10">
+                      <span className="font-mono text-lg tracking-widest text-white block drop-shadow-md">
+                        {cardNumber || '•••• •••• •••• ••••'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs relative z-10 text-white/80 uppercase font-mono">
+                      <div>
+                        <span className="text-[9px] text-zinc-400 block">Card Holder</span>
+                        <span className="font-bold text-white tracking-wider truncate max-w-[150px] block">
+                          {cardHolder || 'FULL NAME'}
                         </span>
                       </div>
-
-                      <div className="relative z-10">
-                        <span className="font-mono text-lg tracking-widest text-white block drop-shadow-md">
-                          {cardNumber || '•••• •••• •••• ••••'}
+                      <div>
+                        <span className="text-[9px] text-zinc-400 block">Expires</span>
+                        <span className="font-bold text-white tracking-wider">
+                          {cardExpiry || 'MM/YY'}
                         </span>
                       </div>
+                    </div>
+                  </div>
 
-                      <div className="flex items-center justify-between text-xs relative z-10 text-white/80 uppercase font-mono">
-                        <div>
-                          <span className="text-[9px] text-zinc-400 block">Card Holder</span>
-                          <span className="font-bold text-white tracking-wider truncate max-w-[150px] block">
-                            {cardHolder || 'FULL NAME'}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-zinc-400 block">Expires</span>
-                          <span className="font-bold text-white tracking-wider">
-                            {cardExpiry || 'MM/YY'}
-                          </span>
-                        </div>
+                  {/* Card Input Fields */}
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                        Card Number *
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          required
+                          value={cardNumber}
+                          onChange={handleCardNumberChange}
+                          placeholder="0000 0000 0000 0000"
+                          className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors font-mono"
+                        />
+                        <CreditCard className="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500" />
                       </div>
                     </div>
 
-                    {/* Card Input Fields */}
-                    <div className="space-y-4">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                          Card Number *
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            required={paymentMethod === 'card'}
-                            value={cardNumber}
-                            onChange={handleCardNumberChange}
-                            placeholder="0000 0000 0000 0000"
-                            className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors font-mono"
-                          />
-                          <CreditCard className="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500" />
-                        </div>
-                      </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                        Cardholder Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={cardHolder}
+                        onChange={(e) => setCardHolder(e.target.value)}
+                        placeholder="Name as printed on card"
+                        className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors uppercase"
+                      />
+                    </div>
 
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
                         <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                          Cardholder Name *
+                          Expiry Date (MM/YY) *
                         </label>
                         <input
                           type="text"
-                          required={paymentMethod === 'card'}
-                          value={cardHolder}
-                          onChange={(e) => setCardHolder(e.target.value)}
-                          placeholder="Name as printed on card"
-                          className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors uppercase"
+                          required
+                          value={cardExpiry}
+                          onChange={handleExpiryChange}
+                          placeholder="12/28"
+                          className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors font-mono text-center"
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                            Expiry Date (MM/YY) *
-                          </label>
-                          <input
-                            type="text"
-                            required={paymentMethod === 'card'}
-                            value={cardExpiry}
-                            onChange={handleExpiryChange}
-                            placeholder="12/28"
-                            className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors font-mono text-center"
-                          />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
-                            <span>CVV / CVC *</span>
-                            <span className="text-[10px] text-zinc-500 normal-case">3 digits</span>
-                          </label>
-                          <input
-                            type="password"
-                            maxLength={4}
-                            required={paymentMethod === 'card'}
-                            value={cardCvv}
-                            onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
-                            placeholder="•••"
-                            className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors font-mono text-center"
-                          />
-                        </div>
-                      </div>
-
-                      <label className="flex items-center gap-2 text-xs text-zinc-400 cursor-pointer pt-1">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                          <span>CVV / CVC *</span>
+                          <span className="text-[10px] text-zinc-500 normal-case">3 digits</span>
+                        </label>
                         <input
-                          type="checkbox"
-                          checked={saveCard}
-                          onChange={(e) => setSaveCard(e.target.checked)}
-                          className="accent-red-600 rounded w-4 h-4 cursor-pointer"
+                          type="password"
+                          maxLength={4}
+                          required
+                          value={cardCvv}
+                          onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
+                          placeholder="•••"
+                          className="w-full bg-zinc-950 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-red-500 focus:outline-none transition-colors font-mono text-center"
                         />
-                        <span>Securely save this card for fast 1-click booking next time</span>
-                      </label>
-                    </div>
-                  </div>
-                )}
-
-                {/* ── Wallet Option ── */}
-                {paymentMethod === 'wallet' && (
-                  <div className="p-6 bg-zinc-950 rounded-xl border border-white/10 text-center space-y-4">
-                    <p className="text-xs text-zinc-400">
-                      Authorize payment instantly using your preferred digital wallet.
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-3">
-                      <div className="px-5 py-2.5 rounded-xl bg-white text-black font-bold text-xs flex items-center gap-1.5 shadow-md">
-                        <span>Apple Pay</span>
-                      </div>
-                      <div className="px-5 py-2.5 rounded-xl bg-[#202124] text-white font-bold text-xs flex items-center gap-1.5 border border-white/20 shadow-md">
-                        <span>Google Pay</span>
-                      </div>
-                      <div className="px-5 py-2.5 rounded-xl bg-zinc-800 text-white font-bold text-xs flex items-center gap-1.5 border border-white/10 shadow-md">
-                        <span>PayPal</span>
                       </div>
                     </div>
-                  </div>
-                )}
 
-                {/* ── Counter Pay Option ── */}
-                {paymentMethod === 'counter' && (
-                  <div className="p-6 bg-zinc-950 rounded-xl border border-white/10 space-y-2 text-xs text-zinc-400">
-                    <h4 className="font-bold text-white text-sm">Pay at Cinema Box Office</h4>
-                    <p>
-                      Your seats will be reserved under booking reference for up to <strong>30 minutes before showtime</strong>.
-                      Please present your ID or email confirmation at the ticket counter to pay and collect physical tickets.
-                    </p>
+                    <label className="flex items-center gap-2 text-xs text-zinc-400 cursor-pointer pt-1">
+                      <input
+                        type="checkbox"
+                        checked={saveCard}
+                        onChange={(e) => setSaveCard(e.target.checked)}
+                        className="accent-red-600 rounded w-4 h-4 cursor-pointer"
+                      />
+                      <span>Securely save this card for fast 1-click booking next time</span>
+                    </label>
                   </div>
-                )}
+                </div>
               </div>
 
               {/* 3. Promo Code Section */}

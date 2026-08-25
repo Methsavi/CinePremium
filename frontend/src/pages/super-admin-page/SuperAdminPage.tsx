@@ -4,6 +4,7 @@ import MovieManagePage from "../admin-page/components/MovieManagePage";
 import HallManagePage from "../admin-page/components/HallManagePage";
 import ShowtimeManagePage from "../admin-page/components/ShowtimeManagePage";
 import FeedbackManagePage from "../admin-page/components/FeedbackManagePage";
+import BookingManagePage from "../admin-page/components/BookingManagePage";
 import { LineChartAnalytics } from "../admin-page/components/LineChartAnalytics";
 import { getMovies } from "../../services/movieApi";
 import { getHalls } from "../../services/hallApi";
@@ -21,10 +22,10 @@ import logo from "../../assets/logo.png";
 import { 
   Users, Film, Tv, Calendar, ArrowLeft, LayoutDashboard, 
   LogOut, ShieldAlert, RefreshCw, Search, Trash2, Edit2,
-  ChevronRight, MessageSquare, ArrowUpRight
+  ChevronRight, MessageSquare, ArrowUpRight, Ticket
 } from "lucide-react";
 
-type ActiveTab = "overview" | "users" | "movies" | "halls" | "showtimes" | "feedbacks";
+type ActiveTab = "overview" | "users" | "bookings" | "movies" | "halls" | "showtimes" | "feedbacks";
 
 export default function SuperAdminPage() {
   const navigate = useNavigate();
@@ -136,7 +137,7 @@ export default function SuperAdminPage() {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
+    navigate("/admin-login");
   };
 
   const handleDeleteUser = async (targetId: string, targetName: string) => {
@@ -241,7 +242,7 @@ export default function SuperAdminPage() {
               Go to Homepage
             </Link>
             <Link 
-              to="/login" 
+              to="/admin-login" 
               className="px-5 py-2.5 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition-all shadow-md"
             >
               Sign In as Admin
@@ -301,6 +302,18 @@ export default function SuperAdminPage() {
             >
               <Users className="w-4 h-4 shrink-0" />
               <span>Users</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("bookings")}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all text-left cursor-pointer ${
+                activeTab === "bookings"
+                  ? "bg-red-600 text-white shadow-md"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <Ticket className="w-4 h-4 shrink-0" />
+              <span>Bookings</span>
             </button>
 
             <div className="pt-3 pb-1 px-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
@@ -383,6 +396,7 @@ export default function SuperAdminPage() {
           <h2 className="text-sm sm:text-base font-bold text-white uppercase tracking-tight">
             {activeTab === "overview" && "Overview Dashboard"}
             {activeTab === "users" && "User Accounts & Role Permissions"}
+            {activeTab === "bookings" && "Booking Management"}
             {activeTab === "movies" && "Movie Database Management"}
             {activeTab === "halls" && "Cinema Hall Seating Config"}
             {activeTab === "showtimes" && "Showtimes & Ticket Rates Planning"}
@@ -797,7 +811,8 @@ export default function SuperAdminPage() {
             </div>
           )}
 
-          {/* Cinema Manager Integrations */}
+          {/* Bookings & Cinema Manager Integrations */}
+          {activeTab === "bookings" && <BookingManagePage />}
           {activeTab === "movies" && <MovieManagePage />}
           {activeTab === "halls" && <HallManagePage />}
           {activeTab === "showtimes" && <ShowtimeManagePage />}

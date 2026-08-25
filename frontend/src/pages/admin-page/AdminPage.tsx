@@ -4,6 +4,7 @@ import MovieManagePage from "./components/MovieManagePage";
 import HallManagePage from "./components/HallManagePage";
 import ShowtimeManagePage from "./components/ShowtimeManagePage";
 import FeedbackManagePage from "./components/FeedbackManagePage";
+import BookingManagePage from "./components/BookingManagePage";
 import { LineChartAnalytics } from "./components/LineChartAnalytics";
 import { getMovies } from "../../services/movieApi";
 import { getHalls } from "../../services/hallApi";
@@ -18,10 +19,10 @@ import { io } from "socket.io-client";
 import { 
   Film, Tv, Calendar, ArrowLeft, LayoutDashboard, 
   LogOut, ShieldAlert, ChevronRight,
-  BarChart3, PieChart, MessageSquare, ArrowUpRight
+  BarChart3, PieChart, MessageSquare, ArrowUpRight, Ticket
 } from "lucide-react";
 
-type ActiveTab = "overview" | "movies" | "halls" | "showtimes" | "feedbacks";
+type ActiveTab = "overview" | "bookings" | "movies" | "halls" | "showtimes" | "feedbacks";
 
 const SCREEN_FORMAT_COLORS: Record<string, { fill: string }> = {
   "IMAX 3D":      { fill: "bg-red-600" },
@@ -97,7 +98,7 @@ export function AdminPage() {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
+    navigate("/admin-login");
   };
 
   // Analytics Computations directly from Database
@@ -188,10 +189,10 @@ export function AdminPage() {
               Back to Home
             </Link>
             <Link 
-              to="/login" 
+              to="/admin-login" 
               className="px-5 py-2.5 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition-all shadow-md"
             >
-              Sign In to Manager
+              Sign In as Manager
             </Link>
           </div>
         </div>
@@ -239,6 +240,25 @@ export function AdminPage() {
                 <LayoutDashboard className="w-4 h-4 shrink-0" />
                 <span>Overview</span>
               </div>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("bookings")}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all text-left cursor-pointer ${
+                activeTab === "bookings"
+                  ? "bg-red-600 text-white shadow-md"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Ticket className="w-4 h-4 shrink-0" />
+                <span>Bookings</span>
+              </div>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                activeTab === "bookings" ? "bg-white/20 text-white" : "bg-zinc-800 text-zinc-400"
+              }`}>
+                {bookingsList.length}
+              </span>
             </button>
 
             <div className="pt-3 pb-1 px-3 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
@@ -350,6 +370,7 @@ export function AdminPage() {
         <header className="h-16 border-b border-white/10 bg-[#0d0d10] px-6 flex items-center shrink-0 z-20">
           <h2 className="text-sm sm:text-base font-bold text-white uppercase tracking-tight">
             {activeTab === "overview" && "Overview Dashboard"}
+            {activeTab === "bookings" && "Booking Management"}
             {activeTab === "movies" && "Movie Catalog Database"}
             {activeTab === "halls" && "Cinema Hall Configuration"}
             {activeTab === "showtimes" && "Showtimes Scheduling Board"}
@@ -607,6 +628,7 @@ export function AdminPage() {
           )}
 
           {/* ════ TAB VIEWS ════ */}
+          {activeTab === "bookings" && <BookingManagePage />}
           {activeTab === "movies" && <MovieManagePage />}
           {activeTab === "halls" && <HallManagePage />}
           {activeTab === "showtimes" && <ShowtimeManagePage />}

@@ -4,6 +4,10 @@ import HomePage from "./pages/home-page/HomePage";
 import SingleMovieListingPage from "./pages/single-movie-listingpage/SingleMovieListingPage";
 import LoginPage from "./pages/login-page/LoginPage";
 import RegisterPage from "./pages/register-page/RegisterPage";
+import { VerifyEmailPage } from "./pages/verify-email-page/VerifyEmailPage";
+import { ForgotPasswordPage } from "./pages/forgot-password-page/ForgotPasswordPage";
+import { ProfilePage } from "./pages/profile-page/ProfilePage";
+import { AdminLoginPage } from "./pages/admin-login-page/AdminLoginPage";
 import AdminPage from "@/pages/admin-page/AdminPage.tsx";
 import SuperAdminPage from "./pages/super-admin-page/SuperAdminPage.tsx";
 import { CinemasPage } from "./pages/cinemas-page/CinemasPage.tsx";
@@ -29,14 +33,21 @@ export default function App() {
       <Route path="/payment" element={<CheckoutPage />} />
       <Route path="/movie/:id" element={<SingleMovieListingPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/admin-login" element={<AdminLoginPage />} />
+      <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/staff-login" element={<AdminLoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ForgotPasswordPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/super-admin" element={<SuperAdminPage />} />
       <Route path="/cinemas" element={<CinemasPage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/about-us" element={<AboutPage />} />
       
-      {/* 404 Page Not Found (Catches all undefined routes including /my-payments) */}
+      {/* 404 Page Not Found */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </>

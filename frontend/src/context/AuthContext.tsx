@@ -8,10 +8,12 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (credentials: LoginPayload) => Promise<void>;
-  register: (payload: RegisterPayload) => Promise<void>;
+  login: (credentials: LoginPayload) => Promise<User>;
+  register: (payload: RegisterPayload) => Promise<any>;
   logout: () => Promise<void>;
   clearError: () => void;
+  updateUserState: (updatedUser: User) => void;
+  setSession: (authUser: User, authToken: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,12 +47,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Token expired or invalid
             handleSessionClear();
           }
-        } catch (err: any) {
-          console.warn('Session verification failed:', err?.message);
-          // If offline or dev fallback, keep cached user if present
-          if (!user) {
-            handleSessionClear();
-          }
+        } catch (err) {
+          console.warn('Existing session invalid:', err);
+          handleSessionClear();
         }
       }
       setIsLoading(false);
@@ -66,6 +65,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem(USER_KEY);
   };
 
+  const updateUserState = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+  };
+
   const login = async (credentials: LoginPayload) => {
     setIsLoading(true);
     setError(null);
@@ -74,9 +78,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const { user: authUser, token: authToken } = res.data;
       
       setUser(authUser);
-      setToken(authToken);
-      localStorage.setItem(TOKEN_KEY, authToken);
+      if (authToken) {
+        setToken(authToken);
+        localStorage.setItem(TOKEN_KEY, authToken);
+      }
       localStorage.setItem(USER_KEY, JSON.stringify(authUser));
+      return authUser;
     } catch (err: any) {
       const msg = err.message || 'Login failed. Please check your credentials.';
       setError(msg);
@@ -86,17 +93,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const setSession = (authUser: User, authToken: string) => {
+    setUser(authUser);
+    setToken(authToken);
+    localStorage.setItem(TOKEN_KEY, authToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(authUser));
+  };
+
   const register = async (payload: RegisterPayload) => {
     setIsLoading(true);
     setError(null);
     try {
       const res = await authApi.register(payload);
-      const { user: authUser, token: authToken } = res.data;
-
-      setUser(authUser);
-      setToken(authToken);
-      localStorage.setItem(TOKEN_KEY, authToken);
-      localStorage.setItem(USER_KEY, JSON.stringify(authUser));
+      return res.data;
     } catch (err: any) {
       const msg = err.message || 'Registration failed. Please try again.';
       setError(msg);
@@ -133,6 +142,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         register,
         logout,
         clearError,
+        updateUserState,
+        setSession,
       }}
     >
       {children}

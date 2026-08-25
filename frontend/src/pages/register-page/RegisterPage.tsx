@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, Film, ArrowRight, AlertCircle, CheckCircle2, Check } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import logo from '@/assets/logo.png';
 import logo2 from '@/assets/logo2.png';
 
 export function RegisterPage() {
@@ -66,10 +67,14 @@ export function RegisterPage() {
         role: 'user',
       });
 
-      setSuccessMsg('Account created successfully! Redirecting to home...');
+      setSuccessMsg('Account created! Redirecting to email verification...');
       setTimeout(() => {
-        navigate('/');
-      }, 1200);
+        navigate('/verify-email', {
+          state: {
+            email: email.trim(),
+          },
+        });
+      }, 1000);
     } catch (err: any) {
       // Error handled by AuthContext
     }
@@ -85,12 +90,14 @@ export function RegisterPage() {
 
       {/* Top Header */}
       <header className="px-6 md:px-12 py-6 flex items-center justify-between z-10 max-w-[1280px] w-full mx-auto">
-        <Link to="/" className="flex items-center gap-3 group cursor-pointer">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:bg-primary/20 transition-all">
-            <Film className="w-5 h-5 text-primary" />
-          </div>
-          <span className="font-display text-2xl font-bold text-primary tracking-tighter">
-            CinePremium
+        <Link to="/" className="flex items-center gap-3 group cursor-pointer select-none">
+          <img 
+            src={logo} 
+            alt="CinePremium" 
+            className="w-9 h-9 sm:w-10 sm:h-10 object-contain group-hover:scale-105 transition-transform" 
+          />
+          <span className="font-display text-2xl font-bold text-white tracking-tighter">
+            Cine<span className="text-primary">Premium</span>
           </span>
         </Link>
 
@@ -110,12 +117,9 @@ export function RegisterPage() {
           <section className="flex flex-col items-center justify-center text-center lg:text-left lg:items-start">
             <img
               src={logo2}
-              alt="CinePremium - Premium Movies, Premium Experience"
+              alt="CinePremium"
               className="w-full max-w-md lg:max-w-lg object-contain drop-shadow-[0_0_40px_rgba(229,9,20,0.2)]"
             />
-            <p className="max-w-md text-sm sm:text-base text-on-surface-variant leading-relaxed lg:pl-4">
-              Your front-row seat to unforgettable stories, premium screens, and effortless movie nights.
-            </p>
           </section>
 
           {/* Registration form */}

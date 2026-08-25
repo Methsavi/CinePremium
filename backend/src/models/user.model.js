@@ -25,6 +25,40 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'cinema_manager', 'admin'],
       default: 'user',
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationCode: {
+      type: String,
+      default: null,
+    },
+    verificationCodeExpiry: {
+      type: Date,
+      default: null,
+    },
+    resetPasswordOTP: {
+      type: String,
+      default: null,
+    },
+    resetPasswordOTPExpiry: {
+      type: Date,
+      default: null,
+    },
+    avatarUrl: {
+      type: String,
+      default: null,
+    },
+    phone: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    bio: {
+      type: String,
+      default: '',
+      trim: true,
+    },
   },
   {
     timestamps: true,
@@ -45,7 +79,21 @@ userSchema.set('toJSON', {
 
 export const MongoUser = mongoose.model('User', userSchema);
 
+// Pending User Schema (Holds unverified registrations until 6-digit code is confirmed)
+const pendingUserSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, lowercase: true, trim: true },
+    password: { type: String, required: true },
+    role: { type: String, default: 'user' },
+    verificationCode: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now, expires: 86400 }, // 24 hours TTL
+  }
+);
+export const MongoPendingUser = mongoose.model('PendingUser', pendingUserSchema);
+
 // In-memory fallback database
+const memoryPendingUsersDb = new Map();
 const DEMO_PASSWORD_HASH = bcrypt.hashSync('password123', 10);
 const memoryUsersDb = [
   {
@@ -152,6 +200,11 @@ export const UserModel = {
         email: user.email,
         password: user.password,
         role: user.role,
+        isVerified: user.isVerified || false,
+        verificationCode: user.verificationCode || null,
+        verificationCodeExpiry: user.verificationCodeExpiry || null,
+        resetPasswordOTP: user.resetPasswordOTP || null,
+        resetPasswordOTPExpiry: user.resetPasswordOTPExpiry || null,
         createdAt: user.createdAt?.toISOString() || new Date().toISOString(),
       };
     }
@@ -173,6 +226,9 @@ export const UserModel = {
         email,
         password: hashedPassword,
         role: userData.role || 'user',
+        isVerified: userData.isVerified !== undefined ? userData.isVerified : false,
+        verificationCode: userData.verificationCode || null,
+        verificationCodeExpiry: userData.verificationCodeExpiry || null,
       });
       return doc.toJSON();
     }
@@ -183,6 +239,9 @@ export const UserModel = {
       email,
       password: hashedPassword,
       role: userData.role || 'user',
+      isVerified: userData.isVerified !== undefined ? userData.isVerified : false,
+      verificationCode: userData.verificationCode || null,
+      verificationCodeExpiry: userData.verificationCodeExpiry || null,
       createdAt: new Date().toISOString(),
     };
     memoryUsersDb.unshift(newUser);
@@ -238,5 +297,83 @@ export const UserModel = {
       return rest;
     }
     return null;
+  },
+
+  async savePendingUser({ name, email, password, role, verificationCode }) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const lowerEmail = email.toLowerCase();
+
+    if (isDbConnected()) {
+      await MongoPendingUser.deleteMany({ email: lowerEmail });
+      const pendingDoc = await MongoPendingUser.create({
+        name,
+        email: lowerEmail,
+        password: hashedPassword,
+        role: role || 'user',
+        verificationCode,
+      });
+      return pendingDoc;
+    }
+
+    const pendingData = {
+      name,
+      email: lowerEmail,
+      password: hashedPassword,
+      role: role || 'user',
+      verificationCode,
+      createdAt: new Date(),
+    };
+    memoryPendingUsersDb.set(lowerEmail, pendingData);
+    return pendingData;
+  },
+
+  async findPendingUser(email) {
+    if (!email) return null;
+    const lowerEmail = email.toLowerCase();
+
+    if (isDbConnected()) {
+      return MongoPendingUser.findOne({ email: lowerEmail });
+    }
+
+    return memoryPendingUsersDb.get(lowerEmail) || null;
+  },
+
+  async deletePendingUser(email) {
+    if (!email) return;
+    const lowerEmail = email.toLowerCase();
+
+    if (isDbConnected()) {
+      await MongoPendingUser.deleteMany({ email: lowerEmail });
+    } else {
+      memoryPendingUsersDb.delete(lowerEmail);
+    }
+  },
+
+  async createVerifiedUser({ name, email, passwordHash, role }) {
+    const lowerEmail = email.toLowerCase();
+
+    if (isDbConnected()) {
+      const doc = await MongoUser.create({
+        name,
+        email: lowerEmail,
+        password: passwordHash,
+        role: role || 'user',
+        isVerified: true,
+      });
+      return doc.toJSON();
+    }
+
+    const newUser = {
+      id: `user_${Date.now()}`,
+      name,
+      email: lowerEmail,
+      password: passwordHash,
+      role: role || 'user',
+      isVerified: true,
+      createdAt: new Date().toISOString(),
+    };
+    memoryUsersDb.unshift(newUser);
+    const { password: _, ...userWithoutPassword } = newUser;
+    return userWithoutPassword;
   },
 };
