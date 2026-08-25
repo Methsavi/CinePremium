@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { KeyRound, Mail, Lock, Eye, EyeOff, Film, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { KeyRound, Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { authApi } from '@/services/authApi';
 import { useNotification } from '@/context/NotificationContext';
 import logo from '@/assets/logo.png';

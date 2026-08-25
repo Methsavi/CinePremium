@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
-  Search, LogIn, UserPlus, LogOut, Ticket, Shield, 
+  Search, LogIn, UserPlus, LogOut, Shield, 
   User as UserIcon, ChevronDown,
   Menu, X, Bell,
   Sparkles, Clock

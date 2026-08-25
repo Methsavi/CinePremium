@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Lock, Eye, EyeOff, Film, ArrowRight, AlertCircle, CheckCircle2, Check } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle2, Check } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import logo from '@/assets/logo.png';
 import logo2 from '@/assets/logo2.png';
